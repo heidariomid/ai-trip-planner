@@ -45,6 +45,19 @@
   same property; the resolution order is not worth reasoning about
 - Put shared colours and spacing in `tailwind.config.js` under
   `theme.extend`, not in a constants file. One source of truth
+- **The palette is warm luxury, and that is a product decision, not a
+  preference.** This is a travel planner — it should feel like a sunset,
+  not like a dashboard. Use `accent` (terracotta), `gold`, `ink`,
+  `subtle`, and `sand`. Reach for `amber`, `orange`, and `rose` when you
+  need a Tailwind scale. **Never introduce `slate`, `sky`, `blue`,
+  `violet`, or any cool grey** — one cool element in a warm screen looks
+  like a bug, and the most common place it sneaks in is a loading or
+  empty state that nobody looked at
+- Glass surfaces go through `components/GlassCard.tsx`. A frosted panel
+  needs blurred colour behind it; dropping it onto a flat background
+  gives grey, not glass
+- Buttons are capsules and are centred, not stretched edge to edge. Pass
+  `fullWidth` only when the layout genuinely calls for it
 - Repeating the same long class string in three places is the signal to
   extract a component, not to add a `@apply` layer
 - No component library. Components are hand-rolled in `components/`
