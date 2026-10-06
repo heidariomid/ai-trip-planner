@@ -1,0 +1,19 @@
+---
+description: After finishing a task, stop leftover terminals and delete review artifacts
+alwaysApply: true
+---
+
+# Cleanup After Finish
+
+When a task is done — especially `/feature after-review` or `/feature complete` — clean up before ending the turn. Do not leave processes or junk files running.
+
+- **Terminals** — stop every process you started (`npx expo start`, Metro, builds, watchers). Check the terminals folder and kill leftover PIDs. A stale Metro bundler holding port 8081 is what makes the next `npm start` fail for no visible reason.
+- **Browsers** — close Playwright / IDE browser tabs you opened for QA or the Supabase dashboard.
+- **Artifacts** — delete files you created for the session only: screenshots, `/tmp` helpers, unused downloads. Do not delete app assets, `.env`, or files the user asked to keep.
+- **Test data** — remove throwaway Supabase users and rows you created while verifying, unless the user wants them kept.
+- Do this even if the verdict is Ready, and even if you already reported the result.
+
+```text
+❌ BAD: finish /feature complete with Metro still on :8081
+✅ GOOD: kill the dev server, close the browser, delete QA screenshots, then reply
+```
