@@ -31,3 +31,4 @@
 - feat: migrate to Expo Router and adopt Tailwind via NativeWind
 - feat: add Supabase email and Google auth
 - feat: add trips, itinerary, and storage schema (spec 2)
+- fix: revoke execute on handle_new_user from anon and authenticated
