@@ -19,9 +19,15 @@ row in `profiles`.
 
 ### Supabase project
 
-- Create a Supabase project. Note the **Project URL** and the **anon key**
-- The anon key is designed to ship in a client and is safe in the bundle.
-  The **service-role key must never enter this repo**
+- Create a Supabase project. Note the **Project URL** and the
+  **publishable key** (`sb_publishable_…`), from the Connect dialog or
+  **Settings → API Keys**
+- Use the publishable key, not the legacy `anon` JWT. Supabase is
+  deprecating `anon` and `service_role` by the end of 2026, and both key
+  systems work side by side until then. A long key starting with `eyJ` is
+  the old one
+- The publishable key is designed to ship in a client and is safe in the
+  bundle. The **secret key (`sb_secret_…`) must never enter this repo**
 - Keep every schema change as a `.sql` file under `supabase/`, so the
   database is reproducible and reviewable. Clicking SQL into the dashboard
   and not saving it leaves no record of how the schema got there
@@ -32,7 +38,7 @@ Only `EXPO_PUBLIC_*` variables reach the app at runtime.
 
 ```
 EXPO_PUBLIC_SUPABASE_URL=
-EXPO_PUBLIC_SUPABASE_ANON_KEY=
+EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY=
 ```
 
 Commit `.env.example` with these names and placeholder values. `.env`
@@ -62,7 +68,7 @@ import 'react-native-url-polyfill/auto'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { createClient } from '@supabase/supabase-js'
 
-export const supabase = createClient(URL, ANON_KEY, {
+export const supabase = createClient(URL, PUBLISHABLE_KEY, {
   auth: {
     storage: AsyncStorage,
     autoRefreshToken: true,
@@ -125,8 +131,8 @@ Enable RLS on `profiles` in the same migration that creates it. Policies:
 - **insert** — not needed by the app; the trigger runs as definer
 
 A table with RLS enabled and no policy returns nothing, which is confusing
-but safe. A table with RLS **off** is readable by anyone holding the anon
-key, which ships in the app. Never leave it off.
+but safe. A table with RLS **off** is readable by anyone holding the
+publishable key, which ships in the app. Never leave it off.
 
 ### Auth providers
 

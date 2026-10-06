@@ -36,8 +36,17 @@
 
 ## Styling
 
-- `StyleSheet.create` at the bottom of the file. No inline style objects
-  in JSX — they allocate a new object on every render
+- **Tailwind via NativeWind.** Style with `className`, not
+  `StyleSheet.create`. The utilities compile to real native styles at
+  build time, so there is no runtime cost to prefer them
+- Reach for `style={}` only where NativeWind genuinely cannot express the
+  value — a measured layout, an animated value, a prop a native component
+  only accepts as an object. Never mix both on the same element for the
+  same property; the resolution order is not worth reasoning about
+- Put shared colours and spacing in `tailwind.config.js` under
+  `theme.extend`, not in a constants file. One source of truth
+- Repeating the same long class string in three places is the signal to
+  extract a component, not to add a `@apply` layer
 - No component library. Components are hand-rolled in `components/`
 - Respect the safe area. Content must not sit under the notch or the home
   indicator
@@ -48,16 +57,15 @@
 ## File organization
 
 ```
-app/ or screens/   Screens
+app/               Routes — Expo Router, file-based
 components/        Reusable UI
 lib/               Clients and helpers (supabase.ts, …)
 hooks/             Custom hooks
-constants/         Theme, colors, spacing
 types/             Shared and generated types
 ```
 
-The exact screen directory depends on the navigation choice in phase 1.
-Everything else holds either way.
+Theme values (colours, spacing, fonts) live in `tailwind.config.js`, so
+there is no `constants/` directory for them.
 
 ## Naming
 
@@ -81,7 +89,7 @@ Everything else holds either way.
 - Every new table gets RLS enabled and a policy in the same migration that
   creates it. A table with RLS on and no policy silently returns nothing,
   which is confusing but safe; a table with RLS off is readable by anyone
-  holding the anon key, which is not
+  holding the publishable key, which is not
 - Keep SQL in `supabase/` as files, so the schema is reviewable and
   repeatable. Clicking it into the dashboard leaves no record
 
@@ -106,8 +114,9 @@ Everything else holds either way.
 
 - Only `EXPO_PUBLIC_*` variables reach the app bundle. **Anything in the
   bundle is public** — it ships to the device and can be read out of it
-- The Supabase anon key is designed to be public and is fine to ship. The
-  service-role key is not, and must never appear in this repo
+- The Supabase publishable key (`sb_publishable_…`) is designed to be
+  public and is fine to ship. The secret key (`sb_secret_…`) is not, and
+  must never appear in this repo
 - `.env` is gitignored. `.env.example` holds the key names with
   placeholder values and is committed
 - Supabase handles auth. Do not store passwords, hand-roll a session, or
@@ -128,6 +137,9 @@ where the screens change faster than tests for them would pay off.
 Verification is manual and on a device instead. Before any commit:
 
 - The screen renders on a real phone or simulator
+- **The web bundle loads without a console error.** Native and web take
+  different code paths through NativeWind, and web has already thrown an
+  uncaught error that iOS never saw
 - The keyboard does not cover the input or the submit button
 - Loading and error states both appear, not just the happy path
 - The app survives a cold start with the expected session
