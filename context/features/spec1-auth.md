@@ -1,8 +1,10 @@
-# Phase 1 — Supabase Setup & Authentication Spec
+# Spec 1 — Authentication
+
+This step is complete.
 
 ## Overview
 
-Phase 1 of 6. Connect the app to Supabase and ship the two screens that
+Spec 1 of 17. Connect the app to Supabase and ship the two screens that
 let a traveller get an account: **Sign Up** and **Sign In**. Email and
 password, plus Google. The first time someone signs up, their details are
 saved to our own `profiles` table.
@@ -251,11 +253,11 @@ Both screens:
 
 Named so they do not get built by accident:
 
-- `trips` and `itinerary` tables — phases 2 and 3
-- Storage buckets for images and documents — phase 5
+- `trips`, itinerary days and activities, and the `images` and `documents` buckets — spec 2
 - Password reset, email change, account deletion
-- Profile editing — the row is created here, edited later
-- Any AI
+- Profile editing — spec 10
+- Any AI — spec 11, spec 12, and spec 13
+- Password reset and account deletion — spec 16
 
 ## Verification
 
