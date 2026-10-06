@@ -31,12 +31,14 @@ from Home and from a trip.
 
 ## Current state
 
-Spec 1 is done. Specs 2 through 17 are written and not built.
+Specs 1 and 2 are done. Specs 3 through 17 are written and not built.
 
 - Expo Router, email and Google sign-in, and a `profiles` row on first
   sign-up. Verified on Expo Go and web
 - The signed-in home is still a placeholder
-- No `trips` table, no itinerary, no storage buckets, no AI
+- `trips`, the itinerary tables, and the two private buckets exist in
+  the database. No screen reads them yet
+- No AI
 
 Nothing has been deployed. No EAS build, no store listing.
 
@@ -74,10 +76,14 @@ data.
 ## What the boards show
 
 **Home.** A greeting, a strip of destination art, an "Ask me here" bar,
-and filters: My Plan, Explore, All Plans, Active. Cards show a title, a
+and filters: My Plan, Explore, All Plans, Active. Explore cards show a title, a
 day count, a rough cost, a place count, tags, and a small map picture.
 The ask bar is the way into the assistant. The mic icon is drawn and does
-not listen. The map picture is art, not a live map.
+not listen. The map picture is art, not a live map. A traveller's own trip card
+is different: cover, title, source and destination, dates, day count,
+an Upcoming, Ongoing, or Past badge, and from spec 8 a planning
+progress bar computed from days planned and items packed. The tab bar
+floats. Icons are Lucide and the font is Outfit.
 
 **My Trips.** The traveller's own trips as cards. Active means today
 falls inside the trip's dates. Drafts, once they exist, are a status
@@ -102,6 +108,8 @@ those. It does not sell tickets.
 **Explore.** Curated plans, separate from the traveller's trips. Opening
 one is read-only. Copying one asks for a start date and creates a trip
 they own, with its days and activities, and no cover of its own.
+Category chips filter the list. From spec 12 a plan can also open the
+chat with a message already typed.
 
 **Profile.** Name, avatar, sign out, and interest tags the assistant can
 read. Saved places come later. Joining a family trip is one code field,
@@ -112,8 +120,12 @@ privacy policy come before release.
 day cards, and place cards. Place cards are text and a placeholder,
 because there is no photo API. Spec 11 only talks, and it caps how many
 requests one account can make in a day. Spec 12 is allowed to create a
-trip, save a draft, regenerate, add a day, and update bookings. Spec 13
-generates the cover. Hearts on a place card are spec 14.
+trip, save a draft, regenerate, save a day card's activities onto an
+existing day, and update bookings. It never inserts a day. Days come
+from the trip's dates. The assistant reads the selected trip's
+itinerary so it does not repeat a place. Spec 13
+generates the cover, on the form and automatically for a trip created
+in the chat. Hearts on a place card are spec 14.
 
 **Family share.** From the trip, a member list and a join code. The
 joiner types the code on a Join a trip screen opened from Profile.
@@ -133,9 +145,9 @@ Full columns live in the spec that creates the table.
 | `profiles` | spec 1, extended in spec 10 | one row per user, keyed to `auth.users.id` |
 | `trips` | spec 2 | title, source, destination, dates, cover path, description, traveler count, owner |
 | `itinerary_days` | spec 2 | one row per day of a trip |
-| `itinerary_activities` | spec 2 | time, place, activity, note, belonging to a day |
+| `itinerary_activities` | spec 2 | start time, end time, place, activity, note, belonging to a day |
 | `images`, `documents` | spec 2 | private buckets. Documents have no screen until a later ticket file needs one |
-| explore plans | spec 6 | seeded, readable by any signed-in user, copied into `trips` |
+| explore plans | spec 6 | seeded, with a category, readable by any signed-in user, copied into `trips` |
 | bookings | spec 7 | four tables: flights, car rentals, hotels, extras |
 | packing items | spec 8 | category, label, packed |
 | trip photos, notes | spec 9 | gallery separate from the cover; a list of notes |
@@ -244,7 +256,7 @@ and when it is done.
 
 1. @context/features/spec1-auth.md — sign up, sign in, `profiles`. Done
 2. @context/features/spec2-database-and-storage.md — `trips`, itinerary
-   days and activities, private buckets. No screens
+   days and activities, private buckets. No screens. Done
 3. @context/features/spec3-app-shell.md — the three tabs
 4. @context/features/spec4-create-trip.md — the add-trip form and the card
 5. @context/features/spec5-trip-itinerary.md — the trip screen and its days

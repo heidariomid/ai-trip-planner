@@ -17,6 +17,10 @@ Opening one is read-only. Copying one creates a trip the traveller owns.
   delete them. `anon` cannot read them
 - The rough cost is a field on the explore plan. It is not copied onto
   `trips`, because `trips` has no budget column
+- Each plan has one category, plain text, such as beach, city,
+  adventure, or food. Explore shows a row of category chips above the
+  cards, with All selected first. Picking a chip filters the list that
+  is already loaded. It is not a new request
 - Home's Explore filter lists these plans. My Plan, All Plans, and Active
   still list only the user's trips
 - Opening a plan shows the banner and the itinerary, read-only, and a
@@ -37,6 +41,8 @@ Opening one is read-only. Copying one creates a trip the traveller owns.
 - Editing an explore plan in the app
 - Copying bookings, packing, or photos. Explore plans do not have those
 - AI generating the catalogue
+- A Plan with AI button on a plan. That is spec 12, because the chat
+  does not exist yet
 
 ## Done when
 
@@ -45,6 +51,7 @@ Opening one is read-only. Copying one creates a trip the traveller owns.
   days and the plan's activities. The copy has no cover
 - The copy is invisible to a second user. The explore plan is visible to
   both
+- A category chip narrows the list, and All brings every plan back
 - A signed-in user cannot update an explore row
 - `npx tsc --noEmit` passes
 

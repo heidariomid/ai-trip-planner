@@ -36,8 +36,13 @@ edit the trip's own fields and add, edit, and delete activities on a day.
   anywhere undoes the date change and the renumber together
 - The other tabs (Bookings, Packing, Photos, Notes) are visible and
   empty. They are filled by later specs
-- Itinerary lists the days already created in spec 4. Inline add, edit,
-  and delete of an activity: time, place, activity, and a short note
+- Itinerary lists the days already created in spec 4. A row of date
+  chips picks the day, and the activities of that day show as a
+  timeline ordered by start time. Inline add, edit, and delete of an
+  activity: start time, an optional end time, place, activity, and a
+  short note. `ends_at` already exists from spec 2. An end time before
+  the start time fails on the form, and the database check rejects it
+  too
 - The row appears as soon as it is saved. A failure stays on the row as
   a readable sentence
 - The banner menu includes Delete trip. Confirm first. Only the owner
@@ -72,6 +77,9 @@ edit the trip's own fields and add, edit, and delete activities on a day.
 - Delete the trip from the banner menu. It leaves My Trips, and its
   cover no longer loads
 - A second user cannot open the trip
+- An activity saves with a start and an end time, and one with the end
+  before the start is rejected on the form. The time pickers are not
+  hidden behind the card or the keyboard
 - The keyboard does not cover the inline fields
 - `npx tsc --noEmit` passes
 

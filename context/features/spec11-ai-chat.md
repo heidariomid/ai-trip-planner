@@ -38,6 +38,17 @@ and not guessed from an older note.
   one is selected, to a trip. RLS so a second user cannot read the thread
 - The system prompt may include the trip's title, dates, destination, and
   the user's interest tags. It must not include the service key
+- When a trip is selected, the prompt also carries that trip's days and
+  activities: day number, date, times, place, and activity. The
+  assistant is told not to suggest a place that is already on the trip.
+  The function reads those rows with the caller's own token, so
+  row-level security decides what it can see. It does not read them
+  with the secret key. Cap how many activities are sent, so a long trip
+  cannot grow the prompt without limit
+- Reply text is rendered as formatted markdown: headings, bold, and
+  lists. Raw `**` and `#` never show. The renderer is chosen at the
+  start of this step and has to run in Expo Go. Links and images inside
+  the markdown are not rendered
 - The model is called from a place the secret key can live. The secret
   does not ship in the app. If that means a Supabase Edge Function, the
   function is part of this step
@@ -58,6 +69,10 @@ and not guessed from an older note.
 
 - On a phone, ask about the open trip, see a streamed reply, tap a chip,
   leave, and come back to the same thread
+- Ask for places on a trip that already has an activity. The reply does
+  not offer that same place again
+- A reply with a list and bold text shows formatted, with no raw
+  markdown symbols
 - Create Trip and Save Draft do nothing
 - A 31st request on the same UTC day is refused with that sentence, and
   it does not call the model

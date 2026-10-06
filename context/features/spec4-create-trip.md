@@ -9,6 +9,9 @@ and shows the card in My Trips and on Home.
 
 ## Requirements
 
+- The form opens from the Create a trip button that spec 3 left
+  disabled in the My Plan and My Trips empty states, and from a plus
+  button on My Trips that stays once the list has trips
 - The form fields are title, source, destination, start date, end date,
   cover, description, and travelers. Title, source, destination, and the
   two dates are required. Description is optional and stops at 200
@@ -31,6 +34,13 @@ and shows the card in My Trips and on Home.
 - Save calls `create_trip`. It does not insert the trip and then the
   days from the phone. Days come back from that one call, `day_number`
   starting at 1
+- The trip card is one component, used on Home and on My Trips. It
+  shows the cover, the title, source and destination, the date range,
+  the computed day count, and a badge: Upcoming before the start date,
+  Ongoing while today falls inside the dates, Past after the end date.
+  It does not show a cost, a place count, tags, or a map picture. Those
+  belong to the Explore card, and `trips` has no column for them. The
+  planning progress bar on this card arrives in spec 8
 - The new card appears under My Trips and under Home's My Plan and All
   Plans. Active shows the trip only when today falls inside its dates
 - Explore still shows the static cards from spec 3
@@ -51,7 +61,7 @@ and shows the card in My Trips and on Home.
 - Killing the app halfway through save does not leave a trip with the
   wrong number of days. The days are created with the trip
 - A trip whose dates include today appears under Active. One that does
-  not, does not
+  not, does not. The badge on each card matches its dates
 - A second user does not see the trip
 - The description cannot pass 200 characters, and the date check holds
 - Airplane mode fails with a readable error, not a spinner that never ends

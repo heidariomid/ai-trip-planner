@@ -28,6 +28,11 @@ One new file, `supabase/migrations/0002_trips_itinerary_storage.sql`,
 following `0001_profiles.sql`. Apply that same SQL to the remote project
 so the migration history matches the file.
 
+A second file, `supabase/migrations/0003_activity_ends_at.sql`, adds
+`ends_at` to `itinerary_activities` and replaces the body of
+`create_trip` so the activity list accepts it. It is its own file
+because `0002` was already applied when the column was decided.
+
 Do not edit `0001_profiles.sql`.
 
 ### `profiles` — already applied
@@ -106,6 +111,7 @@ stops as `jsonb` on the day.
 | `day_id` | `uuid` not null | references `public.itinerary_days(id)` on delete cascade |
 | `sort_order` | `integer` not null | default `0` |
 | `starts_at` | `time` | null allowed |
+| `ends_at` | `time` | null allowed. Not before `starts_at` when both are set |
 | `place` | `text` | |
 | `activity` | `text` | |
 | `notes` | `text` | a short note |
@@ -160,7 +166,7 @@ transaction. It returns the new trip id.
 
 Arguments: title, source, destination, start date, end date, description,
 traveler count, image path, and an optional list of activities (day
-number, time, place, activity, note). The list defaults to empty. The
+number, start time, end time, place, activity, note). The list defaults to empty. The
 function writes those as `itinerary_activities` rows before it returns.
 The list is an argument, not a column. Days are still rows.
 

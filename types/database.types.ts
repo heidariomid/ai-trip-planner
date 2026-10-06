@@ -17,6 +17,88 @@ export type Database = {
   }
   public: {
     Tables: {
+      itinerary_activities: {
+        Row: {
+          activity: string | null
+          created_at: string
+          day_id: string
+          ends_at: string | null
+          id: string
+          notes: string | null
+          place: string | null
+          sort_order: number
+          starts_at: string | null
+        }
+        Insert: {
+          activity?: string | null
+          created_at?: string
+          day_id: string
+          ends_at?: string | null
+          id?: string
+          notes?: string | null
+          place?: string | null
+          sort_order?: number
+          starts_at?: string | null
+        }
+        Update: {
+          activity?: string | null
+          created_at?: string
+          day_id?: string
+          ends_at?: string | null
+          id?: string
+          notes?: string | null
+          place?: string | null
+          sort_order?: number
+          starts_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "itinerary_activities_day_id_fkey"
+            columns: ["day_id"]
+            isOneToOne: false
+            referencedRelation: "itinerary_days"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      itinerary_days: {
+        Row: {
+          created_at: string
+          date: string | null
+          day_number: number
+          id: string
+          title: string | null
+          trip_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          date?: string | null
+          day_number: number
+          id?: string
+          title?: string | null
+          trip_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          date?: string | null
+          day_number?: number
+          id?: string
+          title?: string | null
+          trip_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "itinerary_days_trip_id_fkey"
+            columns: ["trip_id"]
+            isOneToOne: false
+            referencedRelation: "trips"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -44,12 +126,78 @@ export type Database = {
         }
         Relationships: []
       }
+      trips: {
+        Row: {
+          created_at: string
+          description: string | null
+          destination: string
+          end_date: string
+          id: string
+          image_path: string | null
+          source: string
+          start_date: string
+          title: string
+          traveler_count: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          destination: string
+          end_date: string
+          id?: string
+          image_path?: string | null
+          source: string
+          start_date: string
+          title: string
+          traveler_count?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          destination?: string
+          end_date?: string
+          id?: string
+          image_path?: string | null
+          source?: string
+          start_date?: string
+          title?: string
+          traveler_count?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trips_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      create_trip: {
+        Args: {
+          p_activities?: Json
+          p_description?: string
+          p_destination: string
+          p_end_date: string
+          p_image_path?: string
+          p_source: string
+          p_start_date: string
+          p_title: string
+          p_traveler_count?: number
+        }
+        Returns: string
+      }
     }
     Enums: {
       [_ in never]: never
