@@ -93,7 +93,9 @@ Use these. Do not restyle them per screen.
   `primary` is accent with white text. `secondary` is white with a
   `line` border. `fullWidth` only when the layout needs it
 - `components/TextField.tsx` — label above, filled with `canvas`, accent
-  border on focus, red border and message on error
+  border on focus, red border and message on error. `hint` puts quiet
+  text right of the label, such as a character count. `multiline` makes
+  it 96pt tall
 - `components/FormMessage.tsx` — `error` is red, `info` is `accent-soft`
 - `components/AuthScreenLayout.tsx` — canvas, safe area, keyboard handling
 - `components/Text.tsx` — every string. Sets the Outfit family
@@ -111,6 +113,35 @@ Use these. Do not restyle them per screen.
 - `components/ExploreCard.tsx` — a `Card` with a title, facts as label
   above value, tags as `canvas` capsules, and the static map picture
 - `components/AskBar.tsx`, `components/DestinationStrip.tsx` — Home only
+- `components/TripCard.tsx` — a traveller's own trip, compact and in the
+  same shape as `ExploreCard`: title, a `subtle` route line, a calendar icon
+  beside the day count and the dates, and the badge on the left, with
+  the cover as a 92pt picture on the right and the planning progress
+  bar across the bottom. Not a full-width cover: two
+  cards have to fit on one screen
+- `components/Badge.tsx` — a small capsule. `highlighted` is
+  `accent-soft` with `accent` text and is for the one state that matters
+  now (Ongoing). Everything else is `canvas` with `subtle` text
+- `components/AddButton.tsx` — the 56pt `accent` circle with a white
+  plus. It floats above the tab bar on the right
+- `components/DateField.tsx` — looks like a filled input and opens a
+  month calendar in a modal. The selected day is an `accent` circle
+- `components/ProgressBar.tsx` — a `subtle` label and a bold percentage
+  above a 6pt `canvas` track with an `accent` fill
+- `components/Stepper.tsx` — a count in a filled row with minus and plus
+- `components/CoverPicker.tsx`, `components/TripForm.tsx` — the Add a
+  trip form only
+
+A private image is never given a URL by hand. A component calls
+`useImageSource(path)` from `hooks/useImageSource.ts`, which goes through
+`lib/storage.ts` and falls back to `assets/placeholder.png`.
+
+Focus is always the `accent`: an `accent` border, an `accent` text
+cursor and selection, and `outline-none` so the browser's own focus ring
+(which follows the system colour and can be orange) never shows.
+
+A form puts its error message beside the submit button when the form is
+taller than the screen. A message at the top is off screen by then.
 
 The tab bar floats over the content. A scrolling tab pads its list with
 `useTabBarClearance()` from `hooks/useTabBar.ts`; `Screen` does it for a
@@ -127,19 +158,11 @@ Build them this way when their spec arrives.
 
 - **Screen:** `bg-canvas`, safe area respected, 20px side padding,
   content capped at `max-w-[380px]` and centred
-- **Add button:** a 56pt `accent` circle with a white plus and
-  `shadows.accent`
-- **Badge (Upcoming, Ongoing, Past, roles):** a small capsule. The one
-  state that matters now uses `accent-soft` with `accent` text. Every
-  other state uses `canvas` with `subtle` text. Do not give each status
-  its own colour
-- **Trip card:** a `Card` with the cover image on top (`rounded-2xl`),
-  a bold title, a `subtle` route line, and dates in a `canvas` strip at
-  the bottom
+- **Role badges (spec 15):** use `Badge`. Do not give each role its own
+  colour
 - **Icons:** Lucide, `ink` or `muted`, never multicoloured
 - **Divider:** `h-px bg-line`, and only where space alone is not enough
 - **Loading:** `ActivityIndicator` in `colors.accent` on `canvas`
-- **Progress bar (spec 8):** a `canvas` track with an `accent` fill
 - **Chat bubbles (spec 11):** the traveller's message is `accent` with
   white text. The assistant's is `surface` with `ink` text
 

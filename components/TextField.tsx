@@ -7,6 +7,8 @@ import { Text } from "./Text";
 export interface TextFieldProps extends TextInputProps {
   label: string;
   error?: string;
+  /** Quiet text on the right of the label, such as a character count. */
+  hint?: string;
 }
 
 // Taken from the props rather than named directly: React Native renamed these
@@ -21,7 +23,7 @@ function borderFor(isFocused: boolean, hasError: boolean) {
 }
 
 export const TextField = forwardRef<TextInput, TextFieldProps>(
-  function TextField({ label, error, onFocus, onBlur, ...inputProps }, ref) {
+  function TextField({ label, error, hint, onFocus, onBlur, ...inputProps }, ref) {
     const [isFocused, setIsFocused] = useState(false);
 
     const handleFocus: FocusHandler = (event) => {
@@ -36,14 +38,20 @@ export const TextField = forwardRef<TextInput, TextFieldProps>(
 
     return (
       <View className="mb-3.5">
-        <Text className="mb-1.5 ml-1 text-[13px] font-medium text-subtle">
-          {label}
-        </Text>
+        <View className="mb-1.5 ml-1 flex-row items-center justify-between">
+          <Text className="text-[13px] font-medium text-subtle">{label}</Text>
+          {hint ? <Text className="mr-1 text-[13px] text-muted">{hint}</Text> : null}
+        </View>
         <TextInput
           ref={ref}
           onFocus={handleFocus}
           onBlur={handleBlur}
-          className={`h-[50px] rounded-2xl border px-4 font-regular text-[16px] text-ink ${borderFor(
+          textAlignVertical={inputProps.multiline ? "top" : "center"}
+          selectionColor={colors.accent}
+          cursorColor={colors.accent}
+          className={`rounded-2xl border px-4 font-regular text-[16px] text-ink caret-accent outline-none ${
+            inputProps.multiline ? "h-24 py-3" : "h-[50px]"
+          } ${borderFor(
             isFocused,
             Boolean(error),
           )}`}

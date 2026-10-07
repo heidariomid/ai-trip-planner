@@ -35,3 +35,5 @@
 - feat: adopt minimal design system with a single-source theme
 - feat: add the three-tab app shell with Outfit and a floating tab bar
   (spec 3)
+- feat: add the create-trip form, the trip card, and the signed-URL
+  storage helper (spec 4)
