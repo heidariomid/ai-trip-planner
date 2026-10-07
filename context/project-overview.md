@@ -32,7 +32,7 @@ from Home and from a trip.
 
 ## Current state
 
-Specs 1 through 4 are done. Specs 5 through 17 are written and not built.
+Specs 1 through 5 are done. Specs 6 through 17 are written and not built.
 
 - Expo Router, email and Google sign-in, and a `profiles` row on first
   sign-up. Verified on Expo Go and web
@@ -41,8 +41,10 @@ Specs 1 through 4 are done. Specs 5 through 17 are written and not built.
 - A traveller can add a trip with a cover. The trip card shows on Home
   and My Trips, newest first, with a planning progress bar that counts
   days with an activity. Checked on web, not yet on a phone
-- The itinerary tables exist in the database. No screen reads their
-  activities yet
+- A trip opens onto its own screen: a banner, the itinerary as a
+  timeline per day, and empty Bookings, Packing, Photos, and Notes
+  sections. A trip can be edited, rescheduled, and deleted. The place
+  on an activity opens Google Maps. Checked on web, not yet on a phone
 - No AI
 
 Nothing has been deployed. No EAS build, no store listing.
@@ -191,7 +193,7 @@ and inside the chat.
 | Sign in, sign up | 1, done |
 | Home, My Trips, Profile shell | 3, done |
 | Add a trip, and the trip card | 4, done |
-| Trip banner and itinerary | 5 |
+| Trip banner and itinerary | 5, done |
 | Explore, and copy into My Trips | 6 |
 | Bookings | 7 |
 | Packing | 8 |
@@ -265,7 +267,8 @@ and when it is done.
 3. @context/features/spec3-app-shell.md — the three tabs. Done
 4. @context/features/spec4-create-trip.md — the add-trip form and the card.
    Done
-5. @context/features/spec5-trip-itinerary.md — the trip screen and its days
+5. @context/features/spec5-trip-itinerary.md — the trip screen and its days.
+   Done
 6. @context/features/spec6-explore.md — curated plans, copied into My Trips
 7. @context/features/spec7-bookings.md — flights, cars, hotels, extras
 8. @context/features/spec8-packing.md — the checklist

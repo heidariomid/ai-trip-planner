@@ -76,7 +76,8 @@ export async function listTrips(): Promise<TripsResult> {
   }
 }
 
-async function saveCover(userId: string, tripId: string, cover: LocalImage) {
+/** Uploads a cover and points the trip at it. Resolves to a sentence on failure. */
+export async function saveCover(userId: string, tripId: string, cover: LocalImage) {
   const upload = await uploadTripCover(userId, tripId, cover);
   if (!upload.success || !upload.data) return upload.error ?? COVER_NOT_SAVED;
 

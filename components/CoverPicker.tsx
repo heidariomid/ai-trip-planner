@@ -1,5 +1,5 @@
 import { ImagePlus, Sparkles, type LucideIcon } from "lucide-react-native";
-import { Image, Pressable, View } from "react-native";
+import { Image, Pressable, View, type ImageSourcePropType } from "react-native";
 
 import { colors } from "../lib/theme";
 import { Text } from "./Text";
@@ -7,6 +7,8 @@ import { Text } from "./Text";
 export interface CoverPickerProps {
   /** The local URI of the picked picture, or null when there is none. */
   previewUri: string | null;
+  /** The cover the trip already has. Shown until a new one is picked. */
+  existing?: ImageSourcePropType;
   onPick: () => void;
   onRemove: () => void;
   disabled?: boolean;
@@ -42,19 +44,27 @@ function Tile({ icon: Icon, title, caption, onPress, disabled }: TileProps) {
 }
 
 /** Pick a cover from the gallery. Generating one is drawn here and arrives later. */
-export function CoverPicker({ previewUri, onPick, onRemove, disabled = false }: CoverPickerProps) {
+export function CoverPicker({
+  previewUri,
+  existing,
+  onPick,
+  onRemove,
+  disabled = false,
+}: CoverPickerProps) {
+  const shown = previewUri ? { uri: previewUri } : existing;
+
   return (
     <View className="mb-3.5">
       <Text className="mb-1.5 ml-1 text-[13px] font-medium text-subtle">Cover</Text>
 
-      {previewUri ? (
+      {shown ? (
         <View>
           <Image
-            source={{ uri: previewUri }}
+            source={shown}
             resizeMode="cover"
             style={PREVIEW_SIZE}
             className="rounded-2xl bg-canvas"
-            accessibilityLabel="The cover you picked"
+            accessibilityLabel={previewUri ? "The cover you picked" : "The current cover"}
           />
           <View className="mt-1 flex-row justify-end gap-5">
             <Pressable
@@ -63,16 +73,20 @@ export function CoverPicker({ previewUri, onPick, onRemove, disabled = false }: 
               onPress={onPick}
               className="h-11 justify-center"
             >
-              <Text className="text-[14px] font-medium text-ink">Change</Text>
+              <Text className="mr-1 text-[14px] font-medium text-ink">Change</Text>
             </Pressable>
-            <Pressable
-              accessibilityRole="button"
-              disabled={disabled}
-              onPress={onRemove}
-              className="h-11 justify-center"
-            >
-              <Text className="mr-1 text-[14px] font-medium text-subtle">Remove</Text>
-            </Pressable>
+            {previewUri ? (
+              <Pressable
+                accessibilityRole="button"
+                disabled={disabled}
+                onPress={onRemove}
+                className="h-11 justify-center"
+              >
+                <Text className="mr-1 text-[14px] font-medium text-subtle">
+                  {existing ? "Undo" : "Remove"}
+                </Text>
+              </Pressable>
+            ) : null}
           </View>
         </View>
       ) : (

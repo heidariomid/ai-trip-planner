@@ -39,7 +39,8 @@ export default function TripsScreen() {
             alignSelf: "center",
             paddingHorizontal: 20,
             paddingTop: 16,
-            paddingBottom: tabBarClearance + (hasTrips ? ADD_BUTTON_CLEARANCE : 0),
+            paddingBottom:
+              tabBarClearance + (hasTrips ? ADD_BUTTON_CLEARANCE : 0),
           }}
           ListHeaderComponent={
             <View>
@@ -51,7 +52,15 @@ export default function TripsScreen() {
           }
           renderItem={({ item }) => (
             <View className="mb-4">
-              <TripCard trip={item} />
+              <TripCard
+                trip={item}
+                onPress={() =>
+                  router.push({
+                    pathname: "/trip/[id]",
+                    params: { id: item.id },
+                  })
+                }
+              />
             </View>
           )}
           ListEmptyComponent={
@@ -73,7 +82,10 @@ export default function TripsScreen() {
             className="absolute left-0 right-0 items-center px-5"
           >
             <View className="w-full max-w-[380px] items-end">
-              <AddButton accessibilityLabel="Create a trip" onPress={openForm} />
+              <AddButton
+                accessibilityLabel="Create a trip"
+                onPress={openForm}
+              />
             </View>
           </View>
         ) : null}

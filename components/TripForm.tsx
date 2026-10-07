@@ -1,4 +1,4 @@
-import { View } from "react-native";
+import { View, type ImageSourcePropType } from "react-native";
 
 import type { UseTripFormResult } from "../hooks/useTripForm";
 import { countDays, pluralize } from "../lib/dates";
@@ -13,6 +13,9 @@ import { TextField } from "./TextField";
 
 export interface TripFormProps {
   form: UseTripFormResult;
+  /** The cover the trip already has, when editing one that has a cover. */
+  existingCover?: ImageSourcePropType;
+  saveLabel?: string;
   onSave: () => void;
   onDone: () => void;
 }
@@ -21,7 +24,13 @@ function describeTravelers(count: number): string {
   return count === 1 ? "Just me" : pluralize(count, "traveler");
 }
 
-export function TripForm({ form, onSave, onDone }: TripFormProps) {
+export function TripForm({
+  form,
+  existingCover,
+  saveLabel = "Save trip",
+  onSave,
+  onDone,
+}: TripFormProps) {
   const { values, setValue, errors, formError, savedNotice, isSaving } = form;
   const isLocked = isSaving || savedNotice !== null;
   const hasValidDates = values.endDate >= values.startDate;
@@ -84,6 +93,7 @@ export function TripForm({ form, onSave, onDone }: TripFormProps) {
 
       <CoverPicker
         previewUri={values.cover?.uri ?? null}
+        existing={existingCover}
         onPick={() => void form.pickCover()}
         onRemove={() => setValue("cover", null)}
         disabled={isLocked}
@@ -118,7 +128,7 @@ export function TripForm({ form, onSave, onDone }: TripFormProps) {
         {savedNotice ? (
           <Button label="Done" onPress={onDone} />
         ) : (
-          <Button label="Save trip" onPress={onSave} loading={isSaving} />
+          <Button label={saveLabel} onPress={onSave} loading={isSaving} />
         )}
       </View>
     </View>

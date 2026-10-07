@@ -80,3 +80,33 @@ export function validateTrip(fields: TripFields): Partial<Record<keyof TripField
 
   return errors;
 }
+
+export const MAX_NOTE_LENGTH = 200;
+
+export interface ActivityFields {
+  /** `HH:MM`, or null when not chosen. */
+  startsAt: string | null;
+  endsAt: string | null;
+  place: string;
+  activity: string;
+  notes: string;
+}
+
+export function validateActivity(
+  fields: ActivityFields,
+): Partial<Record<keyof ActivityFields, string>> {
+  const errors: Partial<Record<keyof ActivityFields, string>> = {};
+
+  if (!fields.startsAt) errors.startsAt = "Choose a start time.";
+  else if (fields.endsAt && fields.endsAt < fields.startsAt) {
+    errors.endsAt = "The end time can't be before the start time.";
+  }
+
+  if (!fields.activity.trim()) errors.activity = "Say what you will do.";
+
+  if (fields.notes.length > MAX_NOTE_LENGTH) {
+    errors.notes = `Keep the note under ${MAX_NOTE_LENGTH} characters.`;
+  }
+
+  return errors;
+}

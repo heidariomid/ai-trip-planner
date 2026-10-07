@@ -129,8 +129,30 @@ Use these. Do not restyle them per screen.
 - `components/ProgressBar.tsx` — a `subtle` label and a bold percentage
   above a 6pt `canvas` track with an `accent` fill
 - `components/Stepper.tsx` — a count in a filled row with minus and plus
-- `components/CoverPicker.tsx`, `components/TripForm.tsx` — the Add a
-  trip form only
+- `components/CoverPicker.tsx`, `components/TripForm.tsx` — the trip
+  form, for adding and editing
+- `components/FormScreen.tsx` — a pushed screen holding one form: a
+  round back button, the screen title, one `Card`, keyboard handling
+- `components/TimeField.tsx` — like `DateField`, opening an hour and
+  minute picker in a modal, in five-minute steps
+- `components/ConfirmDialog.tsx` — asks before something that cannot be
+  undone. Cancel is `secondary`, the action is `primary`, and a failure
+  shows inside the dialog. Use it instead of `Alert`, which does nothing
+  on web
+- `components/TripBanner.tsx` — the cover with round back and options
+  buttons on it, then the title, badge, route, dates, and description
+- `components/TripMenu.tsx` — the banner's options as a sheet at the
+  bottom
+- `components/DayChips.tsx` — the days of a trip in a row. The selected
+  day is `accent-soft` with `accent` text, not a filled chip, so it does
+  not compete with the selected section chip above it
+- `components/ActivityRow.tsx`, `components/ActivityForm.tsx`,
+  `components/Itinerary.tsx` — the timeline. A row sits on the canvas
+  with its time on the left and an `accent` dot on a `line` rail. Tapping
+  it swaps the row for the form, which is a `Card`. The place is the
+  one link on the row: `ink`, medium weight, with a pin before it and a
+  small up-right arrow after it. It opens Google Maps and is not
+  `accent`, because the screen already carries enough of it
 
 A private image is never given a URL by hand. A component calls
 `useImageSource(path)` from `hooks/useImageSource.ts`, which goes through

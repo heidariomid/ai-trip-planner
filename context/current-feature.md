@@ -37,3 +37,5 @@
   (spec 3)
 - feat: add the create-trip form, the trip card, and the signed-URL
   storage helper (spec 4)
+- feat: add the trip screen, the itinerary timeline, trip editing with
+  reschedule_trip, and trip deletion (spec 5)

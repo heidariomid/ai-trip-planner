@@ -70,9 +70,13 @@ export async function getImageSource(
   }
 }
 
-/** Uploads a picked image to `{user_id}/{trip_id}/cover.{ext}` and returns the path. */
+/**
+ * Uploads a picked image to `{owner_id}/{trip_id}/cover-{time}.{ext}` and
+ * returns the path. The name is new every time, so a replaced cover is never
+ * served from a cache that still holds the old picture.
+ */
 export async function uploadTripCover(
-  userId: string,
+  ownerId: string,
   tripId: string,
   image: LocalImage,
 ): Promise<UploadResult> {
@@ -94,7 +98,7 @@ export async function uploadTripCover(
     };
   }
 
-  const path = `${userId}/${tripId}/cover.${extension}`;
+  const path = `${ownerId}/${tripId}/cover-${Date.now()}.${extension}`;
 
   try {
     // An ArrayBuffer rather than a Blob: a Blob built from a file URI uploads
@@ -104,7 +108,7 @@ export async function uploadTripCover(
 
     const { error } = await supabase.storage
       .from(IMAGES_BUCKET)
-      .upload(path, body, { contentType, upsert: true });
+      .upload(path, body, { contentType });
 
     if (error) {
       return {
@@ -120,5 +124,53 @@ export async function uploadTripCover(
       data: null,
       error: toReadableError("storage", error, "The picture could not be uploaded."),
     };
+  }
+}
+
+export interface RemoveResult {
+  success: boolean;
+  error: string | null;
+}
+
+const REMOVE_FAILED = "The trip's pictures could not be removed.";
+
+/** Removes one file. Used when a cover is replaced. */
+export async function removeImage(path: string): Promise<RemoveResult> {
+  try {
+    const { error } = await supabase.storage.from(IMAGES_BUCKET).remove([path]);
+    signedUrls.delete(path);
+    if (error) {
+      return { success: false, error: toReadableError("storage", error, REMOVE_FAILED) };
+    }
+    return { success: true, error: null };
+  } catch (error) {
+    return { success: false, error: toReadableError("storage", error, REMOVE_FAILED) };
+  }
+}
+
+/**
+ * Removes everything under `{owner_id}/{trip_id}/`. The owner is the trip's
+ * `user_id`, not whoever is signed in.
+ */
+export async function removeTripFiles(ownerId: string, tripId: string): Promise<RemoveResult> {
+  const folder = `${ownerId}/${tripId}`;
+
+  try {
+    const bucket = supabase.storage.from(IMAGES_BUCKET);
+    const { data: files, error: listError } = await bucket.list(folder);
+    if (listError) {
+      return { success: false, error: toReadableError("storage", listError, REMOVE_FAILED) };
+    }
+    if (files.length === 0) return { success: true, error: null };
+
+    const paths = files.map((file) => `${folder}/${file.name}`);
+    const { error } = await bucket.remove(paths);
+    paths.forEach((path) => signedUrls.delete(path));
+    if (error) {
+      return { success: false, error: toReadableError("storage", error, REMOVE_FAILED) };
+    }
+    return { success: true, error: null };
+  } catch (error) {
+    return { success: false, error: toReadableError("storage", error, REMOVE_FAILED) };
   }
 }

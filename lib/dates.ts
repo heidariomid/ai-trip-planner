@@ -76,3 +76,32 @@ export function getTripStatus(
   if (today > endDate) return "Past";
   return "Ongoing";
 }
+
+const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"] as const;
+
+/** "Tue, Oct 6": short enough for a chip. */
+export function formatDayLabel(value: string): string {
+  const date = fromISODate(value);
+  return `${WEEKDAYS[date.getDay()]}, ${MONTHS[date.getMonth()]} ${date.getDate()}`;
+}
+
+/** Postgres returns a `time` as `HH:MM:SS`. The app keeps `HH:MM`. */
+export function toTimeValue(value: string | null): string | null {
+  return value ? value.slice(0, 5) : null;
+}
+
+export function buildTime(hour: number, minute: number): string {
+  return `${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}`;
+}
+
+export function parseTime(value: string): { hour: number; minute: number } {
+  const [hour, minute] = value.split(":").map(Number);
+  return { hour, minute };
+}
+
+/** "09:30" becomes "9:30 AM". */
+export function formatTime(value: string): string {
+  const { hour, minute } = parseTime(value);
+  const period = hour < 12 ? "AM" : "PM";
+  return `${hour % 12 === 0 ? 12 : hour % 12}:${String(minute).padStart(2, "0")} ${period}`;
+}

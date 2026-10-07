@@ -34,7 +34,8 @@ const EXPLORE_ITEMS: HomeItem[] = EXPLORE_PLANS.map((plan) => ({
 
 const EMPTY_MESSAGE: Record<PlanFilter, string> = {
   "All Plans": "You have no trips yet. Your plans will show up here.",
-  Active: "No active trip. A trip is active while today falls inside its dates.",
+  Active:
+    "No active trip. A trip is active while today falls inside its dates.",
 };
 
 export default function HomeScreen() {
@@ -90,7 +91,15 @@ export default function HomeScreen() {
           renderItem={({ item }) => (
             <View className="mb-4">
               {item.kind === "trip" ? (
-                <TripCard trip={item.trip} />
+                <TripCard
+                  trip={item.trip}
+                  onPress={() =>
+                    router.push({
+                      pathname: "/trip/[id]",
+                      params: { id: item.trip.id },
+                    })
+                  }
+                />
               ) : (
                 <ExploreCard plan={item.plan} />
               )}
@@ -103,7 +112,10 @@ export default function HomeScreen() {
               </View>
             ) : error ? null : (
               <EmptyState message={EMPTY_MESSAGE[planFilter]}>
-                <Button label="Create a trip" onPress={() => router.push("/create-trip")} />
+                <Button
+                  label="Create a trip"
+                  onPress={() => router.push("/create-trip")}
+                />
               </EmptyState>
             )
           }

@@ -198,6 +198,15 @@ export type Database = {
         }
         Returns: string
       }
+      reschedule_trip: {
+        Args: {
+          p_confirm_drop?: boolean
+          p_end_date: string
+          p_start_date: string
+          p_trip_id: string
+        }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never

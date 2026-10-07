@@ -3,7 +3,8 @@ import { useState } from "react";
 
 import { addDays, todayISO } from "../lib/dates";
 import type { LocalImage } from "../lib/storage";
-import { createTrip } from "../lib/trips";
+import { countDaysToDrop, updateTrip, type TripDetail } from "../lib/trip-detail";
+import { createTrip, type NewTrip } from "../lib/trips";
 import { validateTrip, type TripFields } from "../lib/validation";
 import { useAuth } from "./useAuth";
 
@@ -24,12 +25,33 @@ export interface UseTripFormResult {
   /** Set once the trip is saved but its cover is not. The form is finished. */
   savedNotice: string | null;
   isSaving: boolean;
+  /**
+   * How many days with activities the new dates would remove. Set when a save
+   * stopped to ask; nothing has been sent yet.
+   */
+  daysToDrop: number | null;
   pickCover: () => Promise<void>;
   /** Resolves true when the trip was saved with nothing left to tell. */
   save: () => Promise<boolean>;
+  /** Saves after the traveller agreed to lose those days. */
+  confirmDrop: () => Promise<boolean>;
+  cancelDrop: () => void;
 }
 
-function initialValues(): TripFormValues {
+function initialValues(trip: TripDetail | undefined): TripFormValues {
+  if (trip) {
+    return {
+      title: trip.title,
+      source: trip.source,
+      destination: trip.destination,
+      startDate: trip.start_date,
+      endDate: trip.end_date,
+      description: trip.description ?? "",
+      travelerCount: trip.traveler_count,
+      cover: null,
+    };
+  }
+
   const today = todayISO();
   return {
     title: "",
@@ -43,13 +65,28 @@ function initialValues(): TripFormValues {
   };
 }
 
-export function useTripForm(): UseTripFormResult {
+function toNewTrip(values: TripFormValues): NewTrip {
+  return {
+    title: values.title.trim(),
+    source: values.source.trim(),
+    destination: values.destination.trim(),
+    startDate: values.startDate,
+    endDate: values.endDate,
+    description: values.description.trim(),
+    travelerCount: values.travelerCount,
+    cover: values.cover,
+  };
+}
+
+/** The trip form. With a trip it edits that trip; without one it creates a trip. */
+export function useTripForm(trip?: TripDetail): UseTripFormResult {
   const { user } = useAuth();
-  const [values, setValues] = useState<TripFormValues>(initialValues);
+  const [values, setValues] = useState<TripFormValues>(() => initialValues(trip));
   const [hasSubmitted, setHasSubmitted] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
   const [savedNotice, setSavedNotice] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [daysToDrop, setDaysToDrop] = useState<number | null>(null);
 
   const allErrors = validateTrip(values);
   // The date order is checked as soon as a date changes. An empty required
@@ -83,27 +120,36 @@ export function useTripForm(): UseTripFormResult {
     }
   }
 
-  async function save(): Promise<boolean> {
-    setHasSubmitted(true);
-    setFormError(null);
-    if (Object.keys(allErrors).length > 0) return false;
+  /** True when the save has to stop and ask about days that would be lost. */
+  async function mustAskFirst(existing: TripDetail): Promise<boolean> {
+    const datesChanged =
+      values.startDate !== existing.start_date || values.endDate !== existing.end_date;
+    if (!datesChanged) return false;
 
+    const check = await countDaysToDrop(existing.id, values.startDate, values.endDate);
+    if (!check.success) {
+      setFormError(check.error);
+      return true;
+    }
+    if (check.data > 0) setDaysToDrop(check.data);
+    return check.data > 0;
+  }
+
+  async function send(confirmed: boolean): Promise<boolean> {
     if (!user) {
       setFormError("You are signed out. Sign in again to save a trip.");
       return false;
     }
 
     setIsSaving(true);
-    const result = await createTrip(user.id, {
-      title: values.title.trim(),
-      source: values.source.trim(),
-      destination: values.destination.trim(),
-      startDate: values.startDate,
-      endDate: values.endDate,
-      description: values.description.trim(),
-      travelerCount: values.travelerCount,
-      cover: values.cover,
-    });
+    if (trip && !confirmed && (await mustAskFirst(trip))) {
+      setIsSaving(false);
+      return false;
+    }
+
+    const result = trip
+      ? await updateTrip(trip, toNewTrip(values), confirmed)
+      : await createTrip(user.id, toNewTrip(values));
     setIsSaving(false);
 
     if (!result.success) {
@@ -117,5 +163,30 @@ export function useTripForm(): UseTripFormResult {
     return true;
   }
 
-  return { values, setValue, errors, formError, savedNotice, isSaving, pickCover, save };
+  async function save(): Promise<boolean> {
+    setHasSubmitted(true);
+    setFormError(null);
+    if (Object.keys(allErrors).length > 0) return false;
+    return send(false);
+  }
+
+  async function confirmDrop(): Promise<boolean> {
+    setDaysToDrop(null);
+    setFormError(null);
+    return send(true);
+  }
+
+  return {
+    values,
+    setValue,
+    errors,
+    formError,
+    savedNotice,
+    isSaving,
+    daysToDrop,
+    pickCover,
+    save,
+    confirmDrop,
+    cancelDrop: () => setDaysToDrop(null),
+  };
 }
