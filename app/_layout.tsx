@@ -6,13 +6,14 @@ import { ActivityIndicator, View } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
 import { AuthProvider, useAuth } from "../hooks/useAuth";
+import { colors } from "../lib/theme";
 
 export default function RootLayout() {
   return (
     <SafeAreaProvider>
       <AuthProvider>
         <RootNavigator />
-        <StatusBar style="auto" />
+        <StatusBar style="dark" />
       </AuthProvider>
     </SafeAreaProvider>
   );
@@ -25,11 +26,11 @@ function RootNavigator() {
   // Mounting the navigator first is what produces a flash of the sign-in
   // screen on a cold start that is already signed in.
   if (isRestoring) {
-    // Matches the warm background of every screen, so the cold start does not
-    // flash a cool grey before the app appears.
+    // Matches the canvas of every screen, so the cold start does not flash a
+    // different colour before the app appears.
     return (
-      <View className="flex-1 items-center justify-center bg-sand">
-        <ActivityIndicator size="large" color="#C2410C" />
+      <View className="flex-1 items-center justify-center bg-canvas">
+        <ActivityIndicator size="large" color={colors.accent} />
       </View>
     );
   }

@@ -12,6 +12,14 @@
 If Notes have an open Pre-review **Needs decisions**, mention it, then
 still implement unless the user says wait.
 
+## Design rules while implementing
+
+- Read @context/design-system.md before writing a screen or component
+- Use the existing `Card`, `Button`, `TextField`, and `FormMessage`.
+  Colours come from the tokens in `lib/theme.js`, never a hex value
+- A new token or shared component is added to the design system file in
+  the same change
+
 ## Expo rules while implementing
 
 - Install with `npx expo install`, never `npm install`, for any package

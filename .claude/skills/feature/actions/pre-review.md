@@ -14,6 +14,7 @@ server, create a branch, or write the feature. Status stays Not Started.
 - @context/current-feature.md — goals and notes
 - The spec in @context/features/ or @context/fixes/ if one was loaded
 - @context/coding-standards.md
+- @context/design-system.md, when the spec has a screen
 - @context/project-overview.md
 
 If Goals are empty: stop. "Run /feature load first."

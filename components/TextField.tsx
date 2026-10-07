@@ -1,6 +1,8 @@
 import { forwardRef, useState } from "react";
 import { Text, TextInput, View, type TextInputProps } from "react-native";
 
+import { colors } from "../lib/theme";
+
 export interface TextFieldProps extends TextInputProps {
   label: string;
   error?: string;
@@ -12,9 +14,9 @@ type FocusHandler = NonNullable<TextInputProps["onFocus"]>;
 type BlurHandler = NonNullable<TextInputProps["onBlur"]>;
 
 function borderFor(isFocused: boolean, hasError: boolean) {
-  if (hasError) return "border-red-300 bg-[#FFFAF3]/80";
-  if (isFocused) return "border-accent bg-[#FFFCF7]";
-  return "border-white/90 bg-[#FFFAF3]/75";
+  if (hasError) return "border-red-300 bg-canvas";
+  if (isFocused) return "border-accent bg-surface";
+  return "border-canvas bg-canvas";
 }
 
 export const TextField = forwardRef<TextInput, TextFieldProps>(
@@ -44,7 +46,7 @@ export const TextField = forwardRef<TextInput, TextFieldProps>(
             isFocused,
             Boolean(error),
           )}`}
-          placeholderTextColor="#B9A192"
+          placeholderTextColor={colors.muted}
           {...inputProps}
         />
         {error ? (

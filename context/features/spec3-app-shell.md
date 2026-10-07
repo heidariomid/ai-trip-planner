@@ -35,8 +35,8 @@ except the profile header.
 - My Trips is an empty state
 - Profile shows the signed-in user's name and avatar from `profiles`, and
   signs out. Sign out still lands on Sign In after a cold start
-- The warm luxury look from the rest of the app. No cool grey, no blue
-  chrome
+- The minimal look from the rest of the app: tokens from `lib/theme.js`,
+  no gradients, no warm tones
 
 ## Out of scope
 

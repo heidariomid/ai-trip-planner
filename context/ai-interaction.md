@@ -52,6 +52,8 @@ Before marking any feature done:
 - **Keyboard** — focus every input. The field stays visible and the submit
   button is still reachable. This is the single most common defect in a
   React Native form, and it is invisible in code review
+- **Design** — the screen passes the "Before a screen is done" list in
+  @context/design-system.md, compared against `context/design/mockup.png`
 - **Safe area** — nothing clipped by the notch, the status bar or the home
   indicator
 - **Both platforms** — required when the phase touches native config, deep

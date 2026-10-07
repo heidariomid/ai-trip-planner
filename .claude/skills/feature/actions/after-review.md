@@ -15,6 +15,7 @@ submit button, or a row silently blocked by RLS.
 - @context/current-feature.md — goals and notes
 - The phase spec in @context/features/ if loaded from one
 - @context/ai-interaction.md — verification checklists (sections A, B, C)
+- @context/design-system.md — the "Before a screen is done" list
 
 ## 2. Code review
 

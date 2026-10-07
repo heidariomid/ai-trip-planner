@@ -7,12 +7,12 @@ export interface FormMessageProps {
 
 const CONTAINER = {
   error: "border-red-200/80 bg-red-50/80",
-  info: "border-amber-200/80 bg-amber-50/80",
+  info: "border-accent-soft bg-accent-soft",
 } as const;
 
 const TEXT = {
   error: "text-red-700",
-  info: "text-amber-900",
+  info: "text-ink",
 } as const;
 
 export function FormMessage({ message, tone = "error" }: FormMessageProps) {

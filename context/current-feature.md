@@ -32,3 +32,4 @@
 - feat: add Supabase email and Google auth
 - feat: add trips, itinerary, and storage schema (spec 2)
 - fix: revoke execute on handle_new_user from anon and authenticated
+- feat: adopt minimal design system with a single-source theme

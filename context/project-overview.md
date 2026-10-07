@@ -5,7 +5,8 @@ what you like; the app produces a day-by-day itinerary you can save, edit,
 share with family, and take with you.
 
 The picture source is the five boards in @context/plan/. This file is the
-text those boards become. Field-level detail lives in the spec for the
+text those boards become. The boards decide layout and content; how a
+screen looks is decided by @context/design-system.md. Field-level detail lives in the spec for the
 step that builds it.
 
 ---
@@ -207,7 +208,7 @@ and inside the chat.
 | --- | --- |
 | Framework | Expo SDK 57, React Native 0.86 |
 | Language | TypeScript, strict |
-| UI | NativeWind. No component library |
+| UI | NativeWind. No component library. Look in @context/design-system.md |
 | Navigation | Expo Router, adopted in spec 1 |
 | Backend | Supabase — Postgres, Auth, Storage |
 | AI | Chosen in spec 11, not before |

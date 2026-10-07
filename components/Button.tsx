@@ -1,5 +1,7 @@
 import { ActivityIndicator, Pressable, Text, View } from "react-native";
 
+import { colors, shadows } from "../lib/theme";
+
 export interface ButtonProps {
   label: string;
   onPress: () => void;
@@ -12,7 +14,7 @@ export interface ButtonProps {
 
 const CONTAINER = {
   primary: "bg-accent active:bg-accent-deep",
-  secondary: "border border-white/90 bg-[#FFFAF3]/80 active:bg-[#FFFAF3]",
+  secondary: "border border-line bg-surface active:bg-canvas",
 } as const;
 
 const LABEL = {
@@ -21,20 +23,8 @@ const LABEL = {
 } as const;
 
 const SHADOW = {
-  primary: {
-    shadowColor: "#C2410C",
-    shadowOpacity: 0.35,
-    shadowRadius: 16,
-    shadowOffset: { width: 0, height: 8 },
-    elevation: 6,
-  },
-  secondary: {
-    shadowColor: "#5C3A24",
-    shadowOpacity: 0.1,
-    shadowRadius: 10,
-    shadowOffset: { width: 0, height: 4 },
-    elevation: 2,
-  },
+  primary: shadows.accent,
+  secondary: shadows.soft,
 } as const;
 
 export function Button({
@@ -62,7 +52,7 @@ export function Button({
         <View className="mr-2">
           <ActivityIndicator
             size="small"
-            color={variant === "primary" ? "#ffffff" : "#2B1A12"}
+            color={variant === "primary" ? colors.surface : colors.ink}
           />
         </View>
       ) : null}

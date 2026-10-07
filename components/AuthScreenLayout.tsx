@@ -1,16 +1,14 @@
-import { LinearGradient } from "expo-linear-gradient";
 import type { ReactNode } from "react";
 import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
-  StyleSheet,
   Text,
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { GlassCard } from "./GlassCard";
+import { Card } from "./Card";
 
 export interface AuthScreenLayoutProps {
   title: string;
@@ -25,18 +23,7 @@ export interface AuthScreenLayoutProps {
  */
 export function AuthScreenLayout({ title, subtitle, children }: AuthScreenLayoutProps) {
   return (
-    <View className="flex-1 bg-sand">
-      <LinearGradient
-        colors={["#FDF7EF", "#FBECDC", "#F8E3D6"]}
-        style={StyleSheet.absoluteFill}
-      />
-
-      {/* Colour behind the frosted card. Without these the blur has nothing
-          to pick up and the glass reads as flat grey. */}
-      <View pointerEvents="none" className="absolute -left-24 -top-12 h-72 w-72 rounded-full bg-amber-300/45" />
-      <View pointerEvents="none" className="absolute -right-24 top-36 h-64 w-64 rounded-full bg-orange-400/30" />
-      <View pointerEvents="none" className="absolute -bottom-20 left-8 h-72 w-72 rounded-full bg-rose-300/30" />
-
+    <View className="flex-1 bg-canvas">
       <SafeAreaView className="flex-1" edges={["top", "bottom"]}>
         <KeyboardAvoidingView
           className="flex-1"
@@ -57,7 +44,7 @@ export function AuthScreenLayout({ title, subtitle, children }: AuthScreenLayout
                   {subtitle}
                 </Text>
 
-                <GlassCard>{children}</GlassCard>
+                <Card>{children}</Card>
               </View>
             </View>
           </ScrollView>

@@ -1,14 +1,14 @@
-import { LinearGradient } from "expo-linear-gradient";
 import { useState } from "react";
-import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { Button } from "../../components/Button";
+import { Card } from "../../components/Card";
 import { FormMessage } from "../../components/FormMessage";
-import { GlassCard } from "../../components/GlassCard";
 import { useAuth } from "../../hooks/useAuth";
 import { useProfile } from "../../hooks/useProfile";
 import { signOut } from "../../lib/auth";
+import { colors } from "../../lib/theme";
 
 export default function HomeScreen() {
   const { user } = useAuth();
@@ -27,14 +27,7 @@ export default function HomeScreen() {
   const name = profile?.full_name ?? user?.email ?? "traveller";
 
   return (
-    <View className="flex-1 bg-sand">
-      <LinearGradient
-        colors={["#FDF7EF", "#FBECDC", "#F8E3D6"]}
-        style={StyleSheet.absoluteFill}
-      />
-      <View pointerEvents="none" className="absolute -left-24 -top-12 h-72 w-72 rounded-full bg-amber-300/45" />
-      <View pointerEvents="none" className="absolute -right-24 top-44 h-64 w-64 rounded-full bg-orange-400/30" />
-
+    <View className="flex-1 bg-canvas">
       <SafeAreaView className="flex-1" edges={["top", "bottom"]}>
         <View className="flex-1 items-center px-5 py-10">
           <View className="w-full max-w-[380px] flex-1 justify-between">
@@ -46,9 +39,9 @@ export default function HomeScreen() {
                 You're signed in.
               </Text>
 
-              <GlassCard>
+              <Card>
                 {isLoading ? (
-                  <ActivityIndicator size="small" color="#C2410C" />
+                  <ActivityIndicator size="small" color={colors.accent} />
                 ) : (
                   <>
                     <Text className="text-[20px] font-semibold tracking-tight text-ink">
@@ -71,7 +64,7 @@ export default function HomeScreen() {
                     <FormMessage message={error} />
                   </View>
                 ) : null}
-              </GlassCard>
+              </Card>
             </View>
 
             <View>
