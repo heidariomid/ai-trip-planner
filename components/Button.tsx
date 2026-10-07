@@ -1,6 +1,7 @@
-import { ActivityIndicator, Pressable, Text, View } from "react-native";
+import { ActivityIndicator, Pressable, View } from "react-native";
 
 import { colors, shadows } from "../lib/theme";
+import { Text } from "./Text";
 
 export interface ButtonProps {
   label: string;

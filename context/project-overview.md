@@ -32,11 +32,12 @@ from Home and from a trip.
 
 ## Current state
 
-Specs 1 and 2 are done. Specs 3 through 17 are written and not built.
+Specs 1, 2, and 3 are done. Specs 4 through 17 are written and not built.
 
 - Expo Router, email and Google sign-in, and a `profiles` row on first
   sign-up. Verified on Expo Go and web
-- The signed-in home is still a placeholder
+- The signed-in app is three tabs: Home, My Trips, and Profile. Only the
+  profile header is live data. Explore cards are static
 - `trips`, the itinerary tables, and the two private buckets exist in
   the database. No screen reads them yet
 - No AI
@@ -185,7 +186,7 @@ and inside the chat.
 | Screen | Spec |
 | --- | --- |
 | Sign in, sign up | 1, done |
-| Home, My Trips, Profile shell | 3 |
+| Home, My Trips, Profile shell | 3, done |
 | Add a trip, and the trip card | 4 |
 | Trip banner and itinerary | 5 |
 | Explore, and copy into My Trips | 6 |
@@ -258,7 +259,7 @@ and when it is done.
 1. @context/features/spec1-auth.md — sign up, sign in, `profiles`. Done
 2. @context/features/spec2-database-and-storage.md — `trips`, itinerary
    days and activities, private buckets. No screens. Done
-3. @context/features/spec3-app-shell.md — the three tabs
+3. @context/features/spec3-app-shell.md — the three tabs. Done
 4. @context/features/spec4-create-trip.md — the add-trip form and the card
 5. @context/features/spec5-trip-itinerary.md — the trip screen and its days
 6. @context/features/spec6-explore.md — curated plans, copied into My Trips

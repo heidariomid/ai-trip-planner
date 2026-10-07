@@ -1,10 +1,11 @@
 import { Link } from "expo-router";
 import { useState } from "react";
-import { Text, View } from "react-native";
+import { View } from "react-native";
 
 import { AuthScreenLayout } from "../../components/AuthScreenLayout";
 import { Button } from "../../components/Button";
 import { FormMessage } from "../../components/FormMessage";
+import { Text } from "../../components/Text";
 import { TextField } from "../../components/TextField";
 import { signInWithEmail, signInWithGoogle } from "../../lib/auth";
 import { validateSignIn, type SignInFields } from "../../lib/validation";

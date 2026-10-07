@@ -3,12 +3,12 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
-  Text,
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { Card } from "./Card";
+import { Text } from "./Text";
 
 export interface AuthScreenLayoutProps {
   title: string;

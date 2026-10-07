@@ -27,7 +27,9 @@
       "expo-router",
       "expo-status-bar",
       "expo-sqlite",
-      "expo-web-browser"
+      "expo-web-browser",
+      "expo-font",
+      "expo-splash-screen"
     ],
     "experiments": {
       "typedRoutes": true

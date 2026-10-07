@@ -59,7 +59,15 @@ images inside a card, `rounded-full` for buttons, chips, and badges.
 
 ## Type
 
-The font is Outfit from spec 3 on. Until then it is the system font.
+The font is Outfit, loaded in `app/_layout.tsx` before the first screen
+shows. Outfit ships one file per weight, so in `tailwind.config.js` a
+weight is a family: `font-regular`, `font-medium`, `font-semibold`,
+`font-bold`. There is no `font-sans` and no numeric weight.
+
+**Import `Text` from `components/Text`, never from `react-native`.** It
+applies `font-regular` unless a weight class is present. React Native has
+no inherited font, so a bare `Text` falls back to the system font. A
+`TextInput` carries `font-regular` in its own classes.
 
 | Role | Classes |
 | --- | --- |
@@ -88,6 +96,28 @@ Use these. Do not restyle them per screen.
   border on focus, red border and message on error
 - `components/FormMessage.tsx` — `error` is red, `info` is `accent-soft`
 - `components/AuthScreenLayout.tsx` — canvas, safe area, keyboard handling
+- `components/Text.tsx` — every string. Sets the Outfit family
+- `components/Screen.tsx` — a tab screen that does not scroll: canvas,
+  top safe area, screen title, capped width, bottom padding for the tab
+  bar
+- `components/TabBar.tsx` — the floating capsule. Each tab is an icon
+  above a 12px label. The active tab is `accent` on an `accent-soft`
+  pill, the others are `subtle` with no background
+- `components/Chip.tsx` — a 44pt capsule. Selected is `accent` with white
+  text, unselected is `surface` with `subtle` text
+- `components/EmptyState.tsx` — a `subtle` sentence and at most one button
+- `components/Avatar.tsx` — the profile picture, or the first letter of
+  the name on a `surface` circle
+- `components/ExploreCard.tsx` — a `Card` with a title, facts as label
+  above value, tags as `canvas` capsules, and the static map picture
+- `components/AskBar.tsx`, `components/DestinationStrip.tsx` — Home only
+
+The tab bar floats over the content. A scrolling tab pads its list with
+`useTabBarClearance()` from `hooks/useTabBar.ts`; `Screen` does it for a
+tab that does not scroll.
+
+Size a bundled image with a `style` object, not `w-` and `h-` classes. On
+web a class does not override the image's intrinsic size.
 
 ---
 
@@ -97,13 +127,8 @@ Build them this way when their spec arrives.
 
 - **Screen:** `bg-canvas`, safe area respected, 20px side padding,
   content capped at `max-w-[380px]` and centred
-- **Tab bar (spec 3):** floating, `surface`, `shadows.soft`. Inactive
-  icons are `muted`. The active icon is white inside an `accent` circle.
-  No labels under the icons unless the board requires them
 - **Add button:** a 56pt `accent` circle with a white plus and
   `shadows.accent`
-- **Chip and filter:** a capsule. Selected is `accent` with white text.
-  Unselected is `surface` or `canvas` with `subtle` text
 - **Badge (Upcoming, Ongoing, Past, roles):** a small capsule. The one
   state that matters now uses `accent-soft` with `accent` text. Every
   other state uses `canvas` with `subtle` text. Do not give each status
@@ -114,8 +139,6 @@ Build them this way when their spec arrives.
 - **Icons:** Lucide, `ink` or `muted`, never multicoloured
 - **Divider:** `h-px bg-line`, and only where space alone is not enough
 - **Loading:** `ActivityIndicator` in `colors.accent` on `canvas`
-- **Empty state:** a `subtle` sentence and at most one button. No
-  illustration unless the board shows one
 - **Progress bar (spec 8):** a `canvas` track with an `accent` fill
 - **Chat bubbles (spec 11):** the traveller's message is `accent` with
   white text. The assistant's is `surface` with `ink` text
@@ -127,7 +150,9 @@ Build them this way when their spec arrives.
 - No hex value, `amber`, `orange`, `rose`, `slate`, `sky`, or `blue`
   class appears in the diff
 - Every surface is a `Card`, every button a `Button`
-- The accent appears on at most two elements in one viewport
+- The accent appears on at most two elements in one viewport. Home is
+  the one exception, with three: the active tab, the selected chip, and
+  the Create a trip button
 - The loading and empty states use the same canvas as the screen
 - It was looked at on a device and on web next to
   `context/design/mockup.png`

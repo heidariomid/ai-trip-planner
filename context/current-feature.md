@@ -33,3 +33,5 @@
 - feat: add trips, itinerary, and storage schema (spec 2)
 - fix: revoke execute on handle_new_user from anon and authenticated
 - feat: adopt minimal design system with a single-source theme
+- feat: add the three-tab app shell with Outfit and a floating tab bar
+  (spec 3)

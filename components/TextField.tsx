@@ -1,7 +1,8 @@
 import { forwardRef, useState } from "react";
-import { Text, TextInput, View, type TextInputProps } from "react-native";
+import { TextInput, View, type TextInputProps } from "react-native";
 
 import { colors } from "../lib/theme";
+import { Text } from "./Text";
 
 export interface TextFieldProps extends TextInputProps {
   label: string;
@@ -42,7 +43,7 @@ export const TextField = forwardRef<TextInput, TextFieldProps>(
           ref={ref}
           onFocus={handleFocus}
           onBlur={handleBlur}
-          className={`h-[50px] rounded-2xl border px-4 text-[16px] text-ink ${borderFor(
+          className={`h-[50px] rounded-2xl border px-4 font-regular text-[16px] text-ink ${borderFor(
             isFocused,
             Boolean(error),
           )}`}
