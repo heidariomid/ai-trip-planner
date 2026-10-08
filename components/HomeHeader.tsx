@@ -1,5 +1,6 @@
 import { View } from "react-native";
 
+import { useCurrentHour } from "../hooks/useCurrentHour";
 import { AskBar } from "./AskBar";
 import { Avatar } from "./Avatar";
 import { Text } from "./Text";
@@ -9,9 +10,14 @@ export interface HomeHeaderProps {
   avatarUrl: string | null | undefined;
 }
 
-function getGreeting(hour: number): string {
-  if (hour < 12) return "Good morning,";
-  if (hour < 18) return "Good afternoon,";
+const MORNING_STARTS = 5;
+const AFTERNOON_STARTS = 12;
+const EVENING_STARTS = 18;
+
+/** From the phone's clock. Before 5 in the morning still counts as the evening. */
+export function getGreeting(hour: number): string {
+  if (hour >= MORNING_STARTS && hour < AFTERNOON_STARTS) return "Good morning,";
+  if (hour >= AFTERNOON_STARTS && hour < EVENING_STARTS) return "Good afternoon,";
   return "Good evening,";
 }
 
@@ -22,15 +28,15 @@ function getFirstName(name: string): string {
 
 /** The top of Home: the greeting, the avatar, and the AI planning card. */
 export function HomeHeader({ name, avatarUrl }: HomeHeaderProps) {
+  const hour = useCurrentHour();
+
   return (
     <View className="pb-2">
-      <View className="mb-5 flex-row items-start justify-between">
-        <View className="flex-1 pr-4">
-          <Text className="text-[15px] text-subtle">{getGreeting(new Date().getHours())}</Text>
-          <Text className="text-[32px] font-bold leading-tight tracking-tight text-ink">
-            {getFirstName(name)} 👋
-          </Text>
-        </View>
+      <View className="mb-4 flex-row items-center justify-between">
+        <Text numberOfLines={1} className="flex-1 pr-4 text-[22px] tracking-tight text-subtle">
+          {getGreeting(hour)}{" "}
+          <Text className="font-bold text-ink">{getFirstName(name)}</Text>
+        </Text>
         <Avatar uri={avatarUrl} name={name} />
       </View>
 

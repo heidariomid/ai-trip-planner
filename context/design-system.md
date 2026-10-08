@@ -19,7 +19,8 @@ stays quiet around them.
   borders, or boxes
 - One accent, used rarely: the primary action, the active state, a link
 - No gradients, no blur, no decorative shapes, no warm tones, no second
-  accent colour
+  accent colour. The one exception is the AI planning card on Home,
+  which carries a pale sky-to-peach wash. Do not spread it
 - Red is for errors only
 
 ---
@@ -45,6 +46,8 @@ missing, add a token to `lib/theme.js` and list it here.
 | `accent` | `#5038E0` | Primary button, active tab, links, the add button |
 | `accent-deep` | `#3E28C4` | Pressed state of an accent element |
 | `accent-soft` | `#EEEBFD` | Tinted background for a selected chip or an info message |
+| `sky-soft` | `#E3F0FE` | One end of the wash on the AI planning card. Nowhere else |
+| `peach-soft` | `#FFEBDD` | The other end of that wash. Nowhere else |
 
 | Shadow | Use |
 | --- | --- |
@@ -125,13 +128,16 @@ Use these. Do not restyle them per screen.
 - `components/RoundButton.tsx` — a 44pt white circle with one icon, for
   a control that sits on a picture
 - `components/AskBar.tsx`, `components/HomeHeader.tsx` — Home only. The
-  header is a `subtle` greeting, the first name as the screen title, and
-  the avatar. The ask bar is a neutral white glass card (user decision,
-  2026-10-08): translucent `surface` with a `surface` edge and
-  `shadows.card`, a small `ink` caps label, a `subtle` lead-in, a bold
+  header is one 22px line, a `subtle` greeting then the first name in
+  bold `ink`. Nothing after the name: no emoji and no icon (the user
+  found both ugly, 2026-10-08). The avatar is on the right. The ask bar is a card with a pale wash from `sky-soft`
+  through `surface` to `peach-soft`, corner to corner (user decision,
+  2026-10-08, picked over flat mint, sky, and sand after pure white
+  felt too plain), with a `surface` edge and `shadows.card`, a small
+  `ink` caps label, a `subtle` lead-in, a bold
   30px `ink` headline that rotates through trip ideas, a `subtle` line
-  of help, and a white capsule that looks like an input. It has no
-  colour of its own. It is the first thing on Home because planning with
+  of help, and a white capsule that looks like an input. It is the first
+  thing on Home because planning with
   AI is what the app is for, and it stands out by size and motion.
   Tried and rejected by the user the same day: a filled `accent` card,
   a purple glow under blur, and a blurred photo

@@ -54,8 +54,9 @@
   preference.** A pale `canvas`, white `surface` cards with a soft
   shadow, navy `ink` text, grey `subtle` labels, and one indigo `accent`.
   The accent is rare on purpose: primary action, active state, links. A
-  screen with three accent elements has two too many. **No gradients, no
-  blur, no warm tones** (`amber`, `orange`, `rose`), and no second accent
+  screen with three accent elements has two too many. **No gradients
+  (except the pale wash on the AI planning card on Home), no blur, no
+  warm tones** (`amber`, `orange`, `rose`), and no second accent
   colour. Red is reserved for errors
 - Hierarchy comes from type and space, not from colour or borders: a
   small `subtle` label above a bold `ink` value, generous padding, and

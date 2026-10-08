@@ -41,3 +41,5 @@
   reschedule_trip, and trip deletion (spec 5)
 - feat: add explore plans with copy to a trip, the new Home layout, and
   ticked planning progress (spec 6)
+- fix: give the AI planning card a soft wash and put the greeting on
+  one line that follows the clock
