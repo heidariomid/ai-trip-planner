@@ -49,3 +49,5 @@
   progress (spec 8)
 - feat: add the trip photo gallery and notes, with one shared image
   upload (spec 9)
+- feat: add the editable profile with an avatar upload and interest
+  tags (spec 10)

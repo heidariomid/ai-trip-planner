@@ -8,6 +8,8 @@ import { Text } from "./Text";
 export interface HomeHeaderProps {
   name: string;
   avatarUrl: string | null | undefined;
+  /** An uploaded avatar. Shown instead of `avatarUrl` when set. */
+  avatarPath?: string | null;
 }
 
 const MORNING_STARTS = 5;
@@ -27,7 +29,7 @@ function getFirstName(name: string): string {
 }
 
 /** The top of Home: the greeting, the avatar, and the AI planning card. */
-export function HomeHeader({ name, avatarUrl }: HomeHeaderProps) {
+export function HomeHeader({ name, avatarUrl, avatarPath }: HomeHeaderProps) {
   const hour = useCurrentHour();
 
   return (
@@ -37,7 +39,7 @@ export function HomeHeader({ name, avatarUrl }: HomeHeaderProps) {
           {getGreeting(hour)}{" "}
           <Text className="font-bold text-ink">{getFirstName(name)}</Text>
         </Text>
-        <Avatar uri={avatarUrl} name={name} />
+        <Avatar path={avatarPath} uri={avatarUrl} name={name} />
       </View>
 
       <AskBar />

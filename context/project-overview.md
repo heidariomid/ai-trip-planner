@@ -32,7 +32,7 @@ from Home and from a trip.
 
 ## Current state
 
-Specs 1 through 9 are done. Specs 10 through 17 are written and not built.
+Specs 1 through 10 are done. Specs 11 through 17 are written and not built.
 
 - Expo Router, email and Google sign-in, and a `profiles` row on first
   sign-up. Verified on Expo Go and web
@@ -58,6 +58,10 @@ Specs 1 through 9 are done. Specs 10 through 17 are written and not built.
   on web or on a phone
 - A trip has a photo gallery, separate from its cover, and a list of
   notes. Not yet checked on web or on a phone
+- The Profile tab shows the traveller's avatar, name, email, and
+  interest tags, and an Edit profile screen changes the name, uploads an
+  avatar, and picks up to 6 tags from a fixed list. Not yet checked on
+  web or on a phone
 - No AI
 
 Nothing has been deployed. No EAS build, no store listing.
@@ -162,7 +166,7 @@ Full columns live in the spec that creates the table.
 
 | What | Created in | Shape |
 | --- | --- | --- |
-| `profiles` | spec 1, extended in spec 10 | one row per user, keyed to `auth.users.id` |
+| `profiles` | spec 1, extended in spec 10 | one row per user, keyed to `auth.users.id`. `avatar_url` is the provider's public picture; `avatar_path` is an uploaded one |
 | `trips` | spec 2 | title, source, destination, dates, cover path, description, traveler count, owner |
 | `itinerary_days` | spec 2 | one row per day of a trip |
 | `itinerary_activities` | spec 2 | start time, end time, place, activity, note, belonging to a day |
@@ -171,7 +175,7 @@ Full columns live in the spec that creates the table.
 | bookings | spec 7 | four tables: flights, car rentals, hotels, extras |
 | packing items | spec 8 | category, label, packed |
 | trip photos, notes | spec 9 | gallery separate from the cover; a list of notes |
-| interest tags | spec 10 | on `profiles` |
+| interest tags | spec 10 | `interests` on `profiles`, at most 6 from a fixed list |
 | chat | spec 11 | threads and messages. A card in a message is a transcript, not the itinerary |
 | `trips.status` | spec 12 | `active` or `draft` |
 | cover generation | spec 13 | a second model, Google Gemini `gemini-3.1-flash-lite-image`, writing only the cover file |
@@ -211,7 +215,7 @@ and inside the chat.
 | Bookings | 7, done |
 | Packing | 8, done |
 | Photos and notes | 9, done |
-| Edit profile and interest tags | 10 |
+| Edit profile and interest tags | 10, done |
 | AI chat | 11 |
 | AI creates and updates a trip | 12 |
 | AI cover image | 13 |
@@ -288,7 +292,8 @@ and when it is done.
    Done
 8. @context/features/spec8-packing.md — the checklist. Done
 9. @context/features/spec9-photos-and-notes.md — gallery and notes. Done
-10. @context/features/spec10-profile.md — name, avatar, interest tags
+10. @context/features/spec10-profile.md — name, avatar, interest tags.
+    Done
 11. @context/features/spec11-ai-chat.md — the assistant talks, and does not
     write a trip
 12. @context/features/spec12-ai-trip-actions.md — create, draft, and update

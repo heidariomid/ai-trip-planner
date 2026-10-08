@@ -113,7 +113,9 @@ Use these. Do not restyle them per screen.
   text, unselected is `surface` with `subtle` text
 - `components/EmptyState.tsx` — a `subtle` sentence and at most one button
 - `components/Avatar.tsx` — the profile picture, or the first letter of
-  the name on a `surface` circle
+  the name on a `surface` circle. It takes `path` for an uploaded avatar
+  and `uri` for a public or local one, and never shows the grey
+  placeholder: no picture means the letter
 - `components/ExploreCard.tsx` — a `Card` with a title, facts as label
   above value, tags as `canvas` capsules, and the static map picture.
   It opens the plan
@@ -233,6 +235,16 @@ Use these. Do not restyle them per screen.
   `subtle`, and a `muted` pencil. Tapping it swaps the card for the
   form, a multiline field with a character count. A new note's form
   opens under the header
+
+- `components/ProfileForm.tsx`, `components/InterestChips.tsx` — the
+  edit-profile form. An 88pt avatar centred above a quiet `ink` "Change
+  photo", with a 32pt white camera badge on its corner. The avatar, the
+  badge, and the label are one button, with no spinner and no crop
+  step. Then the name field with a character count, and the interest tags
+  as 44pt capsules that wrap. A picked tag is `accent-soft` with
+  `accent` text and the others are `canvas` with `subtle` text, so Save
+  stays the one filled accent element. Once six are picked the rest dim.
+  On the Profile tab the same tags are quiet `Badge`s
 
 A plan's picture is bundled, not private: `getExploreImage(key)` from
 `lib/explore-images.ts` returns it, or the placeholder for an unknown

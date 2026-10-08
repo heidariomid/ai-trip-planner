@@ -49,6 +49,17 @@ export function validateSignUp(fields: SignUpFields): Partial<Record<keyof SignU
   return errors;
 }
 
+export const MAX_NAME_LENGTH = 60;
+
+export function validateProfileName(fullName: string): string | null {
+  const name = fullName.trim();
+  if (!name) return "Enter your name.";
+  if (name.length > MAX_NAME_LENGTH) {
+    return `Keep your name under ${MAX_NAME_LENGTH} characters.`;
+  }
+  return null;
+}
+
 export const MAX_DESCRIPTION_LENGTH = 200;
 export const MAX_TRAVELERS = 20;
 

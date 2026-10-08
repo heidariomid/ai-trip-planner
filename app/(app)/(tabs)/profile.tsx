@@ -1,7 +1,9 @@
+import { useRouter } from "expo-router";
 import { useState } from "react";
 import { ActivityIndicator, View } from "react-native";
 
 import { Avatar } from "../../../components/Avatar";
+import { Badge } from "../../../components/Badge";
 import { Button } from "../../../components/Button";
 import { Card } from "../../../components/Card";
 import { FormMessage } from "../../../components/FormMessage";
@@ -10,9 +12,11 @@ import { Text } from "../../../components/Text";
 import { useAuth } from "../../../hooks/useAuth";
 import { useProfile } from "../../../hooks/useProfile";
 import { signOut } from "../../../lib/auth";
+import { toInterestLabel } from "../../../lib/profiles";
 import { colors } from "../../../lib/theme";
 
 export default function ProfileScreen() {
+  const router = useRouter();
   const { user } = useAuth();
   const { profile, isLoading, error } = useProfile();
   const [isSigningOut, setIsSigningOut] = useState(false);
@@ -28,6 +32,7 @@ export default function ProfileScreen() {
 
   const email = profile?.email ?? user?.email ?? "";
   const name = profile?.full_name ?? email;
+  const interests = profile?.interests ?? [];
 
   return (
     <Screen title="Profile">
@@ -37,21 +42,47 @@ export default function ProfileScreen() {
         {isLoading ? (
           <ActivityIndicator size="small" color={colors.accent} />
         ) : (
-          <View className="flex-row items-center">
-            <Avatar uri={profile?.avatar_url} name={name} size={64} />
-            <View className="ml-4 flex-1">
-              <Text className="text-[20px] font-semibold tracking-tight text-ink">
-                {name}
-              </Text>
-              {email && email !== name ? (
-                <Text className="mt-1 text-[14px] text-subtle">{email}</Text>
-              ) : null}
+          <View>
+            <View className="flex-row items-center">
+              <Avatar
+                path={profile?.avatar_path}
+                uri={profile?.avatar_url}
+                name={name}
+                size={64}
+              />
+              <View className="ml-4 flex-1">
+                <Text className="text-[20px] font-semibold tracking-tight text-ink">
+                  {name}
+                </Text>
+                {email && email !== name ? (
+                  <Text className="mt-1 text-[14px] text-subtle">{email}</Text>
+                ) : null}
+              </View>
             </View>
+
+            <Text className="mb-2 mt-5 text-[13px] text-subtle">Interests</Text>
+            {interests.length > 0 ? (
+              <View className="flex-row flex-wrap gap-2">
+                {interests.map((interest) => (
+                  <Badge key={interest} label={toInterestLabel(interest)} />
+                ))}
+              </View>
+            ) : (
+              <Text className="text-[14px] leading-5 text-subtle">
+                None yet. Pick a few so trip ideas can fit you.
+              </Text>
+            )}
           </View>
         )}
       </Card>
 
-      <View className="mt-8">
+      {profile ? (
+        <View className="mt-6">
+          <Button label="Edit profile" onPress={() => router.push("/edit-profile")} />
+        </View>
+      ) : null}
+
+      <View className="mt-4">
         <FormMessage message={signOutError} />
         <Button
           label="Sign out"

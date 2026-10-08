@@ -71,13 +71,13 @@ export async function getImageSource(
 }
 
 /**
- * The one upload path. Puts an image at `{owner_id}/{trip_id}/{name}.{ext}`
- * and returns the path. The owner is the trip's `user_id`, not whoever is
- * signed in.
+ * The one upload path. Puts an image at `{folder}/{name}.{ext}` and returns
+ * the path. A trip's folder is `{owner_id}/{trip_id}`, where the owner is the
+ * trip's `user_id` and not whoever is signed in. An avatar's is
+ * `{user_id}/avatar`.
  */
-async function uploadTripImage(
-  ownerId: string,
-  tripId: string,
+async function uploadImage(
+  folder: string,
   name: string,
   image: LocalImage,
 ): Promise<UploadResult> {
@@ -99,7 +99,7 @@ async function uploadTripImage(
     };
   }
 
-  const path = `${ownerId}/${tripId}/${name}.${extension}`;
+  const path = `${folder}/${name}.${extension}`;
 
   try {
     // An ArrayBuffer rather than a Blob: a Blob built from a file URI uploads
@@ -137,7 +137,7 @@ export function uploadTripCover(
   tripId: string,
   image: LocalImage,
 ): Promise<UploadResult> {
-  return uploadTripImage(ownerId, tripId, `cover-${Date.now()}`, image);
+  return uploadImage(`${ownerId}/${tripId}`, `cover-${Date.now()}`, image);
 }
 
 /** Uploads a gallery photo as `photo-{time}-{random}`, beside the cover. */
@@ -147,7 +147,15 @@ export function uploadTripPhoto(
   image: LocalImage,
 ): Promise<UploadResult> {
   const suffix = Math.random().toString(36).slice(2, 8);
-  return uploadTripImage(ownerId, tripId, `photo-${Date.now()}-${suffix}`, image);
+  return uploadImage(`${ownerId}/${tripId}`, `photo-${Date.now()}-${suffix}`, image);
+}
+
+/**
+ * Uploads the signed-in user's avatar as `avatar-{time}`, in their own
+ * `avatar` folder. A new name every time, for the same reason as a cover.
+ */
+export function uploadAvatar(userId: string, image: LocalImage): Promise<UploadResult> {
+  return uploadImage(`${userId}/avatar`, `avatar-${Date.now()}`, image);
 }
 
 export interface RemoveResult {
@@ -158,7 +166,7 @@ export interface RemoveResult {
 const REMOVE_FAILED = "The trip's pictures could not be removed.";
 const LIST_PAGE_SIZE = 100;
 
-/** Removes one file. Used when a cover is replaced. */
+/** Removes one file. Used when a cover or an avatar is replaced. */
 export async function removeImage(path: string): Promise<RemoveResult> {
   try {
     const { error } = await supabase.storage.from(IMAGES_BUCKET).remove([path]);

@@ -57,7 +57,11 @@ export default function HomeScreen() {
           }}
           ListHeaderComponent={
             <View>
-              <HomeHeader name={name} avatarUrl={profile?.avatar_url} />
+              <HomeHeader
+                name={name}
+                avatarUrl={profile?.avatar_url}
+                avatarPath={profile?.avatar_path}
+              />
 
               <View className="mt-5">
                 <SectionHeader
