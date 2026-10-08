@@ -10,6 +10,7 @@ export interface HomeHeaderProps {
   avatarUrl: string | null | undefined;
   /** An uploaded avatar. Shown instead of `avatarUrl` when set. */
   avatarPath?: string | null;
+  onAsk: () => void;
 }
 
 const MORNING_STARTS = 5;
@@ -29,7 +30,7 @@ function getFirstName(name: string): string {
 }
 
 /** The top of Home: the greeting, the avatar, and the AI planning card. */
-export function HomeHeader({ name, avatarUrl, avatarPath }: HomeHeaderProps) {
+export function HomeHeader({ name, avatarUrl, avatarPath, onAsk }: HomeHeaderProps) {
   const hour = useCurrentHour();
 
   return (
@@ -42,7 +43,7 @@ export function HomeHeader({ name, avatarUrl, avatarPath }: HomeHeaderProps) {
         <Avatar path={avatarPath} uri={avatarUrl} name={name} />
       </View>
 
-      <AskBar />
+      <AskBar onPress={onAsk} />
     </View>
   );
 }

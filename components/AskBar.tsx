@@ -1,6 +1,6 @@
 import { LinearGradient } from "expo-linear-gradient";
 import { Mic, Sparkles } from "lucide-react-native";
-import { View } from "react-native";
+import { Pressable, View } from "react-native";
 
 import { colors, shadows } from "../lib/theme";
 import { RotatingText } from "./RotatingText";
@@ -32,16 +32,25 @@ const FILL = {
   left: 0,
 } as const;
 
+export interface AskBarProps {
+  onPress: () => void;
+}
+
 /**
  * The way into planning with AI, and the first thing on Home on purpose: it
  * is what the app is for. A soft sky-to-peach wash, the one gradient in the
- * app, so it has a little colour without a loud one. Drawn, not wired. It is
- * not an input, so there is nothing to submit; the assistant arrives in
- * spec 11.
+ * app, so it has a little colour without a loud one. It is not an input: the
+ * whole card is one button that opens the assistant, where the typing happens.
  */
-export function AskBar() {
+export function AskBar({ onPress }: AskBarProps) {
   return (
-    <View style={shadows.card} className="rounded-card bg-surface">
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel="Plan a trip with the assistant"
+      onPress={onPress}
+      style={shadows.card}
+      className="rounded-card bg-surface active:opacity-80"
+    >
       <View className="overflow-hidden rounded-card border border-surface px-5 pb-5 pt-6">
         <LinearGradient
           colors={WASH}
@@ -79,6 +88,6 @@ export function AskBar() {
           <Mic size={20} color={colors.muted} />
         </View>
       </View>
-    </View>
+    </Pressable>
   );
 }

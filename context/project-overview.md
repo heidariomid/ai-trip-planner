@@ -32,7 +32,7 @@ from Home and from a trip.
 
 ## Current state
 
-Specs 1 through 10 are done. Specs 11 through 17 are written and not built.
+Specs 1 through 11 are done. Specs 12 through 17 are written and not built.
 
 - Expo Router, email and Google sign-in, and a `profiles` row on first
   sign-up. Verified on Expo Go and web
@@ -62,9 +62,14 @@ Specs 1 through 10 are done. Specs 11 through 17 are written and not built.
   interest tags, and an Edit profile screen changes the name, uploads an
   avatar, and picks up to 6 tags from a fixed list. Not yet checked on
   web or on a phone
-- No AI
+- The assistant opens from the Home ask bar and from a trip. It streams
+  replies from Google Gemini through a Supabase Edge Function, shows
+  day cards, place cards, and suggestion chips, saves the conversation,
+  and is capped at 30 requests a day. It cannot create or change a trip
+  yet. The user saw it answer on a phone
 
-Nothing has been deployed. No EAS build, no store listing.
+No app build has been deployed: no EAS build, no store listing. The
+`chat` Edge Function is deployed on the Supabase project.
 
 ---
 
@@ -93,7 +98,8 @@ activities, and bookings, packing, and members are further joins. That is
 not a document tree. Row-level security keeps authorisation next to the
 data.
 
-**Supabase is not an AI provider.** The model is chosen in spec 11.
+**Supabase is not an AI provider.** The model is Google Gemini, chosen in
+spec 11 and called from a Supabase Edge Function.
 
 ---
 
@@ -216,7 +222,7 @@ and inside the chat.
 | Packing | 8, done |
 | Photos and notes | 9, done |
 | Edit profile and interest tags | 10, done |
-| AI chat | 11 |
+| AI chat | 11, done |
 | AI creates and updates a trip | 12 |
 | AI cover image | 13 |
 | Saved places | 14 |
@@ -234,7 +240,7 @@ and inside the chat.
 | UI | NativeWind. No component library. Look in @context/design-system.md |
 | Navigation | Expo Router, adopted in spec 1 |
 | Backend | Supabase — Postgres, Auth, Storage |
-| AI | Chosen in spec 11, not before |
+| AI | Google Gemini `gemini-3.5-flash-lite`, called from a Supabase Edge Function |
 | Package manager | npm, via `npx expo install` |
 | Tests | None — manual verification on device |
 
@@ -295,7 +301,7 @@ and when it is done.
 10. @context/features/spec10-profile.md — name, avatar, interest tags.
     Done
 11. @context/features/spec11-ai-chat.md — the assistant talks, and does not
-    write a trip
+    write a trip. Done
 12. @context/features/spec12-ai-trip-actions.md — create, draft, and update
 13. @context/features/spec13-ai-cover.md — generate a cover, separate from
     writing trip rows

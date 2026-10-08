@@ -130,6 +130,7 @@ Use these. Do not restyle them per screen.
 - `components/RoundButton.tsx` — a 44pt white circle with one icon, for
   a control that sits on a picture
 - `components/AskBar.tsx`, `components/HomeHeader.tsx` — Home only. The
+  whole ask bar is one button that opens the assistant. The
   header is one 22px line, a `subtle` greeting then the first name in
   bold `ink`. Nothing after the name: no emoji and no icon (the user
   found both ugly, 2026-10-08). The avatar is on the right. The ask bar is a card with a pale wash from `sky-soft`
@@ -246,6 +247,26 @@ Use these. Do not restyle them per screen.
   stays the one filled accent element. Once six are picked the rest dim.
   On the Profile tab the same tags are quiet `Badge`s
 
+- `components/ChatBubble.tsx`, `components/ChatCards.tsx`,
+  `components/ChatComposer.tsx`, `components/TripPicker.tsx`,
+  `components/Markdown.tsx` — the assistant screen. The traveller's
+  message is an `accent` bubble with white text on the right. The
+  assistant's is a `surface` bubble on the left with `shadows.soft`,
+  its text drawn by `Markdown` (headings, bold, and lists, in Outfit;
+  never a link or an image). Under a reply come its cards, each a
+  `surface` block with `rounded-2xl`: a day card with a time column, a
+  place card with the 56pt shared placeholder, and suggestion chips as
+  white 44pt capsules with `ink` text. A button for something the chat
+  cannot do yet (`LockedAction`: Add to Trip, Create Trip, Save Draft,
+  Regenerate) is a small outlined capsule at 45% opacity that does
+  nothing. The composer is a white capsule with one 40pt round button:
+  `accent` with an up arrow to send, `canvas` with a square to stop.
+  The trip picker is a white capsule that opens a sheet at the bottom,
+  like `TripMenu`. While a reply has no text yet the bubble holds a
+  small `subtle` spinner. A `muted` 12px line under the composer says
+  the assistant can be wrong. Accent here is the traveller's bubbles
+  and the send button, nothing else
+
 A plan's picture is bundled, not private: `getExploreImage(key)` from
 `lib/explore-images.ts` returns it, or the placeholder for an unknown
 key. A new plan picture needs a new build.
@@ -281,8 +302,6 @@ Build them this way when their spec arrives.
 - **Icons:** Lucide, `ink` or `muted`, never multicoloured
 - **Divider:** `h-px bg-line`, and only where space alone is not enough
 - **Loading:** `ActivityIndicator` in `colors.accent` on `canvas`
-- **Chat bubbles (spec 11):** the traveller's message is `accent` with
-  white text. The assistant's is `surface` with `ink` text
 
 ---
 

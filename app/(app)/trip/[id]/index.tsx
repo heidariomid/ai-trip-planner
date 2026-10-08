@@ -344,6 +344,10 @@ export default function TripScreen() {
       <TripMenu
         visible={isMenuOpen}
         onClose={() => setIsMenuOpen(false)}
+        onAsk={() => {
+          setIsMenuOpen(false);
+          router.push({ pathname: "/chat", params: { tripId: trip.id } });
+        }}
         onEdit={() => {
           setIsMenuOpen(false);
           router.push({ pathname: "/trip/[id]/edit", params: { id: trip.id } });

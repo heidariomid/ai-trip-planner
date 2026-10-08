@@ -163,6 +163,91 @@ export type Database = {
           },
         ]
       }
+      chat_messages: {
+        Row: {
+          cards: Json | null
+          content: string
+          created_at: string
+          id: string
+          role: string
+          thread_id: string
+        }
+        Insert: {
+          cards?: Json | null
+          content: string
+          created_at?: string
+          id?: string
+          role: string
+          thread_id: string
+        }
+        Update: {
+          cards?: Json | null
+          content?: string
+          created_at?: string
+          id?: string
+          role?: string
+          thread_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_messages_thread_id_fkey"
+            columns: ["thread_id"]
+            isOneToOne: false
+            referencedRelation: "chat_threads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      chat_threads: {
+        Row: {
+          created_at: string
+          id: string
+          trip_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          trip_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          trip_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_threads_trip_id_fkey"
+            columns: ["trip_id"]
+            isOneToOne: false
+            referencedRelation: "trips"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      chat_usage: {
+        Row: {
+          day: string
+          request_count: number
+          user_id: string
+        }
+        Insert: {
+          day: string
+          request_count?: number
+          user_id: string
+        }
+        Update: {
+          day?: string
+          request_count?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
       explore_plan_activities: {
         Row: {
           activity: string | null
@@ -544,6 +629,12 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      consume_chat_request: {
+        Args: {
+          p_limit: number
+        }
+        Returns: boolean
+      }
       create_trip: {
         Args: {
           p_activities?: Json

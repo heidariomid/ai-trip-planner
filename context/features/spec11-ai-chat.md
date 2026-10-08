@@ -12,6 +12,38 @@ Generating a cover is spec 13.
 The provider is chosen at the start of this step, written into this spec,
 and not guessed from an older note.
 
+## Decisions taken at the start (2026-10-08)
+
+- **Provider and model:** Google Gemini, `gemini-3.5-flash-lite`, called
+  through `models/{model}:streamGenerateContent?alt=sse`. The user chose
+  Gemini because it has a free tier for building and because spec 13
+  already uses it, so one `GEMINI_API_KEY` function secret serves both.
+  The free tier lets Google use prompts to improve its products and its
+  limits are too low for real users; switch the key to paid billing
+  before release. The model id is one constant in the function
+- **Where it runs:** a Supabase Edge Function named `chat`, in
+  `supabase/functions/chat/index.ts`. It is deployed with JWT
+  verification off at the gateway and checks the caller itself with
+  `auth.getUser`, then runs every query with the caller's token
+- **Markdown renderer:** hand-rolled, `components/Markdown.tsx`. No
+  package, so it runs in Expo Go and uses the app's own font. It draws
+  headings, bold, and lists, keeps a link's words without its address,
+  and drops images and bare URLs
+- **Streaming:** the app reads the reply with `fetch` from `expo/fetch`,
+  which can read a response as it arrives and is included in Expo Go
+- **Cards:** the model may end a reply with one `<cards>{…}</cards>`
+  block of JSON holding `chips`, `places`, and `days`. The function
+  holds that block back from the stream, cuts it down to what the app
+  draws, strips any URL, and saves it in `chat_messages.cards`
+- **Threads:** the chat opens on the newest thread for the selected
+  trip, or the newest with no trip. A button starts a new one. There is
+  no list of old threads
+- **The cap:** `public.consume_chat_request(p_limit)` counts one request
+  for the caller on today's UTC date in `chat_usage`, a table the app
+  cannot read or write. The function passes its own constant, 30
+- **From a trip:** the chat opens from the trip's options menu, as "Ask
+  the assistant"
+
 ## Requirements
 
 - A chat screen opened from the Home ask bar and from a trip. The trip

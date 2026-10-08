@@ -51,3 +51,5 @@
   upload (spec 9)
 - feat: add the editable profile with an avatar upload and interest
   tags (spec 10)
+- feat: add the AI chat with a streaming Gemini Edge Function, saved
+  threads, and a daily cap (spec 11)

@@ -61,6 +61,7 @@ export default function HomeScreen() {
                 name={name}
                 avatarUrl={profile?.avatar_url}
                 avatarPath={profile?.avatar_path}
+                onAsk={() => router.push("/chat")}
               />
 
               <View className="mt-5">
