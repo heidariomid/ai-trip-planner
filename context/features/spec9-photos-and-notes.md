@@ -21,6 +21,15 @@ not one long field.
 - Notes: `trip_id` and a body. The same two functions as photos. Add,
   edit, and delete. The newest note is first
 - Both tabs are the ones left empty in spec 5
+- Decided when the spec was built (2026-10-08): a caption can be added
+  or changed after upload and is at most 120 characters; a note is at
+  most 500; the gallery is three thumbnails to a row, newest first;
+  tapping a photo opens it full screen with its caption and Delete,
+  which asks first; up to 10 photos can be picked in one go
+- A photo's file is `photo-{time}-{random}` in `{owner_id}/{trip_id}/`,
+  beside `cover-{time}`, where the owner is the trip's `user_id`. The
+  upload is one shared helper in `lib/storage.ts`, which spec 13 reuses
+  for a generated cover
 
 ## Out of scope
 

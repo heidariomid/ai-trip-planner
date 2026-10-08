@@ -47,3 +47,5 @@
   (spec 7)
 - feat: add the packing list and count packed items in planning
   progress (spec 8)
+- feat: add the trip photo gallery and notes, with one shared image
+  upload (spec 9)

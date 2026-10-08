@@ -419,6 +419,67 @@ export type Database = {
         }
         Relationships: []
       }
+      trip_notes: {
+        Row: {
+          body: string
+          created_at: string
+          id: string
+          trip_id: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          id?: string
+          trip_id: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          id?: string
+          trip_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trip_notes_trip_id_fkey"
+            columns: ["trip_id"]
+            isOneToOne: false
+            referencedRelation: "trips"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      trip_photos: {
+        Row: {
+          caption: string | null
+          created_at: string
+          id: string
+          image_path: string
+          trip_id: string
+        }
+        Insert: {
+          caption?: string | null
+          created_at?: string
+          id?: string
+          image_path: string
+          trip_id: string
+        }
+        Update: {
+          caption?: string | null
+          created_at?: string
+          id?: string
+          image_path?: string
+          trip_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trip_photos_trip_id_fkey"
+            columns: ["trip_id"]
+            isOneToOne: false
+            referencedRelation: "trips"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       trips: {
         Row: {
           created_at: string

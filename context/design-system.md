@@ -216,6 +216,24 @@ Use these. Do not restyle them per screen.
   Category. Below the last category a `secondary` button adds an item
   under a new category
 
+- `components/AddHeader.tsx` — a section title in the card-title style
+  with an optional `subtle` detail beside it and a quiet `ink` "+ Add"
+  on the right, which can read "Uploading…" while it works. Photos and
+  Notes use it; Bookings and Packing draw the same header by hand
+- `components/Photos.tsx`, `components/PhotoViewer.tsx` — the Photos
+  section of a trip. Under the header, square thumbnails three to a
+  row with an 8pt gap and `rounded-2xl` corners, newest first. Tapping
+  one opens the viewer: the photo on `ink`, a round close button on it,
+  and a `surface` sheet at the bottom with the caption, a red Delete,
+  and a `secondary` button for the caption. The sheet swaps in place to
+  the caption field or to the delete question; nothing opens over it.
+  `ink` behind a photo is the one dark surface in the app
+- `components/Notes.tsx`, `components/NoteForm.tsx` — the Notes section
+  of a trip. A note is a `Card` with its text in `ink`, its date in
+  `subtle`, and a `muted` pencil. Tapping it swaps the card for the
+  form, a multiline field with a character count. A new note's form
+  opens under the header
+
 A plan's picture is bundled, not private: `getExploreImage(key)` from
 `lib/explore-images.ts` returns it, or the placeholder for an unknown
 key. A new plan picture needs a new build.

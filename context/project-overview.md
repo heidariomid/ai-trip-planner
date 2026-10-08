@@ -32,7 +32,7 @@ from Home and from a trip.
 
 ## Current state
 
-Specs 1 through 8 are done. Specs 9 through 17 are written and not built.
+Specs 1 through 9 are done. Specs 10 through 17 are written and not built.
 
 - Expo Router, email and Google sign-in, and a `profiles` row on first
   sign-up. Verified on Expo Go and web
@@ -56,6 +56,8 @@ Specs 1 through 8 are done. Specs 9 through 17 are written and not built.
 - A trip has a packing list grouped by categories the traveller types.
   Packed items count toward the planning progress bar. Not yet checked
   on web or on a phone
+- A trip has a photo gallery, separate from its cover, and a list of
+  notes. Not yet checked on web or on a phone
 - No AI
 
 Nothing has been deployed. No EAS build, no store listing.
@@ -208,7 +210,7 @@ and inside the chat.
 | Explore, and copy into My Trips | 6, done |
 | Bookings | 7, done |
 | Packing | 8, done |
-| Photos and notes | 9 |
+| Photos and notes | 9, done |
 | Edit profile and interest tags | 10 |
 | AI chat | 11 |
 | AI creates and updates a trip | 12 |
@@ -285,7 +287,7 @@ and when it is done.
 7. @context/features/spec7-bookings.md — flights, cars, hotels, extras.
    Done
 8. @context/features/spec8-packing.md — the checklist. Done
-9. @context/features/spec9-photos-and-notes.md — gallery and notes
+9. @context/features/spec9-photos-and-notes.md — gallery and notes. Done
 10. @context/features/spec10-profile.md — name, avatar, interest tags
 11. @context/features/spec11-ai-chat.md — the assistant talks, and does not
     write a trip

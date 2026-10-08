@@ -71,13 +71,14 @@ export async function getImageSource(
 }
 
 /**
- * Uploads a picked image to `{owner_id}/{trip_id}/cover-{time}.{ext}` and
- * returns the path. The name is new every time, so a replaced cover is never
- * served from a cache that still holds the old picture.
+ * The one upload path. Puts an image at `{owner_id}/{trip_id}/{name}.{ext}`
+ * and returns the path. The owner is the trip's `user_id`, not whoever is
+ * signed in.
  */
-export async function uploadTripCover(
+async function uploadTripImage(
   ownerId: string,
   tripId: string,
+  name: string,
   image: LocalImage,
 ): Promise<UploadResult> {
   const contentType = image.mimeType ?? "image/jpeg";
@@ -98,7 +99,7 @@ export async function uploadTripCover(
     };
   }
 
-  const path = `${ownerId}/${tripId}/cover-${Date.now()}.${extension}`;
+  const path = `${ownerId}/${tripId}/${name}.${extension}`;
 
   try {
     // An ArrayBuffer rather than a Blob: a Blob built from a file URI uploads
@@ -127,12 +128,35 @@ export async function uploadTripCover(
   }
 }
 
+/**
+ * Uploads a trip's cover as `cover-{time}`. The name is new every time, so a
+ * replaced cover is never served from a cache that still holds the old picture.
+ */
+export function uploadTripCover(
+  ownerId: string,
+  tripId: string,
+  image: LocalImage,
+): Promise<UploadResult> {
+  return uploadTripImage(ownerId, tripId, `cover-${Date.now()}`, image);
+}
+
+/** Uploads a gallery photo as `photo-{time}-{random}`, beside the cover. */
+export function uploadTripPhoto(
+  ownerId: string,
+  tripId: string,
+  image: LocalImage,
+): Promise<UploadResult> {
+  const suffix = Math.random().toString(36).slice(2, 8);
+  return uploadTripImage(ownerId, tripId, `photo-${Date.now()}-${suffix}`, image);
+}
+
 export interface RemoveResult {
   success: boolean;
   error: string | null;
 }
 
 const REMOVE_FAILED = "The trip's pictures could not be removed.";
+const LIST_PAGE_SIZE = 100;
 
 /** Removes one file. Used when a cover is replaced. */
 export async function removeImage(path: string): Promise<RemoveResult> {
@@ -157,19 +181,31 @@ export async function removeTripFiles(ownerId: string, tripId: string): Promise<
 
   try {
     const bucket = supabase.storage.from(IMAGES_BUCKET);
-    const { data: files, error: listError } = await bucket.list(folder);
-    if (listError) {
-      return { success: false, error: toReadableError("storage", listError, REMOVE_FAILED) };
-    }
-    if (files.length === 0) return { success: true, error: null };
 
-    const paths = files.map((file) => `${folder}/${file.name}`);
-    const { error } = await bucket.remove(paths);
-    paths.forEach((path) => signedUrls.delete(path));
-    if (error) {
-      return { success: false, error: toReadableError("storage", error, REMOVE_FAILED) };
+    // A list returns one page. A gallery can hold more than that, so the first
+    // page is read and removed until the folder is empty.
+    for (;;) {
+      const { data: files, error: listError } = await bucket.list(folder, {
+        limit: LIST_PAGE_SIZE,
+      });
+      if (listError) {
+        return { success: false, error: toReadableError("storage", listError, REMOVE_FAILED) };
+      }
+      if (files.length === 0) return { success: true, error: null };
+
+      const paths = files.map((file) => `${folder}/${file.name}`);
+      const { data: removed, error } = await bucket.remove(paths);
+      paths.forEach((path) => signedUrls.delete(path));
+      // Nothing removed and no error means the files were not ours to remove.
+      // Stopping here keeps the loop from reading the same page for ever.
+      if (error || removed.length === 0) {
+        return {
+          success: false,
+          error: toReadableError("storage", error ?? "no file removed", REMOVE_FAILED),
+        };
+      }
+      if (files.length < LIST_PAGE_SIZE) return { success: true, error: null };
     }
-    return { success: true, error: null };
   } catch (error) {
     return { success: false, error: toReadableError("storage", error, REMOVE_FAILED) };
   }

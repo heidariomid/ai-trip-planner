@@ -146,6 +146,17 @@ export function validatePackingItem(
   return errors;
 }
 
+export const MAX_CAPTION_LENGTH = 120;
+export const MAX_TRIP_NOTE_LENGTH = 500;
+
+export function validateTripNote(body: string): string | null {
+  if (!body.trim()) return "Write something to save.";
+  if (body.length > MAX_TRIP_NOTE_LENGTH) {
+    return `Keep the note under ${MAX_TRIP_NOTE_LENGTH} characters.`;
+  }
+  return null;
+}
+
 export const MAX_DETAIL_LENGTH = 200;
 
 export interface FlightFields {
