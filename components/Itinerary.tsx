@@ -23,6 +23,7 @@ export interface ItineraryItemProps {
     existing: Activity | null,
   ) => Promise<string | null>;
   onDelete: (activity: Activity) => Promise<string | null>;
+  onToggleDone: (activity: Activity) => void;
 }
 
 /** One activity: a timeline row, or the inline form while it is being edited. */
@@ -35,6 +36,7 @@ export function ItineraryItem({
   onEdit,
   onSave,
   onDelete,
+  onToggleDone,
 }: ItineraryItemProps) {
   if (!isEditing) {
     return (
@@ -43,6 +45,7 @@ export function ItineraryItem({
         destination={destination}
         isLast={isLast}
         onPress={() => onEdit(activity.id)}
+        onToggleDone={() => onToggleDone(activity)}
       />
     );
   }

@@ -81,6 +81,22 @@ export function validateTrip(fields: TripFields): Partial<Record<keyof TripField
   return errors;
 }
 
+export interface CopyPlanFields {
+  source: string;
+  startDate: string;
+}
+
+export function validateCopyPlan(
+  fields: CopyPlanFields,
+): Partial<Record<keyof CopyPlanFields, string>> {
+  const errors: Partial<Record<keyof CopyPlanFields, string>> = {};
+
+  if (!fields.source.trim()) errors.source = "Enter where you are leaving from.";
+  if (!fields.startDate) errors.startDate = "Choose a start date.";
+
+  return errors;
+}
+
 export const MAX_NOTE_LENGTH = 200;
 
 export interface ActivityFields {

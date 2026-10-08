@@ -1,11 +1,12 @@
-import { ArrowLeft, CalendarDays, Ellipsis, type LucideIcon } from "lucide-react-native";
-import { Image, Pressable, View } from "react-native";
+import { ArrowLeft, CalendarDays, Ellipsis } from "lucide-react-native";
+import { Image, View } from "react-native";
 
 import { useImageSource } from "../hooks/useImageSource";
 import { countDays, formatDateRange, getTripStatus, pluralize } from "../lib/dates";
-import { colors, shadows } from "../lib/theme";
+import { colors } from "../lib/theme";
 import type { TripDetail } from "../lib/trip-detail";
 import { Badge } from "./Badge";
+import { RoundButton } from "./RoundButton";
 import { Text } from "./Text";
 
 export interface TripBannerProps {
@@ -17,26 +18,6 @@ export interface TripBannerProps {
 // A style object, not classes: the placeholder is a bundled image, and on web
 // a class does not override its intrinsic size.
 const COVER_SIZE = { width: "100%", height: 200 } as const;
-
-interface RoundButtonProps {
-  icon: LucideIcon;
-  accessibilityLabel: string;
-  onPress: () => void;
-}
-
-function RoundButton({ icon: Icon, accessibilityLabel, onPress }: RoundButtonProps) {
-  return (
-    <Pressable
-      accessibilityRole="button"
-      accessibilityLabel={accessibilityLabel}
-      onPress={onPress}
-      style={shadows.soft}
-      className="h-11 w-11 items-center justify-center rounded-full bg-surface active:bg-canvas"
-    >
-      <Icon size={20} color={colors.ink} />
-    </Pressable>
-  );
-}
 
 export function TripBanner({ trip, onBack, onOpenMenu }: TripBannerProps) {
   const cover = useImageSource(trip.image_path);

@@ -26,7 +26,7 @@ import { TripMenu } from "../../../../components/TripMenu";
 import { useTripDetail } from "../../../../hooks/useTripDetail";
 import { todayISO } from "../../../../lib/dates";
 import { colors } from "../../../../lib/theme";
-import type { ItineraryDay } from "../../../../lib/trip-detail";
+import type { Activity, ItineraryDay } from "../../../../lib/trip-detail";
 
 const SECTIONS = ["Itinerary", "Bookings", "Packing", "Photos", "Notes"] as const;
 type Section = (typeof SECTIONS)[number];
@@ -49,8 +49,16 @@ function defaultDay(days: ItineraryDay[]): ItineraryDay | null {
 export default function TripScreen() {
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { trip, isLoading, isMissing, error, saveActivity, removeActivity, removeTrip } =
-    useTripDetail(id);
+  const {
+    trip,
+    isLoading,
+    isMissing,
+    error,
+    saveActivity,
+    removeActivity,
+    toggleActivity,
+    removeTrip,
+  } = useTripDetail(id);
 
   const [section, setSection] = useState<Section>("Itinerary");
   const [selectedDayId, setSelectedDayId] = useState<string | null>(null);
@@ -59,10 +67,16 @@ export default function TripScreen() {
   const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [tickError, setTickError] = useState<string | null>(null);
 
   function goBack() {
     if (router.canGoBack()) router.back();
     else router.replace("/trips");
+  }
+
+  async function handleToggle(activity: Activity) {
+    setTickError(null);
+    setTickError(await toggleActivity(activity));
   }
 
   async function handleDelete() {
@@ -116,7 +130,7 @@ export default function TripScreen() {
               <View className="pb-5">
                 <TripBanner trip={trip} onBack={goBack} onOpenMenu={() => setIsMenuOpen(true)} />
                 <View className="mt-3">
-                  <FormMessage message={error} />
+                  <FormMessage message={error ?? tickError} />
                 </View>
 
                 <ScrollView
@@ -160,6 +174,7 @@ export default function TripScreen() {
                   onEdit={setEditing}
                   onSave={saveActivity}
                   onDelete={removeActivity}
+                  onToggleDone={(activity) => void handleToggle(activity)}
                 />
               ) : null
             }

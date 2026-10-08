@@ -39,3 +39,5 @@
   storage helper (spec 4)
 - feat: add the trip screen, the itinerary timeline, trip editing with
   reschedule_trip, and trip deletion (spec 5)
+- feat: add explore plans with copy to a trip, the new Home layout, and
+  ticked planning progress (spec 6)

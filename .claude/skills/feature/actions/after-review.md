@@ -2,7 +2,7 @@
 
 **Optional.** Best after implementation, before `/feature complete`.
 `complete` does not wait for this. Skip it when the user wants to merge
-without a Notion write-up.
+without a write-up.
 
 Code that typechecks but was never opened on a phone is assumed, not
 reviewed. **A React Native screen has no compile-time proof it renders.**
@@ -11,7 +11,7 @@ submit button, or a row silently blocked by RLS.
 
 ## 1. Read context
 
-- [project.md](../project.md) — Notion parent, QA devices, known QA story
+- [project.md](../project.md) — where the write-up is saved, QA devices, known QA story
 - @context/current-feature.md — goals and notes
 - The phase spec in @context/features/ if loaded from one
 - @context/ai-interaction.md — verification checklists (sections A, B, C)
@@ -97,7 +97,7 @@ Signed-out checks against the REST endpoint with the anon key:
 
 See section B end in @context/ai-interaction.md.
 
-## 7. Save the result to Notion
+## 7. Save the result as a file
 
 The write-up is a **team briefing**, not a QA log. Someone who did not run
 the checks should still understand: is it safe to ship, and what is broken
@@ -107,14 +107,13 @@ in plain words. Do **not** paste the findings in chat.
 first time it is not obvious. No file tours, no raw errors unless one line
 of the message is the whole point.
 
-1. Fetch `notion://docs/enhanced-markdown-spec` and follow it. Do not guess
-   Notion markdown.
-2. Search Notion using `project.md` (parent + index). Same subject → update.
-   None → create under Parent and link from Index. If Parent is not set,
-   ask the user for it once.
-3. Title from `project.md` title shape + the H1 feature name
-4. Page shape:
-   - Opening callout: the one thing to remember + the verdict
+1. Read the "Review write-ups" section of `project.md` for the folder,
+   the file name, the language, and the title shape.
+2. Same feature already has a file → update it. None → create it.
+3. Plain GitHub-flavoured markdown. Start with the date and the status
+   or branch
+4. File shape:
+   - Opening section: the verdict + the one thing to remember
    - A simple table: device QA, Supabase QA, typecheck, expo-doctor,
      console — PASS / FAIL / SKIPPED, each with a one-line reason a
      teammate can read
@@ -133,7 +132,7 @@ Append only this to **Notes** (so `/feature complete` can see it ran):
 ```
 After-review — [date]
 - Verdict: Ready to complete / Needs changes
-- Notion: {url}
+- Write-up: {file path}
 ```
 
 ## 9. Chat
@@ -141,9 +140,9 @@ After-review — [date]
 Chat is **only**:
 
 - The verdict: **Ready to complete** or **Needs changes**
-- The Notion URL
+- A link to the write-up file
 
-If Needs changes: one line that the blockers are on the page; do not commit
+If Needs changes: one line that the blockers are in the file; do not commit
 or run `/feature complete`. If a step was skipped, one short clause why.
 
 ## 10. Cleanup

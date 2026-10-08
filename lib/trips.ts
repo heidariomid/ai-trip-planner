@@ -7,21 +7,34 @@ export type Trip = Pick<
   Tables<"trips">,
   "id" | "title" | "source" | "destination" | "start_date" | "end_date" | "image_path"
 > & {
-  /** From 0 to 1: the share of the trip's days that have at least one activity. */
+  /** From 0 to 1: the share of the trip's activities that are ticked off. */
   planningProgress: number;
 };
 
-interface DayActivityCount {
-  itinerary_activities: { count: number }[];
+interface DayActivityTicks {
+  itinerary_activities: { is_done: boolean }[];
 }
 
-// Spec 8 adds packed items to this. Until then a day with an activity is the
-// only thing that counts as planned.
-function getPlanningProgress(days: DayActivityCount[]): number {
-  if (days.length === 0) return 0;
-  const planned = days.filter((day) => (day.itinerary_activities[0]?.count ?? 0) > 0);
-  return planned.length / days.length;
+// Counted from ticks, not from how full the days are, so a trip copied from an
+// explore plan starts at 0% instead of 100%. Spec 8 adds packed items to this.
+function getPlanningProgress(days: DayActivityTicks[]): number {
+  const activities = days.flatMap((day) => day.itinerary_activities);
+  if (activities.length === 0) return 0;
+  return activities.filter((activity) => activity.is_done).length / activities.length;
 }
+
+/**
+ * One activity as `create_trip` reads it from `p_activities`. A type and not
+ * an interface, because only a type alias can be passed where JSON is expected.
+ */
+export type NewTripActivity = {
+  day_number: number;
+  starts_at: string | null;
+  ends_at: string | null;
+  place: string | null;
+  activity: string | null;
+  notes: string | null;
+};
 
 export interface NewTrip {
   title: string;
@@ -32,6 +45,8 @@ export interface NewTrip {
   description: string;
   travelerCount: number;
   cover: LocalImage | null;
+  /** Written with the trip in the same transaction. Used by a copied plan. */
+  activities?: NewTripActivity[];
 }
 
 export interface TripsResult {
@@ -59,7 +74,7 @@ export async function listTrips(): Promise<TripsResult> {
     const { data, error } = await supabase
       .from("trips")
       .select(
-        "id, title, source, destination, start_date, end_date, image_path, itinerary_days(itinerary_activities(count))",
+        "id, title, source, destination, start_date, end_date, image_path, itinerary_days(itinerary_activities(is_done))",
       )
       .order("created_at", { ascending: false });
 
@@ -108,6 +123,7 @@ export async function createTrip(userId: string, trip: NewTrip): Promise<CreateT
       p_end_date: trip.endDate,
       p_description: trip.description || undefined,
       p_traveler_count: trip.travelerCount,
+      p_activities: trip.activities,
     });
 
     if (error || !data) {

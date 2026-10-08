@@ -16,7 +16,7 @@ The common workflow for every feature/fix:
 2. **Branch** — create a new branch for the feature/fix
 3. **Implement** — implement what's described in @context/current-feature.md
 4. **After-review** (optional) — `/feature after-review` if the user wants
-   a Notion QA write-up: code against goals, device QA, Supabase QA,
+   a QA write-up in `docs/`: code against goals, device QA, Supabase QA,
    `npx tsc --noEmit`, `npx expo-doctor`
 5. **Iterate** — fix what the user or after-review flagged
 6. **Commit** — only when the user asks

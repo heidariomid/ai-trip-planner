@@ -2,7 +2,7 @@
 
 The action files are reusable. **This file is not.** Copy the `feature`
 skill to another repo and replace these values. Do not put project names
-or Notion URLs in the action files.
+or write-up locations in the action files.
 
 ## Who we write for
 
@@ -13,19 +13,32 @@ or Notion URLs in the action files.
 - **App language** — English, left-to-right. No RTL work here (unlike the
   bakery repo this skill came from)
 
-## Notion
+## Review write-ups
 
-- **Parent:** _not set — ask the user for the parent page URL before the
-  first pre-review or after-review_
-- **Index:** _not set_
-- **Title prefix:** Trip Planner
-- **Title shape:** `{prefix} {feature from H1} — Pre-Review` or `After-Review`
+- **Where:** the `docs/` folder in this repo. Notion is not used on this
+  project (user decision, 2026-10-07). Do not search, create, or update a
+  Notion page
+- **File name:** `docs/spec{N}-pre-review.fa.md` or
+  `docs/spec{N}-after-review.fa.md`. For a fix with no spec number, use a
+  short kebab-case name in place of `spec{N}`
+- **Language:** Persian, and short, written the way one developer talks
+  to another. Conversational, not a formal or book-style translation
+- **Never translate a technical term.** Keep it in English inside the
+  Persian sentence: spec, pre-review, explore plan, source, destination,
+  trip, card, copy, banner, migration, row, policy, bucket, screen,
+  route, blocker, and so on. Write «spec 6», not «اسپک ۶»; `source`, not
+  «مبدأ». A translated term reads as vague and has to be mapped back to
+  the code (user correction, 2026-10-07)
+- Name the real thing a sentence is about: the column, the function, the
+  component. «explore plan فیلد `source` نداره» is clear; «پلن آماده مبدأ
+  ندارد» is not
+- **Direction:** right-to-left. Wrap the whole file in
+  `<div dir="rtl" align="right">` … `</div>`, with a blank line after the opening tag
+  and before the closing one so the markdown inside still renders
+- **Title shape:** `# Pre-review برای spec {N}: {feature}` or
+  `# After-review برای spec {N}: {feature}`
 
-Search the index before creating a page. Same subject → update. New page
-goes under Parent and is linked from Index.
-
-Until Parent is set, do not invent a page location. Ask once, then write
-the URL into this file so the next run does not have to ask again.
+Same feature → update its file. Do not create a second one.
 
 ## QA
 

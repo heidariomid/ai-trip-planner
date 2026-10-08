@@ -32,19 +32,24 @@ from Home and from a trip.
 
 ## Current state
 
-Specs 1 through 5 are done. Specs 6 through 17 are written and not built.
+Specs 1 through 6 are done. Specs 7 through 17 are written and not built.
 
 - Expo Router, email and Google sign-in, and a `profiles` row on first
   sign-up. Verified on Expo Go and web
-- The signed-in app is three tabs: Home, My Trips, and Profile. Only the
-  profile header is live data. Explore cards are static
+- The signed-in app is three tabs: Home, My Trips, and Profile. Home is
+  a greeting, the AI planning card (drawn, not wired), a row of popular
+  destinations, and the trips still to continue
 - A traveller can add a trip with a cover. The trip card shows on Home
   and My Trips, newest first, with a planning progress bar that counts
-  days with an activity. Checked on web, not yet on a phone
+  the activities ticked off. Checked on web, not yet on a phone
 - A trip opens onto its own screen: a banner, the itinerary as a
   timeline per day, and empty Bookings, Packing, Photos, and Notes
   sections. A trip can be edited, rescheduled, and deleted. The place
   on an activity opens Google Maps. Checked on web, not yet on a phone
+- Explore plans are seeded in the database. One opens read-only and
+  copies into a trip the traveller owns, with its days, its activities,
+  and the plan's picture as the cover. Checked on web, not yet on a
+  phone
 - No AI
 
 Nothing has been deployed. No EAS build, no store listing.
@@ -194,7 +199,7 @@ and inside the chat.
 | Home, My Trips, Profile shell | 3, done |
 | Add a trip, and the trip card | 4, done |
 | Trip banner and itinerary | 5, done |
-| Explore, and copy into My Trips | 6 |
+| Explore, and copy into My Trips | 6, done |
 | Bookings | 7 |
 | Packing | 8 |
 | Photos and notes | 9 |
@@ -269,7 +274,8 @@ and when it is done.
    Done
 5. @context/features/spec5-trip-itinerary.md — the trip screen and its days.
    Done
-6. @context/features/spec6-explore.md — curated plans, copied into My Trips
+6. @context/features/spec6-explore.md — curated plans, copied into My Trips.
+   Done
 7. @context/features/spec7-bookings.md — flights, cars, hotels, extras
 8. @context/features/spec8-packing.md — the checklist
 9. @context/features/spec9-photos-and-notes.md — gallery and notes

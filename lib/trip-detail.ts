@@ -6,7 +6,15 @@ import { saveCover, type NewTrip } from "./trips";
 
 export type Activity = Pick<
   Tables<"itinerary_activities">,
-  "id" | "day_id" | "sort_order" | "starts_at" | "ends_at" | "place" | "activity" | "notes"
+  | "id"
+  | "day_id"
+  | "sort_order"
+  | "starts_at"
+  | "ends_at"
+  | "place"
+  | "activity"
+  | "notes"
+  | "is_done"
 >;
 
 export type ItineraryDay = Pick<Tables<"itinerary_days">, "id" | "day_number" | "date"> & {
@@ -60,7 +68,8 @@ const ROW_FAILED =
 
 const TRIP_COLUMNS =
   "id, user_id, title, source, destination, start_date, end_date, image_path, description, traveler_count";
-const ACTIVITY_COLUMNS = "id, day_id, sort_order, starts_at, ends_at, place, activity, notes";
+const ACTIVITY_COLUMNS =
+  "id, day_id, sort_order, starts_at, ends_at, place, activity, notes, is_done";
 
 /** By start time, with insert order settling a tie or a missing time. */
 export function sortActivities(activities: Activity[]): Activity[] {

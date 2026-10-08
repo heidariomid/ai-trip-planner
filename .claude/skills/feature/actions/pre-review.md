@@ -9,7 +9,7 @@ server, create a branch, or write the feature. Status stays Not Started.
 
 ## 1. Read context
 
-- [project.md](../project.md) — this repo's Notion parent, who the user
+- [project.md](../project.md) — where the write-up is saved, who the user
   is, QA devices. Required for the briefing voice
 - @context/current-feature.md — goals and notes
 - The spec in @context/features/ or @context/fixes/ if one was loaded
@@ -58,7 +58,7 @@ A limit that only appears on a real device is a must-change.
 | **Implementation note** | Easy to miss; no product vote |
 | **Do not add** | Out of scope, or extra screens / vendors |
 
-## 5. Save the result to Notion
+## 5. Save the result as a file
 
 The write-up is a **team briefing**, not a developer dump. Someone who does
 not read the repo should be able to vote. Do **not** paste the findings in
@@ -69,14 +69,13 @@ then why. Define a term the first time it is not obvious. No file tours,
 no stack traces, no "see line 40". One real example only when it makes the
 risk obvious.
 
-1. Fetch `notion://docs/enhanced-markdown-spec` and follow it. Do not guess
-   Notion markdown.
-2. Search Notion using `project.md` (parent + index). Same subject → update.
-   None → create under Parent and link from Index. If Parent is not set in
-   `project.md`, ask the user for it once rather than guessing a location.
-3. Title from `project.md` title shape + the H1 feature name
-4. Page shape:
-   - Opening callout: the one thing to remember + the verdict
+1. Read the "Review write-ups" section of `project.md` for the folder,
+   the file name, the language, and the title shape.
+2. Same feature already has a file → update it. None → create it.
+3. Plain GitHub-flavoured markdown. Start with the date and the status
+   or branch
+4. File shape:
+   - Opening section: the verdict + the one thing to remember
    - For each must-change / amendment: **what it is now**, **what the
      traveller would see if we ship that**, **why we want a change**,
      **what we recommend**
@@ -94,7 +93,7 @@ Append only this to **Notes** (so `/feature start` can see it ran):
 ```
 Pre-review — [date]
 - Verdict: Ready to implement / Needs decisions
-- Notion: {url}
+- Write-up: {file path}
 ```
 
 Leave Goals unchanged until decisions are approved. After the team agrees,
@@ -105,6 +104,6 @@ update Goals, Notes, and the spec so implementation follows the new text.
 Chat is **only**:
 
 - The verdict: **Ready to implement** or **Needs decisions**
-- The Notion URL
+- A link to the write-up file
 
 If a step was skipped, one short clause why. No findings dump.

@@ -1,4 +1,4 @@
-import { ArrowUpRight, MapPin, Pencil } from "lucide-react-native";
+import { ArrowUpRight, Check, MapPin, Pencil } from "lucide-react-native";
 import { Pressable, View } from "react-native";
 
 import { formatTime, toTimeValue } from "../lib/dates";
@@ -12,22 +12,33 @@ export interface ActivityRowProps {
   /** The trip's destination, added to the place when it is opened in Maps. */
   destination: string;
   isLast: boolean;
-  onPress: () => void;
+  /** Opens the row for editing. Left out, the row is read-only. */
+  onPress?: () => void;
+  /** Ticks the activity off or clears the tick. Left out, there is no tick. */
+  onToggleDone?: () => void;
 }
 
 /**
  * One stop on the day's timeline. Tapping it opens it for editing; tapping the
- * place opens that place in Google Maps instead.
+ * place opens that place in Google Maps instead. A read-only row keeps the
+ * Maps link and loses the rest.
  */
-export function ActivityRow({ activity, destination, isLast, onPress }: ActivityRowProps) {
+export function ActivityRow({
+  activity,
+  destination,
+  isLast,
+  onPress,
+  onToggleDone,
+}: ActivityRowProps) {
   const place = activity.place;
   const startsAt = toTimeValue(activity.starts_at);
   const endsAt = toTimeValue(activity.ends_at);
 
   return (
     <Pressable
-      accessibilityRole="button"
-      accessibilityLabel={`Edit ${activity.activity ?? "activity"}`}
+      accessibilityRole={onPress ? "button" : undefined}
+      accessibilityLabel={onPress ? `Edit ${activity.activity ?? "activity"}` : undefined}
+      disabled={!onPress}
       onPress={onPress}
       className="flex-row"
     >
@@ -41,12 +52,31 @@ export function ActivityRow({ activity, destination, isLast, onPress }: Activity
       </View>
 
       <View className="mr-3 items-center">
-        <View className="mt-1.5 h-2.5 w-2.5 rounded-full bg-accent" />
+        {onToggleDone ? (
+          <Pressable
+            accessibilityRole="checkbox"
+            accessibilityLabel={`Done: ${activity.activity ?? "activity"}`}
+            accessibilityState={{ checked: activity.is_done }}
+            hitSlop={12}
+            onPress={onToggleDone}
+            className={`h-6 w-6 items-center justify-center rounded-full border ${
+              activity.is_done ? "border-accent bg-accent" : "border-muted bg-surface"
+            }`}
+          >
+            {activity.is_done ? <Check size={14} color={colors.surface} /> : null}
+          </Pressable>
+        ) : (
+          <View className="mt-1.5 h-2.5 w-2.5 rounded-full bg-muted" />
+        )}
         {isLast ? null : <View className="mt-1 w-px flex-1 bg-line" />}
       </View>
 
       <View className="flex-1 pb-6">
-        <Text className="text-[15px] font-semibold leading-5 text-ink">
+        <Text
+          className={`text-[15px] font-semibold leading-5 ${
+            activity.is_done ? "text-subtle line-through" : "text-ink"
+          }`}
+        >
           {activity.activity}
         </Text>
         {place ? (
@@ -67,9 +97,11 @@ export function ActivityRow({ activity, destination, isLast, onPress }: Activity
         ) : null}
       </View>
 
-      <View className="h-11 w-11 items-end justify-start pt-1">
-        <Pencil size={16} color={colors.muted} />
-      </View>
+      {onPress ? (
+        <View className="h-11 w-11 items-end justify-start pt-1">
+          <Pencil size={16} color={colors.muted} />
+        </View>
+      ) : null}
     </Pressable>
   );
 }

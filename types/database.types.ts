@@ -17,6 +17,115 @@ export type Database = {
   }
   public: {
     Tables: {
+      explore_plan_activities: {
+        Row: {
+          activity: string | null
+          day_id: string
+          ends_at: string | null
+          id: string
+          notes: string | null
+          place: string | null
+          sort_order: number
+          starts_at: string | null
+        }
+        Insert: {
+          activity?: string | null
+          day_id: string
+          ends_at?: string | null
+          id?: string
+          notes?: string | null
+          place?: string | null
+          sort_order?: number
+          starts_at?: string | null
+        }
+        Update: {
+          activity?: string | null
+          day_id?: string
+          ends_at?: string | null
+          id?: string
+          notes?: string | null
+          place?: string | null
+          sort_order?: number
+          starts_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "explore_plan_activities_day_id_fkey"
+            columns: ["day_id"]
+            isOneToOne: false
+            referencedRelation: "explore_plan_days"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      explore_plan_days: {
+        Row: {
+          day_number: number
+          id: string
+          plan_id: string
+          title: string | null
+        }
+        Insert: {
+          day_number: number
+          id?: string
+          plan_id: string
+          title?: string | null
+        }
+        Update: {
+          day_number?: number
+          id?: string
+          plan_id?: string
+          title?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "explore_plan_days_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "explore_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      explore_plans: {
+        Row: {
+          category: string
+          created_at: string
+          description: string | null
+          destination: string
+          id: string
+          image_key: string | null
+          rough_cost: string
+          sort_order: number
+          tags: string[]
+          title: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          description?: string | null
+          destination: string
+          id?: string
+          image_key?: string | null
+          rough_cost: string
+          sort_order?: number
+          tags?: string[]
+          title: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          destination?: string
+          id?: string
+          image_key?: string | null
+          rough_cost?: string
+          sort_order?: number
+          tags?: string[]
+          title?: string
+        }
+        Relationships: []
+      }
       itinerary_activities: {
         Row: {
           activity: string | null
@@ -24,6 +133,7 @@ export type Database = {
           day_id: string
           ends_at: string | null
           id: string
+          is_done: boolean
           notes: string | null
           place: string | null
           sort_order: number
@@ -35,6 +145,7 @@ export type Database = {
           day_id: string
           ends_at?: string | null
           id?: string
+          is_done?: boolean
           notes?: string | null
           place?: string | null
           sort_order?: number
@@ -46,6 +157,7 @@ export type Database = {
           day_id?: string
           ends_at?: string | null
           id?: string
+          is_done?: boolean
           notes?: string | null
           place?: string | null
           sort_order?: number

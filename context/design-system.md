@@ -88,7 +88,8 @@ bordered box.
 Use these. Do not restyle them per screen.
 
 - `components/Card.tsx` — the only surface. White, `rounded-card`,
-  `shadows.card`
+  `shadows.card`. `flush` removes the padding for a card whose picture
+  runs edge to edge; the picture then rounds its own top corners
 - `components/Button.tsx` — a capsule, 48pt tall, centred by default.
   `primary` is accent with white text. `secondary` is white with a
   `line` border. `fullWidth` only when the layout needs it
@@ -111,8 +112,38 @@ Use these. Do not restyle them per screen.
 - `components/Avatar.tsx` — the profile picture, or the first letter of
   the name on a `surface` circle
 - `components/ExploreCard.tsx` — a `Card` with a title, facts as label
-  above value, tags as `canvas` capsules, and the static map picture
-- `components/AskBar.tsx`, `components/DestinationStrip.tsx` — Home only
+  above value, tags as `canvas` capsules, and the static map picture.
+  It opens the plan
+- `components/Fact.tsx` — one fact: a small `subtle` label above a bold
+  `ink` value
+- `components/CategoryChips.tsx` — the category filter under the Explore
+  chip. A 44pt capsule; the selected one is `accent-soft` with `accent`
+  text, not filled, so it does not compete with the Explore chip
+- `components/PlanBanner.tsx` — the top of a curated plan: its bundled
+  picture with a back button, the title, the destination, three facts,
+  and the description. No dates and no badge
+- `components/RoundButton.tsx` — a 44pt white circle with one icon, for
+  a control that sits on a picture
+- `components/AskBar.tsx`, `components/HomeHeader.tsx` — Home only. The
+  header is a `subtle` greeting, the first name as the screen title, and
+  the avatar. The ask bar is a neutral white glass card (user decision,
+  2026-10-08): translucent `surface` with a `surface` edge and
+  `shadows.card`, a small `ink` caps label, a `subtle` lead-in, a bold
+  30px `ink` headline that rotates through trip ideas, a `subtle` line
+  of help, and a white capsule that looks like an input. It has no
+  colour of its own. It is the first thing on Home because planning with
+  AI is what the app is for, and it stands out by size and motion.
+  Tried and rejected by the user the same day: a filled `accent` card,
+  a purple glow under blur, and a blurred photo
+- `components/RotatingText.tsx` — one line of text that swaps to the
+  next phrase with a short fade and rise. The only animation in the app
+  so far
+- `components/SectionHeader.tsx` — a section title in the card-title
+  style, with an optional `subtle` "See all" and chevron on the right
+- `components/DestinationCard.tsx`, `components/PopularDestinations.tsx`
+  — a row of 150pt cards on Home, each an explore plan: its picture edge
+  to edge at the top, then the place in bold and the country with a pin. Tapping one
+  opens the plan. The row bleeds past the screen's side padding
 - `components/TripCard.tsx` — a traveller's own trip, compact and in the
   same shape as `ExploreCard`: title, a `subtle` route line, a calendar icon
   beside the day count and the dates, and the badge on the left, with
@@ -147,12 +178,21 @@ Use these. Do not restyle them per screen.
   day is `accent-soft` with `accent` text, not a filled chip, so it does
   not compete with the selected section chip above it
 - `components/ActivityRow.tsx`, `components/ActivityForm.tsx`,
-  `components/Itinerary.tsx` — the timeline. A row sits on the canvas
-  with its time on the left and an `accent` dot on a `line` rail. Tapping
+  `components/Itinerary.tsx` — the timeline. `ActivityRow` without
+  `onPress` is read-only: no pencil, and only the place can be tapped.
+  A row sits on the canvas
+  with its time on the left and a 24pt tick circle on a `line` rail:
+  empty with a `muted` border, or `accent` with a white check once the
+  activity is done, and then the title is struck through in `subtle`.
+  A read-only row has a small `muted` dot instead. Tapping
   it swaps the row for the form, which is a `Card`. The place is the
   one link on the row: `ink`, medium weight, with a pin before it and a
   small up-right arrow after it. It opens Google Maps and is not
   `accent`, because the screen already carries enough of it
+
+A plan's picture is bundled, not private: `getExploreImage(key)` from
+`lib/explore-images.ts` returns it, or the placeholder for an unknown
+key. A new plan picture needs a new build.
 
 A private image is never given a URL by hand. A component calls
 `useImageSource(path)` from `hooks/useImageSource.ts`, which goes through
@@ -195,9 +235,7 @@ Build them this way when their spec arrives.
 - No hex value, `amber`, `orange`, `rose`, `slate`, `sky`, or `blue`
   class appears in the diff
 - Every surface is a `Card`, every button a `Button`
-- The accent appears on at most two elements in one viewport. Home is
-  the one exception, with three: the active tab, the selected chip, and
-  the Create a trip button
+- The accent appears on at most two elements in one viewport
 - The loading and empty states use the same canvas as the screen
 - It was looked at on a device and on web next to
   `context/design/mockup.png`

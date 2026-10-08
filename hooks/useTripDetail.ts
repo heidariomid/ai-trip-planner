@@ -1,7 +1,12 @@
 import { useFocusEffect } from "expo-router";
 import { useCallback, useState } from "react";
 
-import { createActivity, deleteActivity, updateActivity } from "../lib/itinerary";
+import {
+  createActivity,
+  deleteActivity,
+  setActivityDone,
+  updateActivity,
+} from "../lib/itinerary";
 import {
   deleteTrip,
   getTripDetail,
@@ -25,6 +30,8 @@ export interface UseTripDetailResult {
     existing: Activity | null,
   ) => Promise<string | null>;
   removeActivity: (activity: Activity) => Promise<string | null>;
+  /** Ticks an activity off, or clears the tick. */
+  toggleActivity: (activity: Activity) => Promise<string | null>;
   /** Deletes the trip and its files. */
   removeTrip: () => Promise<string | null>;
 }
@@ -113,11 +120,42 @@ export function useTripDetail(tripId: string): UseTripDetailResult {
     [],
   );
 
+  const toggleActivity = useCallback<UseTripDetailResult["toggleActivity"]>(
+    async (activity) => {
+      const setDone = (isDone: boolean) =>
+        setTrip((current) =>
+          current
+            ? withActivities(current, activity.day_id, (activities) =>
+                activities.map((item) =>
+                  item.id === activity.id ? { ...item, is_done: isDone } : item,
+                ),
+              )
+            : current,
+        );
+
+      // The tick moves at once and goes back if the save fails.
+      setDone(!activity.is_done);
+      const result = await setActivityDone(activity.id, !activity.is_done);
+      if (!result.success) setDone(activity.is_done);
+      return result.error;
+    },
+    [],
+  );
+
   const removeTrip = useCallback<UseTripDetailResult["removeTrip"]>(async () => {
     if (!trip) return null;
     const result = await deleteTrip(trip);
     return result.success ? null : result.error;
   }, [trip]);
 
-  return { trip, isLoading, isMissing, error, saveActivity, removeActivity, removeTrip };
+  return {
+    trip,
+    isLoading,
+    isMissing,
+    error,
+    saveActivity,
+    removeActivity,
+    toggleActivity,
+    removeTrip,
+  };
 }

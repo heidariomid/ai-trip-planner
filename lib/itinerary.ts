@@ -16,8 +16,9 @@ export interface ActivityDeleteResult {
 
 const SAVE_FAILED = "We couldn't save this activity. Please try again.";
 const DELETE_FAILED = "We couldn't delete this activity. Please try again.";
+const TICK_FAILED = "We couldn't update that activity. Please try again.";
 
-const COLUMNS = "id, day_id, sort_order, starts_at, ends_at, place, activity, notes";
+const COLUMNS = "id, day_id, sort_order, starts_at, ends_at, place, activity, notes, is_done";
 
 function toColumns(fields: ActivityFields) {
   return {
@@ -88,5 +89,29 @@ export async function deleteActivity(activityId: string): Promise<ActivityDelete
     return { success: true, error: null };
   } catch (error) {
     return { success: false, error: toReadableError("itinerary", error, DELETE_FAILED) };
+  }
+}
+
+/** Ticks an activity off, or clears the tick. A trip's progress counts these. */
+export async function setActivityDone(
+  activityId: string,
+  isDone: boolean,
+): Promise<ActivityDeleteResult> {
+  try {
+    const { data, error } = await supabase
+      .from("itinerary_activities")
+      .update({ is_done: isDone })
+      .eq("id", activityId)
+      .select("id");
+
+    if (error || data.length === 0) {
+      return {
+        success: false,
+        error: toReadableError("itinerary", error ?? "no row updated", TICK_FAILED),
+      };
+    }
+    return { success: true, error: null };
+  } catch (error) {
+    return { success: false, error: toReadableError("itinerary", error, TICK_FAILED) };
   }
 }

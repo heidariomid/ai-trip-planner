@@ -14,7 +14,7 @@ Manages the full lifecycle of a feature from spec to merge.
 
 Project overlay (this repo only): [project.md](project.md). Read it before
 pre-review or after-review. Copy the skill to another repo → replace that
-file; do not put project names or Notion URLs in the action files.
+file; do not put project names or write-up locations in the action files.
 
 ### File Structure
 
@@ -43,7 +43,7 @@ load → start → complete
 | 1 | `load` | Spec chosen; fill Goals and Notes |
 | 2 | `start` | Create branch; implement; list leftover setup |
 | 3 | `complete` | Commit, merge, push — when the user asks |
-| optional | `pre-review` | Before start — spec vs repo; team votes on Notion |
+| optional | `pre-review` | Before start — spec vs repo; team votes in the write-up |
 | optional | `after-review` | After implementation — typecheck, doctor, on-device QA, Supabase QA |
 | optional | `test` | Unit tests — this project rarely uses |
 | optional | `explain` | Document changes for handoff |
@@ -54,7 +54,7 @@ After-review procedure: [actions/after-review.md](actions/after-review.md).
 
 **`/feature pre-review` is not `/feature after-review`.** Pre-review does
 not typecheck, build, or open the app on a device. Both save the write-up
-to Notion; chat is the verdict + URL only.
+as a file, where `project.md` says; chat is the verdict + file link only.
 
 ## This is a React Native app, not a website
 
@@ -73,7 +73,7 @@ Execute the requested action: $ARGUMENTS
 | Action         | Description                                               |
 | -------------- | --------------------------------------------------------- |
 | `load`         | Load a feature spec or inline description                 |
-| `pre-review`   | Optional. Spec vs repo; save the briefing to Notion       |
+| `pre-review`   | Optional. Spec vs repo; save the briefing as a file       |
 | `start`        | Create branch, implement, then list leftover setup steps  |
 | `after-review` | Optional. Typecheck, doctor, device QA, Supabase QA       |
 | `test`         | Unit tests for lib/utilities (rare here)                  |
