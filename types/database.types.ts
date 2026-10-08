@@ -17,6 +17,152 @@ export type Database = {
   }
   public: {
     Tables: {
+      booking_car_rentals: {
+        Row: {
+          company: string
+          created_at: string
+          id: string
+          pickup_at: string | null
+          pickup_location: string | null
+          pickup_on: string | null
+          trip_id: string
+        }
+        Insert: {
+          company: string
+          created_at?: string
+          id?: string
+          pickup_at?: string | null
+          pickup_location?: string | null
+          pickup_on?: string | null
+          trip_id: string
+        }
+        Update: {
+          company?: string
+          created_at?: string
+          id?: string
+          pickup_at?: string | null
+          pickup_location?: string | null
+          pickup_on?: string | null
+          trip_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "booking_car_rentals_trip_id_fkey"
+            columns: ["trip_id"]
+            isOneToOne: false
+            referencedRelation: "trips"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      booking_extras: {
+        Row: {
+          created_at: string
+          detail: string | null
+          id: string
+          title: string
+          trip_id: string
+        }
+        Insert: {
+          created_at?: string
+          detail?: string | null
+          id?: string
+          title: string
+          trip_id: string
+        }
+        Update: {
+          created_at?: string
+          detail?: string | null
+          id?: string
+          title?: string
+          trip_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "booking_extras_trip_id_fkey"
+            columns: ["trip_id"]
+            isOneToOne: false
+            referencedRelation: "trips"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      booking_flights: {
+        Row: {
+          airline: string
+          arrives_at: string | null
+          created_at: string
+          departs_at: string | null
+          departs_on: string | null
+          flight_number: string
+          id: string
+          trip_id: string
+        }
+        Insert: {
+          airline: string
+          arrives_at?: string | null
+          created_at?: string
+          departs_at?: string | null
+          departs_on?: string | null
+          flight_number: string
+          id?: string
+          trip_id: string
+        }
+        Update: {
+          airline?: string
+          arrives_at?: string | null
+          created_at?: string
+          departs_at?: string | null
+          departs_on?: string | null
+          flight_number?: string
+          id?: string
+          trip_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "booking_flights_trip_id_fkey"
+            columns: ["trip_id"]
+            isOneToOne: false
+            referencedRelation: "trips"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      booking_hotels: {
+        Row: {
+          check_in: string
+          check_out: string
+          created_at: string
+          id: string
+          name: string
+          trip_id: string
+        }
+        Insert: {
+          check_in: string
+          check_out: string
+          created_at?: string
+          id?: string
+          name: string
+          trip_id: string
+        }
+        Update: {
+          check_in?: string
+          check_out?: string
+          created_at?: string
+          id?: string
+          name?: string
+          trip_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "booking_hotels_trip_id_fkey"
+            columns: ["trip_id"]
+            isOneToOne: false
+            referencedRelation: "trips"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       explore_plan_activities: {
         Row: {
           activity: string | null

@@ -32,7 +32,7 @@ from Home and from a trip.
 
 ## Current state
 
-Specs 1 through 6 are done. Specs 7 through 17 are written and not built.
+Specs 1 through 7 are done. Specs 8 through 17 are written and not built.
 
 - Expo Router, email and Google sign-in, and a `profiles` row on first
   sign-up. Verified on Expo Go and web
@@ -43,13 +43,16 @@ Specs 1 through 6 are done. Specs 7 through 17 are written and not built.
   and My Trips, newest first, with a planning progress bar that counts
   the activities ticked off. Checked on web, not yet on a phone
 - A trip opens onto its own screen: a banner, the itinerary as a
-  timeline per day, and empty Bookings, Packing, Photos, and Notes
+  timeline per day, Bookings, and empty Packing, Photos, and Notes
   sections. A trip can be edited, rescheduled, and deleted. The place
   on an activity opens Google Maps. Checked on web, not yet on a phone
 - Explore plans are seeded in the database. One opens read-only and
   copies into a trip the traveller owns, with its days, its activities,
   and the plan's picture as the cover. Checked on web, not yet on a
   phone
+- A trip records flights, car rentals, hotels, and extras, each added,
+  edited, and deleted inline. One flight was checked on web; the rest
+  and the phone are not checked yet
 - No AI
 
 Nothing has been deployed. No EAS build, no store listing.
@@ -166,7 +169,7 @@ Full columns live in the spec that creates the table.
 | interest tags | spec 10 | on `profiles` |
 | chat | spec 11 | threads and messages. A card in a message is a transcript, not the itinerary |
 | `trips.status` | spec 12 | `active` or `draft` |
-| cover generation | spec 13 | a second model, writing only the cover file |
+| cover generation | spec 13 | a second model, Google Gemini `gemini-3.1-flash-lite-image`, writing only the cover file |
 | saved places | spec 14 | a heart on a place, listed on Profile |
 | members, join code | spec 15 | owner stays on `trips`. Other people are members. Join is a function |
 | account | spec 16 | password reset, deletion, privacy policy, Sign in with Apple |
@@ -200,7 +203,7 @@ and inside the chat.
 | Add a trip, and the trip card | 4, done |
 | Trip banner and itinerary | 5, done |
 | Explore, and copy into My Trips | 6, done |
-| Bookings | 7 |
+| Bookings | 7, done |
 | Packing | 8 |
 | Photos and notes | 9 |
 | Edit profile and interest tags | 10 |
@@ -276,7 +279,8 @@ and when it is done.
    Done
 6. @context/features/spec6-explore.md — curated plans, copied into My Trips.
    Done
-7. @context/features/spec7-bookings.md — flights, cars, hotels, extras
+7. @context/features/spec7-bookings.md — flights, cars, hotels, extras.
+   Done
 8. @context/features/spec8-packing.md — the checklist
 9. @context/features/spec9-photos-and-notes.md — gallery and notes
 10. @context/features/spec10-profile.md — name, avatar, interest tags

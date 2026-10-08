@@ -43,3 +43,5 @@
   ticked planning progress (spec 6)
 - fix: give the AI planning card a soft wash and put the greeting on
   one line that follows the clock
+- feat: add bookings for flights, car rentals, hotels, and extras
+  (spec 7)

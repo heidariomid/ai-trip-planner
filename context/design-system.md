@@ -196,6 +196,16 @@ Use these. Do not restyle them per screen.
   small up-right arrow after it. It opens Google Maps and is not
   `accent`, because the screen already carries enough of it
 
+- `components/BookingRow.tsx`, `components/BookingForm.tsx`,
+  `components/BookingFields.tsx`, `components/Bookings.tsx` — the
+  Bookings section of a trip. Four sections (Flights, Car rental, Hotels,
+  Extras), each a card-title heading with a quiet `ink` "+ Add" on the
+  right, like "See all". A booking is a `Card` with a Lucide icon in a
+  `canvas` circle, a bold `ink` title, `subtle` lines under it, and a
+  `muted` pencil. Tapping it swaps the card for the form, as on the
+  timeline. An empty section is one `subtle` sentence. Nothing here is
+  `accent` except Save
+
 A plan's picture is bundled, not private: `getExploreImage(key)` from
 `lib/explore-images.ts` returns it, or the placeholder for an unknown
 key. A new plan picture needs a new build.

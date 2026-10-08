@@ -126,3 +126,73 @@ export function validateActivity(
 
   return errors;
 }
+
+export const MAX_DETAIL_LENGTH = 200;
+
+export interface FlightFields {
+  airline: string;
+  flightNumber: string;
+  /** `YYYY-MM-DD`. */
+  departsOn: string;
+  /** `HH:MM`, or null when not chosen. */
+  departsAt: string | null;
+  arrivesAt: string | null;
+}
+
+export interface CarRentalFields {
+  company: string;
+  pickupLocation: string;
+  pickupOn: string;
+  pickupAt: string | null;
+}
+
+export interface HotelFields {
+  name: string;
+  checkIn: string;
+  checkOut: string;
+}
+
+export interface ExtraFields {
+  title: string;
+  detail: string;
+}
+
+/** What a booking form holds, tagged with the kind of booking it is for. */
+export type BookingDraft =
+  | { kind: "flight"; fields: FlightFields }
+  | { kind: "car"; fields: CarRentalFields }
+  | { kind: "hotel"; fields: HotelFields }
+  | { kind: "extra"; fields: ExtraFields };
+
+export type BookingKind = BookingDraft["kind"];
+
+/** Keyed by the name of the field the message belongs under. */
+export type BookingErrors = Partial<Record<string, string>>;
+
+export function validateBooking(draft: BookingDraft): BookingErrors {
+  const errors: BookingErrors = {};
+
+  switch (draft.kind) {
+    case "flight":
+      if (!draft.fields.airline.trim()) errors.airline = "Enter the airline.";
+      if (!draft.fields.flightNumber.trim()) errors.flightNumber = "Enter the flight number.";
+      break;
+    case "car":
+      if (!draft.fields.company.trim()) errors.company = "Enter the rental company.";
+      break;
+    case "hotel":
+      if (!draft.fields.name.trim()) errors.name = "Enter the hotel's name.";
+      if (draft.fields.checkOut < draft.fields.checkIn) {
+        errors.checkOut = "Check-out can't be before check-in.";
+      }
+      break;
+    case "extra":
+      if (!draft.fields.title.trim()) errors.title = "Give it a title.";
+      if (draft.fields.detail.length > MAX_DETAIL_LENGTH) {
+        errors.detail = `Keep the detail under ${MAX_DETAIL_LENGTH} characters.`;
+      }
+      break;
+  }
+
+  return errors;
+}
