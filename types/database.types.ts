@@ -357,6 +357,41 @@ export type Database = {
           },
         ]
       }
+      packing_items: {
+        Row: {
+          category: string
+          created_at: string
+          id: string
+          is_packed: boolean
+          label: string
+          trip_id: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          id?: string
+          is_packed?: boolean
+          label: string
+          trip_id: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          id?: string
+          is_packed?: boolean
+          label?: string
+          trip_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "packing_items_trip_id_fkey"
+            columns: ["trip_id"]
+            isOneToOne: false
+            referencedRelation: "trips"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null

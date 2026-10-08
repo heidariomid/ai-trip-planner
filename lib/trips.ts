@@ -7,7 +7,7 @@ export type Trip = Pick<
   Tables<"trips">,
   "id" | "title" | "source" | "destination" | "start_date" | "end_date" | "image_path"
 > & {
-  /** From 0 to 1: the share of the trip's activities that are ticked off. */
+  /** From 0 to 1: activities ticked off and items packed, half each. */
   planningProgress: number;
 };
 
@@ -15,12 +15,22 @@ interface DayActivityTicks {
   itinerary_activities: { is_done: boolean }[];
 }
 
+function shareOf(done: number, total: number): number | null {
+  return total === 0 ? null : done / total;
+}
+
 // Counted from ticks, not from how full the days are, so a trip copied from an
-// explore plan starts at 0% instead of 100%. Spec 8 adds packed items to this.
-function getPlanningProgress(days: DayActivityTicks[]): number {
+// explore plan starts at 0% instead of 100%. Activities and packing are half
+// each; a trip that has only one of them is measured by that one alone.
+function getPlanningProgress(days: DayActivityTicks[], packing: { is_packed: boolean }[]): number {
   const activities = days.flatMap((day) => day.itinerary_activities);
-  if (activities.length === 0) return 0;
-  return activities.filter((activity) => activity.is_done).length / activities.length;
+  const shares = [
+    shareOf(activities.filter((activity) => activity.is_done).length, activities.length),
+    shareOf(packing.filter((item) => item.is_packed).length, packing.length),
+  ].filter((share): share is number => share !== null);
+
+  if (shares.length === 0) return 0;
+  return shares.reduce((sum, share) => sum + share, 0) / shares.length;
 }
 
 /**
@@ -74,16 +84,16 @@ export async function listTrips(): Promise<TripsResult> {
     const { data, error } = await supabase
       .from("trips")
       .select(
-        "id, title, source, destination, start_date, end_date, image_path, itinerary_days(itinerary_activities(is_done))",
+        "id, title, source, destination, start_date, end_date, image_path, itinerary_days(itinerary_activities(is_done)), packing_items(is_packed)",
       )
       .order("created_at", { ascending: false });
 
     if (error) {
       return { success: false, data: [], error: toReadableError("trips", error, LOAD_FAILED) };
     }
-    const trips = data.map(({ itinerary_days, ...trip }) => ({
+    const trips = data.map(({ itinerary_days, packing_items, ...trip }) => ({
       ...trip,
-      planningProgress: getPlanningProgress(itinerary_days),
+      planningProgress: getPlanningProgress(itinerary_days, packing_items),
     }));
     return { success: true, data: trips, error: null };
   } catch (error) {

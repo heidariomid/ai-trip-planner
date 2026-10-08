@@ -18,11 +18,13 @@ here, because this is the first step where both of its inputs exist.
   traveller types, not a fixed list
 - Inline add, edit, and delete. Toggling packed saves immediately
 - An empty category is not shown once its last item is gone
-- The trip card from spec 4 gains a planning progress bar with a
-  percentage, on Upcoming and Ongoing trips. It is computed and never
-  stored. One half is the share of days that have at least one
-  activity. The other half is the share of packing items that are
-  packed. A trip with no packing items uses the days share alone
+- The planning progress bar on the trip card, already there since
+  spec 4, now counts packing too, and shows on Upcoming and Ongoing
+  trips only. It is computed and never stored. One half is the share
+  of activities ticked off (user decision, 2026-10-08, replacing the
+  share of days with an activity). The other half is the share of
+  packing items that are packed. A trip that has only one of the two
+  uses that share alone, and a trip with neither reads 0%
 - The counts behind the bar arrive with the trip list in one request.
   A card does not fetch its own. The read goes through the same
   policies as the rows, so it needs no new grant
@@ -36,8 +38,8 @@ here, because this is the first step where both of its inputs exist.
 
 - On a phone, add items under two categories, check one, uncheck it,
   rename one, delete one. Leave and come back. The list matches
-- The bar on the trip card moves after an activity is added to an empty
-  day and after an item is checked, once the list is shown again
+- The bar on the trip card moves after an activity is ticked and after
+  an item is checked, once the list is shown again
 - A second user cannot see the items
 - `npx tsc --noEmit` passes
 

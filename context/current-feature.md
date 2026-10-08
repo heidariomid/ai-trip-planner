@@ -45,3 +45,5 @@
   one line that follows the clock
 - feat: add bookings for flights, car rentals, hotels, and extras
   (spec 7)
+- feat: add the packing list and count packed items in planning
+  progress (spec 8)

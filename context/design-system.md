@@ -206,6 +206,16 @@ Use these. Do not restyle them per screen.
   timeline. An empty section is one `subtle` sentence. Nothing here is
   `accent` except Save
 
+- `components/PackingRow.tsx`, `components/PackingForm.tsx`,
+  `components/Packing.tsx` — the Packing section of a trip. One heading
+  per category in the card-title style, with a `subtle` "2 of 5 packed"
+  beside it and the same quiet `ink` "+ Add" as Bookings. An item is a
+  row on the canvas: the 24pt tick circle from the timeline, the label,
+  and a `muted` pencil. A packed item is struck through in `subtle`.
+  Tapping the row swaps it for the form, a `Card` with Item and
+  Category. Below the last category a `secondary` button adds an item
+  under a new category
+
 A plan's picture is bundled, not private: `getExploreImage(key)` from
 `lib/explore-images.ts` returns it, or the placeholder for an unknown
 key. A new plan picture needs a new build.

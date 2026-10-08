@@ -127,6 +127,25 @@ export function validateActivity(
   return errors;
 }
 
+export const MAX_PACKING_CATEGORY_LENGTH = 40;
+export const MAX_PACKING_LABEL_LENGTH = 80;
+
+export interface PackingFields {
+  category: string;
+  label: string;
+}
+
+export function validatePackingItem(
+  fields: PackingFields,
+): Partial<Record<keyof PackingFields, string>> {
+  const errors: Partial<Record<keyof PackingFields, string>> = {};
+
+  if (!fields.label.trim()) errors.label = "Say what to pack.";
+  if (!fields.category.trim()) errors.category = "Name a category, such as Clothes.";
+
+  return errors;
+}
+
 export const MAX_DETAIL_LENGTH = 200;
 
 export interface FlightFields {

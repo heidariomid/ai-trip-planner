@@ -27,21 +27,30 @@ import {
   ItineraryItem,
   type EditingTarget,
 } from "../../../../components/Itinerary";
+import {
+  PackingListItem,
+  buildPackingRows,
+  type PackingEditing,
+  type PackingListRow,
+} from "../../../../components/Packing";
 import { TripBanner } from "../../../../components/TripBanner";
 import { TripMenu } from "../../../../components/TripMenu";
 import { useBookings } from "../../../../hooks/useBookings";
+import { usePacking } from "../../../../hooks/usePacking";
 import { useTripDetail } from "../../../../hooks/useTripDetail";
 import { todayISO } from "../../../../lib/dates";
+import type { PackingItem } from "../../../../lib/packing";
 import { colors } from "../../../../lib/theme";
 import type { Activity, ItineraryDay } from "../../../../lib/trip-detail";
 
 const SECTIONS = ["Itinerary", "Bookings", "Packing", "Photos", "Notes"] as const;
 type Section = (typeof SECTIONS)[number];
 
-/** One row of the screen's list: an activity of the selected day, or a booking row. */
+/** One row of the screen's list: an activity of the selected day, a booking row, or a packing row. */
 type TripRow =
   | { type: "activity"; key: string; activity: Activity; isLast: boolean }
-  | { type: "booking"; key: string; item: BookingItem };
+  | { type: "booking"; key: string; item: BookingItem }
+  | { type: "packing"; key: string; row: PackingListRow };
 
 const CONTENT_STYLE = {
   width: "100%",
@@ -72,11 +81,13 @@ export default function TripScreen() {
     removeTrip,
   } = useTripDetail(id);
   const bookings = useBookings(id);
+  const packing = usePacking(id);
 
   const [section, setSection] = useState<Section>("Itinerary");
   const [selectedDayId, setSelectedDayId] = useState<string | null>(null);
   const [editing, setEditing] = useState<EditingTarget>(null);
   const [editingBooking, setEditingBooking] = useState<BookingEditing>(null);
+  const [editingPacking, setEditingPacking] = useState<PackingEditing>(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -91,6 +102,11 @@ export default function TripScreen() {
   async function handleToggle(activity: Activity) {
     setTickError(null);
     setTickError(await toggleActivity(activity));
+  }
+
+  async function handlePack(item: PackingItem) {
+    setTickError(null);
+    setTickError(await packing.toggleItem(item));
   }
 
   async function handleDelete() {
@@ -127,6 +143,10 @@ export default function TripScreen() {
   const day = trip.days.find((item) => item.id === selectedDayId) ?? defaultDay(trip.days);
   const showsItinerary = section === "Itinerary" && day !== null;
   const showsBookings = section === "Bookings";
+  const showsPacking = section === "Packing";
+  const isSectionLoading =
+    (showsBookings && bookings.isLoading) || (showsPacking && packing.isLoading);
+  const sectionError = showsBookings ? bookings.error : showsPacking ? packing.error : null;
 
   let rows: TripRow[] = [];
   if (showsItinerary) {
@@ -141,6 +161,12 @@ export default function TripScreen() {
       type: "booking",
       key: item.key,
       item,
+    }));
+  } else if (showsPacking && !packing.isLoading) {
+    rows = buildPackingRows(packing.items).map((row) => ({
+      type: "packing",
+      key: row.key,
+      row,
     }));
   }
 
@@ -161,9 +187,7 @@ export default function TripScreen() {
               <View className="pb-5">
                 <TripBanner trip={trip} onBack={goBack} onOpenMenu={() => setIsMenuOpen(true)} />
                 <View className="mt-3">
-                  <FormMessage
-                    message={error ?? tickError ?? (showsBookings ? bookings.error : null)}
-                  />
+                  <FormMessage message={error ?? tickError ?? sectionError} />
                 </View>
 
                 <ScrollView
@@ -210,6 +234,18 @@ export default function TripScreen() {
                   />
                 );
               }
+              if (row.type === "packing") {
+                return (
+                  <PackingListItem
+                    row={row.row}
+                    editing={editingPacking}
+                    onEdit={setEditingPacking}
+                    onSave={packing.saveItem}
+                    onDelete={packing.removeItem}
+                    onToggle={(item) => void handlePack(item)}
+                  />
+                );
+              }
               return day ? (
                 <ItineraryItem
                   activity={row.activity}
@@ -232,8 +268,8 @@ export default function TripScreen() {
                   onEdit={setEditing}
                   onSave={saveActivity}
                 />
-              ) : showsBookings ? (
-                bookings.isLoading ? (
+              ) : showsBookings || showsPacking ? (
+                isSectionLoading ? (
                   <View className="py-10">
                     <ActivityIndicator color={colors.accent} />
                   </View>

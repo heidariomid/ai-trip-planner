@@ -77,12 +77,11 @@ export function TripCard({ trip, onPress }: TripCardProps) {
           />
         </View>
 
-        <View className="mt-4">
-          <ProgressBar
-            label="Planning progress"
-            value={trip.planningProgress}
-          />
-        </View>
+        {status === "Past" ? null : (
+          <View className="mt-4">
+            <ProgressBar label="Planning progress" value={trip.planningProgress} />
+          </View>
+        )}
       </Card>
     </Pressable>
   );
