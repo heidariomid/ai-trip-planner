@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Privacy policy · AI Trip Planner</title>
+    <meta name="theme-color" content="#F3F3F8" />
+    <link rel="icon" href="/favicon.ico" />
+    <style>
+      :root {
+        --canvas: #f3f3f8;
+        --surface: #ffffff;
+        --ink: #1a1c3d;
+        --subtle: #74778f;
+        --line: #e8e8f0;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: var(--canvas);
+        color: var(--ink);
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        font-size: 16px;
+        line-height: 1.6;
+        -webkit-text-size-adjust: 100%;
+      }
+      main {
+        max-width: 680px;
+        margin: 0 auto;
+        padding: 40px 20px 64px;
+      }
+      h1 {
+        margin: 0;
+        font-size: 32px;
+        line-height: 1.2;
+        letter-spacing: -0.02em;
+      }
+      h2 {
+        margin: 36px 0 8px;
+        font-size: 20px;
+        letter-spacing: -0.01em;
+      }
+      p,
+      ul {
+        margin: 0 0 12px;
+      }
+      ul {
+        padding-left: 20px;
+      }
+      li {
+        margin-bottom: 6px;
+      }
+      .updated {
+        margin-top: 8px;
+        color: var(--subtle);
+        font-size: 14px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        background: var(--surface);
+        border-radius: 16px;
+        overflow: hidden;
+        font-size: 15px;
+      }
+      th,
+      td {
+        padding: 12px 14px;
+        text-align: left;
+        vertical-align: top;
+        border-bottom: 1px solid var(--line);
+      }
+      tr:last-child td {
+        border-bottom: 0;
+      }
+      th {
+        color: var(--subtle);
+        font-size: 13px;
+        font-weight: 500;
+      }
+      a {
+        color: var(--ink);
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Privacy policy</h1>
+      <p class="updated">AI Trip Planner · Last updated 9 October 2026</p>
+
+      <h2>In short</h2>
+      <p>
+        AI Trip Planner keeps the trips you plan so you can come back to them. We store what you
+        type and upload, we send parts of it to a few services that make the app work, and we do
+        not sell it or show you ads. You can delete your account, and everything with it, from the
+        Profile tab at any time.
+      </p>
+
+      <h2>What we store</h2>
+      <ul>
+        <li>
+          <strong>Your account:</strong> your email address, your name, and a password that is
+          stored only as a hash we cannot read. If you sign in with Google, we receive your name,
+          email address, and profile picture from Google instead of a password.
+        </li>
+        <li>
+          <strong>Your profile:</strong> a picture if you upload one, and the interests you pick.
+        </li>
+        <li>
+          <strong>Your trips:</strong> titles, places, dates, descriptions, itineraries, bookings
+          you write down (flights, car rentals, hotels, and their confirmation codes), packing
+          lists, notes, cover pictures, and photos you add.
+        </li>
+        <li>
+          <strong>Your conversations with the assistant:</strong> the messages you send and the
+          replies, so you can reopen them.
+        </li>
+        <li><strong>Places you save</strong> with the heart, by name and city.</li>
+        <li>
+          <strong>Sharing:</strong> which trips you joined or shared, and with what role.
+        </li>
+        <li>
+          <strong>Usage counts:</strong> how many assistant messages and AI covers you used today,
+          to keep the daily limits.
+        </li>
+      </ul>
+      <p>
+        We do not collect your location, your contacts, or payment details, and the app has no
+        advertising or analytics trackers.
+      </p>
+
+      <h2>Who receives your data</h2>
+      <table>
+        <tr>
+          <th>Service</th>
+          <th>What it receives</th>
+          <th>Why</th>
+        </tr>
+        <tr>
+          <td>Supabase</td>
+          <td>Everything listed above</td>
+          <td>It hosts the database, the files, and sign-in</td>
+        </tr>
+        <tr>
+          <td>Google sign-in</td>
+          <td>That you signed in to this app</td>
+          <td>Only if you choose "Continue with Google"</td>
+        </tr>
+        <tr>
+          <td>Google Gemini</td>
+          <td>
+            Your messages to the assistant, your interests, and the itinerary of
+            the trip you are asking about
+          </td>
+          <td>It writes the assistant's replies</td>
+        </tr>
+        <tr>
+          <td>Cloudflare Workers AI</td>
+          <td>A trip's title, destination, and description</td>
+          <td>Only when you ask for an AI cover picture</td>
+        </tr>
+        <tr>
+          <td>Wikipedia and Wikimedia Commons</td>
+          <td>The name and city of a place the assistant recommends</td>
+          <td>To find a photo of it. Your device asks them directly</td>
+        </tr>
+        <tr>
+          <td>Google Maps</td>
+          <td>The name of a place</td>
+          <td>Only when you tap a place to open it in Maps</td>
+        </tr>
+      </table>
+      <p style="margin-top: 12px">
+        The assistant currently runs on a free tier of Google Gemini, under which Google may use
+        what is sent to it to improve its products. Do not type anything into the chat that you
+        would not want shared that way, such as passport numbers or card details.
+      </p>
+
+      <h2>Who can see your trips</h2>
+      <p>
+        Only you, until you share a trip. When you give someone a trip's join code, they can see
+        that trip, including its bookings, notes, and photos, along with your name and profile
+        picture. They never see your email address or your other trips. You can remove a person or
+        change the code at any time.
+      </p>
+
+      <h2>Keeping and deleting</h2>
+      <p>
+        We keep your data for as long as you have an account. "Delete account" on the Profile tab
+        removes your account, your trips, your files, and your conversations straight away and
+        cannot be undone. A trip you shared is removed for the people you shared it with too.
+        Photos you added to someone else's trip stay with that trip.
+      </p>
+
+      <h2>On your device</h2>
+      <p>
+        The app keeps you signed in by storing a session in your browser or on your phone. It
+        uses no advertising cookies.
+      </p>
+
+      <h2>Children</h2>
+      <p>The app is not meant for children under 13.</p>
+
+      <h2>Changes</h2>
+      <p>If this policy changes, the date at the top changes with it.</p>
+
+      <h2>Contact</h2>
+      <p>Questions about your data: <a href="mailto:CONTACT_EMAIL">CONTACT_EMAIL</a>.</p>
+    </main>
+  </body>
+</html>

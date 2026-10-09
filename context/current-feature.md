@@ -63,3 +63,5 @@
   Profile, and a city on every place card (spec 14)
 - feat: add family share with join codes, member roles, and a
   read-only trip for viewers (spec 15)
+- feat: add the web app shell, an install hint, account deletion, and
+  a privacy policy page (spec 16)

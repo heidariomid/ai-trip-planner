@@ -110,11 +110,20 @@ Use these. Do not restyle them per screen.
   text right of the label, such as a character count. `multiline` makes
   it 96pt tall
 - `components/FormMessage.tsx` — `error` is red, `info` is `accent-soft`
-- `components/AuthScreenLayout.tsx` — canvas, safe area, keyboard handling
+- `components/AuthScreenLayout.tsx` — canvas, safe area, keyboard
+  handling, and the install hint above the title
+- `components/InstallHint.tsx` — how to put the web app on the home
+  screen, on Sign In and Sign Up only. A `surface` block with
+  `rounded-2xl` and `shadows.soft`: a semibold `ink` title, a `subtle`
+  line, a `muted` close cross with a 44pt target, then two numbered
+  steps, each a Lucide icon in a 36pt `canvas` circle beside a medium
+  `ink` label. On Android a `secondary` "Install app" button sits under
+  the steps when the browser offers its prompt. Nothing in it is
+  `accent`, so Sign in stays the one filled button
 - `components/Text.tsx` — every string. Sets the Outfit family
-- `components/Screen.tsx` — a tab screen that does not scroll: canvas,
-  top safe area, screen title, capped width, bottom padding for the tab
-  bar
+- `components/Screen.tsx` — a tab screen: canvas, top safe area, screen
+  title, capped width, bottom padding for the tab bar. It does not
+  scroll unless it is given `scroll`, which Profile uses
 - `components/TabBar.tsx` — the floating capsule. Each tab is an icon
   above a 12px label. The active tab is `accent` on an `accent-soft`
   pill, the others are `subtle` with no background
@@ -355,10 +364,22 @@ Use these. Do not restyle them per screen.
 - `app/(app)/join-trip.tsx` — a `FormScreen` with a `subtle` line of
   help, one code field in capitals, and a "Join trip" button. A join shows
   an `info` `FormMessage` for a moment and then opens My Trips
-- The Profile tab has two rows under the card, "Saved places" and
-  "Join a trip": each a 56pt `surface` row with `rounded-2xl` and
-  `shadows.soft`, a Lucide icon in `ink`, the label in medium `ink`,
-  and a `muted` chevron
+- The Profile tab has three rows under the card, "Saved places",
+  "Join a trip", and "Privacy policy": each a 56pt `surface` row with
+  `rounded-2xl` and `shadows.soft`, a Lucide icon in `ink`, the label
+  in medium `ink`, and a `muted` chevron. The profile card has a `muted`
+  pencil with a 44pt target on its top right, which opens Edit profile.
+  After a wider gap "Sign out" is a fourth row of the same shape with
+  no chevron, and under it sits "Delete account": 14px medium red text
+  with a 44pt target and no border or fill, which opens a
+  `ConfirmDialog`. The tab has no capsule buttons (user request,
+  2026-10-10: three stacked buttons looked messy). It is red because it destroys
+  data, and it is text so it does not compete with the buttons
+- Sign Up has one `subtle` 13px line above "Already have an account?"
+  whose words "privacy policy" are underlined medium `ink`, not `accent`
+- `public/privacy.html` is a plain page outside the app: the `canvas`
+  background, `ink` text in the system font, and one white table. Its
+  colours are written in the file, because it cannot read the theme
 - `components/TripMenu.tsx` shows a row only to someone who may use it:
   "Edit trip" to the owner and an editor, "Delete trip" and "Move to my
   trips" to the owner, and "Leave trip" to a member

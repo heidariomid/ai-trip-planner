@@ -8,6 +8,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { Card } from "./Card";
+import { InstallHint } from "./InstallHint";
 import { Text } from "./Text";
 
 export interface AuthScreenLayoutProps {
@@ -37,6 +38,7 @@ export function AuthScreenLayout({ title, subtitle, children }: AuthScreenLayout
           >
             <View className="items-center px-5 py-10">
               <View className="w-full max-w-[380px]">
+                <InstallHint />
                 <Text className="ml-1 text-[32px] font-bold leading-tight tracking-tight text-ink">
                   {title}
                 </Text>

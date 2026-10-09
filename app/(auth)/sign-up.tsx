@@ -8,6 +8,7 @@ import { FormMessage } from "../../components/FormMessage";
 import { Text } from "../../components/Text";
 import { TextField } from "../../components/TextField";
 import { signInWithGoogle, signUpWithEmail } from "../../lib/auth";
+import { openPrivacyPolicy } from "../../lib/links";
 import { validateSignUp, type SignUpFields } from "../../lib/validation";
 
 type FieldErrors = Partial<Record<keyof SignUpFields, string>>;
@@ -133,7 +134,18 @@ export default function SignUpScreen() {
         disabled={pending !== null}
       />
 
-      <View className="mt-6 flex-row items-center justify-center">
+      <View className="mt-5 flex-row flex-wrap items-center justify-center">
+        <Text className="text-[13px] text-subtle">By creating an account you agree to the </Text>
+        <Text
+          accessibilityRole="link"
+          onPress={() => void openPrivacyPolicy()}
+          className="py-2 text-[13px] font-medium text-ink underline"
+        >
+          privacy policy
+        </Text>
+      </View>
+
+      <View className="mt-2 flex-row items-center justify-center">
         <Text className="text-[14px] text-subtle">Already have an account? </Text>
         <Link href="/sign-in">
           <Text className="py-2 text-[14px] font-semibold text-accent">Sign in</Text>

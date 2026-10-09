@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { View } from "react-native";
+import { ScrollView, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { useTabBarClearance } from "../hooks/useTabBar";
@@ -8,23 +8,43 @@ import { Text } from "./Text";
 export interface ScreenProps {
   title: string;
   children: ReactNode;
+  /** For a tab whose content can be taller than the screen. */
+  scroll?: boolean;
 }
 
-/** A tab screen that does not scroll: canvas, safe area, title, capped width. */
-export function Screen({ title, children }: ScreenProps) {
+/** A tab screen: canvas, safe area, title, capped width, room for the tab bar. */
+export function Screen({ title, children, scroll = false }: ScreenProps) {
   const paddingBottom = useTabBarClearance();
+
+  const content = (
+    <View className={`w-full max-w-[380px] ${scroll ? "" : "flex-1"}`}>
+      <Text className="mb-6 text-[32px] font-bold leading-tight tracking-tight text-ink">
+        {title}
+      </Text>
+      {children}
+    </View>
+  );
 
   return (
     <View className="flex-1 bg-canvas">
       <SafeAreaView className="flex-1" edges={["top"]}>
-        <View className="flex-1 items-center px-5 pt-4" style={{ paddingBottom }}>
-          <View className="w-full max-w-[380px] flex-1">
-            <Text className="mb-6 text-[32px] font-bold leading-tight tracking-tight text-ink">
-              {title}
-            </Text>
-            {children}
+        {scroll ? (
+          <ScrollView
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{
+              alignItems: "center",
+              paddingHorizontal: 20,
+              paddingTop: 16,
+              paddingBottom,
+            }}
+          >
+            {content}
+          </ScrollView>
+        ) : (
+          <View className="flex-1 items-center px-5 pt-4" style={{ paddingBottom }}>
+            {content}
           </View>
-        </View>
+        )}
       </SafeAreaView>
     </View>
   );

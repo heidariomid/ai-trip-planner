@@ -32,7 +32,7 @@ from Home and from a trip.
 
 ## Current state
 
-Specs 1 through 15 are done. Specs 16 through 18 are written and not built.
+Specs 1 through 16 are done. Specs 17 and 18 are written and not built.
 
 - Expo Router, email and Google sign-in, and a `profiles` row on first
   sign-up. Verified on Expo Go and web
@@ -90,6 +90,15 @@ Specs 1 through 15 are done. Specs 16 through 18 are written and not built.
   and can remove them; a member joins from Profile and can leave. A
   viewer's trip is read-only. The owner's side was checked on web; a
   member's side and the phone were not
+
+- The web build has an app shell: a manifest, home screen icons, and
+  the iOS tags, so it opens full screen from a home screen icon. Sign
+  In and Sign Up show how to add it there on a phone. Profile scrolls
+  and has a Privacy policy row and Delete account, which removes the
+  account, its files, and its trips through the `delete-account` Edge
+  Function. The function was checked on two throwaway accounts; the
+  screens were checked on web, and the home screen app was never opened
+  on a phone
 
 No app build has been deployed: no EAS build, no store listing. The
 `chat`, `place-photo`, and `trip-cover` Edge Functions are deployed on
@@ -253,7 +262,7 @@ and inside the chat.
 | AI cover image | 13, done |
 | Saved places | 14, done |
 | Family share | 15, done |
-| Web app shell, install hint, delete account, privacy policy | 16 |
+| Web app shell, install hint, delete account, privacy policy | 16, done |
 | Password reset | 18 |
 
 ---
@@ -342,7 +351,7 @@ and when it is done.
 15. @context/features/spec15-family-share.md — members and a join code.
     Done
 16. @context/features/spec16-account-and-store.md — the web app shell, the
-    install hint, account deletion, privacy policy
+    install hint, account deletion, privacy policy. Done
 17. @context/features/spec17-release.md — the web app on a public address
 18. @context/features/spec18-password-reset-and-email.md — password reset
     by code, Resend, email confirmation on. Not scheduled
