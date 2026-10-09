@@ -65,3 +65,9 @@
   read-only trip for viewers (spec 15)
 - feat: add the web app shell, an install hint, account deletion, and
   a privacy policy page (spec 16)
+- docs: add the README
+- docs: take the test credentials and project identifiers out of the
+  repository
+- chore: add the Vercel config so the web export is built and served
+- feat: release the web app with a first-screen line, a link preview,
+  a daily keep-alive, and release notes (spec 17)

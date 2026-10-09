@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import {
+  Image,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -38,6 +39,19 @@ export function AuthScreenLayout({ title, subtitle, children }: AuthScreenLayout
           >
             <View className="items-center px-5 py-10">
               <View className="w-full max-w-[380px]">
+                <View className="mb-6 ml-1 flex-row items-center">
+                  <Image
+                    source={require("../assets/icon.png")}
+                    accessibilityIgnoresInvertColors
+                    style={{ width: 40, height: 40, borderRadius: 10 }}
+                  />
+                  <View className="ml-3 flex-1">
+                    <Text className="text-[15px] font-semibold text-ink">AI Trip Planner</Text>
+                    <Text className="text-[13px] leading-[18px] text-subtle">
+                      Plan a trip day by day with an AI assistant.
+                    </Text>
+                  </View>
+                </View>
                 <InstallHint />
                 <Text className="ml-1 text-[32px] font-bold leading-tight tracking-tight text-ink">
                   {title}

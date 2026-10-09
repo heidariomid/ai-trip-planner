@@ -815,6 +815,10 @@ export type Database = {
         }
         Returns: string
       }
+      ping: {
+        Args: never
+        Returns: string
+      }
       replace_day_activities: {
         Args: {
           p_activities: Json

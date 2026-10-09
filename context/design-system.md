@@ -111,7 +111,13 @@ Use these. Do not restyle them per screen.
   it 96pt tall
 - `components/FormMessage.tsx` — `error` is red, `info` is `accent-soft`
 - `components/AuthScreenLayout.tsx` — canvas, safe area, keyboard
-  handling, and the install hint above the title
+  handling, and above the title a brand row and then the install hint.
+  The brand row says what the app is to someone who opens the link
+  cold: the app icon at 40pt with 10pt corners, "AI Trip Planner" in
+  15px semibold `ink`, and one 13px `subtle` line under it
+- `public/og-image.png` — the 1200 by 630 picture a shared link shows:
+  the sky-to-peach wash, the icon, and the headline in Outfit. It is
+  drawn outside the app, so the wash is allowed there
 - `components/InstallHint.tsx` — how to put the web app on the home
   screen, on Sign In and Sign Up only. A `surface` block with
   `rounded-2xl` and `shadows.soft`: a semibold `ink` title, a `subtle`

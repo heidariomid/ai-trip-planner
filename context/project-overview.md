@@ -32,7 +32,8 @@ from Home and from a trip.
 
 ## Current state
 
-Specs 1 through 16 are done. Specs 17 and 18 are written and not built.
+Specs 1 through 17 are done, and the site is live at
+`https://plan-trip-ai.vercel.app`. Spec 18 is written and not built.
 
 - Expo Router, email and Google sign-in, and a `profiles` row on first
   sign-up. Verified on Expo Go and web
@@ -99,6 +100,13 @@ Specs 1 through 16 are done. Specs 17 and 18 are written and not built.
   Function. The function was checked on two throwaway accounts; the
   screens were checked on web, and the home screen app was never opened
   on a phone
+
+- The web app is public at `https://plan-trip-ai.vercel.app`, built by
+  Vercel from `main` on GitHub. Google sign-in works there in the
+  browser and from the home screen icon on an iPhone, for the owner's
+  account. Sign In and Sign Up say what the app is, a shared link has a
+  title, description, and picture, and Vercel calls `/api/keep-alive`
+  once a day so the free Supabase project does not pause
 
 No app build has been deployed: no EAS build, no store listing. The
 `chat`, `place-photo`, and `trip-cover` Edge Functions are deployed on
@@ -352,6 +360,7 @@ and when it is done.
     Done
 16. @context/features/spec16-account-and-store.md — the web app shell, the
     install hint, account deletion, privacy policy. Done
-17. @context/features/spec17-release.md — the web app on a public address
+17. @context/features/spec17-release.md — the web app on a public address.
+    Done
 18. @context/features/spec18-password-reset-and-email.md — password reset
     by code, Resend, email confirmation on. Not scheduled
