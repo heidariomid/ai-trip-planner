@@ -3,10 +3,14 @@ import { toReadableError } from "./errors";
 import { uploadTripCover, type LocalImage } from "./storage";
 import { supabase } from "./supabase";
 
+export type TripStatusValue = "active" | "draft";
+
 export type Trip = Pick<
   Tables<"trips">,
   "id" | "title" | "source" | "destination" | "start_date" | "end_date" | "image_path"
 > & {
+  /** A draft is a plan saved from the chat that is not a trip yet. */
+  status: TripStatusValue;
   /** From 0 to 1: activities ticked off and items packed, half each. */
   planningProgress: number;
 };
@@ -57,6 +61,8 @@ export interface NewTrip {
   cover: LocalImage | null;
   /** Written with the trip in the same transaction. Used by a copied plan. */
   activities?: NewTripActivity[];
+  /** Left out, the trip is active. */
+  status?: TripStatusValue;
 }
 
 export interface TripsResult {
@@ -78,21 +84,27 @@ const LOAD_FAILED = "We couldn't load your trips. Pull down to try again.";
 const SAVE_FAILED = "We couldn't save your trip. Please try again.";
 const COVER_NOT_SAVED = "Your trip is saved, but the cover picture did not save.";
 
+/** The column is text with a check; anything unexpected reads as active. */
+export function toTripStatus(value: string): TripStatusValue {
+  return value === "draft" ? "draft" : "active";
+}
+
 /** Row-level security limits this to trips the caller may read. */
 export async function listTrips(): Promise<TripsResult> {
   try {
     const { data, error } = await supabase
       .from("trips")
       .select(
-        "id, title, source, destination, start_date, end_date, image_path, itinerary_days(itinerary_activities(is_done)), packing_items(is_packed)",
+        "id, title, source, destination, start_date, end_date, image_path, status, itinerary_days(itinerary_activities(is_done)), packing_items(is_packed)",
       )
       .order("created_at", { ascending: false });
 
     if (error) {
       return { success: false, data: [], error: toReadableError("trips", error, LOAD_FAILED) };
     }
-    const trips = data.map(({ itinerary_days, packing_items, ...trip }) => ({
+    const trips = data.map(({ itinerary_days, packing_items, status, ...trip }) => ({
       ...trip,
+      status: toTripStatus(status),
       planningProgress: getPlanningProgress(itinerary_days, packing_items),
     }));
     return { success: true, data: trips, error: null };
@@ -134,6 +146,8 @@ export async function createTrip(userId: string, trip: NewTrip): Promise<CreateT
       p_description: trip.description || undefined,
       p_traveler_count: trip.travelerCount,
       p_activities: trip.activities,
+      // Only a draft names its status; an active trip takes the default.
+      p_status: trip.status === "draft" ? "draft" : undefined,
     });
 
     if (error || !data) {

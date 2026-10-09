@@ -44,7 +44,11 @@ export function TripBanner({ trip, onBack, onOpenMenu }: TripBannerProps) {
           {trip.title}
         </Text>
         <View className="mt-2">
-          <Badge label={status} highlighted={status === "Ongoing"} />
+          {trip.status === "draft" ? (
+            <Badge label="Draft" />
+          ) : (
+            <Badge label={status} highlighted={status === "Ongoing"} />
+          )}
         </View>
       </View>
 

@@ -18,11 +18,14 @@ const MAX_MESSAGE_LENGTH = 2000;
 const HISTORY_MESSAGES = 20;
 // A long trip must not grow the prompt without limit.
 const MAX_ACTIVITIES_IN_PROMPT = 60;
-const MAX_OUTPUT_TOKENS = 2048;
+// Room for a week-long plan with its cards. A reply cut off inside the cards
+// block loses every card in it.
+const MAX_OUTPUT_TOKENS = 4096;
 
 const OVER_LIMIT = `You have reached today's limit of ${DAILY_LIMIT} messages. Try again tomorrow.`;
 const NOT_SET_UP = "The assistant is not set up yet.";
 const BUSY = "The assistant is busy right now. Try again in a minute.";
+const NOTHING_TO_REDO = "There is no reply to regenerate.";
 const NO_ANSWER = "The assistant could not answer that. Try asking another way.";
 const FAILED = "The assistant could not answer. Please try again.";
 
@@ -30,6 +33,10 @@ const CARDS_OPEN = "<cards>";
 const CARDS_CLOSE = "</cards>";
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const URL_PATTERN = /https?:\/\/\S+|www\.\S+/gi;
+const TIME = /^([01]\d|2[0-3]):[0-5]\d$/;
+const DATE = /^\d{4}-\d{2}-\d{2}$/;
+const MAX_TRIP_DAYS = 60;
+const MAX_TRAVELERS = 20;
 
 const CORS = {
   "Access-Control-Allow-Origin": "*",
@@ -60,14 +67,33 @@ interface DayItem {
 }
 
 interface DayCard {
+  /** Which day of the trip, from 1. */
+  day: number;
   title: string;
   items: DayItem[];
 }
+
+/** The summary a new trip is made from. It has no source and no dates: the app asks. */
+interface TripCard {
+  title: string;
+  destination: string;
+  day_count: number;
+  traveler_count: number;
+  description: string;
+}
+
+type BookingCard =
+  | { kind: "hotel"; name: string; check_in: string | null; check_out: string | null }
+  | { kind: "car"; company: string; pickup_location: string | null }
+  | { kind: "extra"; title: string; detail: string | null }
+  | { kind: "flight"; airline: string; flight_number: string };
 
 interface Cards {
   chips: string[];
   places: PlaceCard[];
   days: DayCard[];
+  trip: TripCard | null;
+  bookings: BookingCard[];
 }
 
 /** A short plain string. A URL the model wrote is dropped, never passed on. */
@@ -86,11 +112,98 @@ function field(value: unknown, key: string): unknown {
     : undefined;
 }
 
+/** A whole number inside a range, or the fallback. */
+function whole(value: unknown, min: number, max: number, fallback: number): number {
+  const number = typeof value === "number" ? value : Number(value);
+  if (!Number.isInteger(number)) return fallback;
+  return Math.min(max, Math.max(min, number));
+}
+
+function toDate(value: unknown): string | null {
+  return typeof value === "string" && DATE.test(value) ? value : null;
+}
+
+function toTripCard(value: unknown): TripCard | null {
+  const title = clean(field(value, "title"), 80);
+  const destination = clean(field(value, "destination"), 80);
+  if (!title || !destination) return null;
+  return {
+    title,
+    destination,
+    day_count: whole(field(value, "day_count"), 1, MAX_TRIP_DAYS, 1),
+    traveler_count: whole(field(value, "traveler_count"), 1, MAX_TRAVELERS, 1),
+    description: clean(field(value, "description"), 200),
+  };
+}
+
+function toBookingCard(value: unknown): BookingCard | null {
+  switch (field(value, "kind")) {
+    case "hotel": {
+      const name = clean(field(value, "name"), 80);
+      const checkIn = toDate(field(value, "check_in"));
+      const checkOut = toDate(field(value, "check_out"));
+      // Both dates or neither: the app fills a missing pair from the trip.
+      const hasDates = checkIn !== null && checkOut !== null && checkOut >= checkIn;
+      return name
+        ? { kind: "hotel", name, check_in: hasDates ? checkIn : null, check_out: hasDates ? checkOut : null }
+        : null;
+    }
+    case "car": {
+      const company = clean(field(value, "company"), 80);
+      return company
+        ? { kind: "car", company, pickup_location: clean(field(value, "pickup_location"), 80) || null }
+        : null;
+    }
+    case "extra": {
+      const title = clean(field(value, "title"), 80);
+      return title ? { kind: "extra", title, detail: clean(field(value, "detail"), 200) || null } : null;
+    }
+    case "flight": {
+      const airline = clean(field(value, "airline"), 60);
+      const flightNumber = clean(field(value, "flight_number"), 12);
+      return airline && flightNumber ? { kind: "flight", airline, flight_number: flightNumber } : null;
+    }
+    default:
+      return null;
+  }
+}
+
+/**
+ * The first whole JSON object in the block. The model often leaves a stray
+ * character or tag after the closing brace, and a strict parse of the whole
+ * block would then throw away every card in it.
+ */
+function firstJsonObject(raw: string): string | null {
+  const start = raw.indexOf("{");
+  if (start === -1) return null;
+
+  let depth = 0;
+  let inString = false;
+  let escaped = false;
+  for (let index = start; index < raw.length; index += 1) {
+    const character = raw[index];
+    if (inString) {
+      if (escaped) escaped = false;
+      else if (character === "\\") escaped = true;
+      else if (character === '"') inString = false;
+    } else if (character === '"') {
+      inString = true;
+    } else if (character === "{") {
+      depth += 1;
+    } else if (character === "}") {
+      depth -= 1;
+      if (depth === 0) return raw.slice(start, index + 1);
+    }
+  }
+  return null;
+}
+
 function toCards(raw: string): Cards | null {
   let parsed: unknown;
   try {
-    parsed = JSON.parse(raw);
+    parsed = JSON.parse(firstJsonObject(raw) ?? "");
   } catch {
+    console.error("[chat] cards block could not be read", raw.slice(0, 200));
     return null;
   }
 
@@ -103,20 +216,32 @@ function toCards(raw: string): Cards | null {
     .filter((place) => place.name);
 
   const days = list(field(parsed, "days"), 7)
-    .map((day) => ({
+    .map((day, index) => ({
+      day: whole(field(day, "day"), 1, MAX_TRIP_DAYS, index + 1),
       title: clean(field(day, "title"), 80),
       items: list(field(day, "items"), 8)
-        .map((item) => ({
-          time: clean(field(item, "time"), 20) || null,
-          place: clean(field(item, "place"), 80) || null,
-          activity: clean(field(item, "activity"), 160),
-        }))
+        .map((item) => {
+          // The database casts this to a time, and one value that is not a
+          // time would fail the whole trip. Anything else becomes no time.
+          const time = clean(field(item, "time"), 5);
+          return {
+            time: TIME.test(time) ? time : null,
+            place: clean(field(item, "place"), 80) || null,
+            activity: clean(field(item, "activity"), 160),
+          };
+        })
         .filter((item) => item.activity),
     }))
     .filter((day) => day.title && day.items.length > 0);
 
-  if (chips.length + places.length + days.length === 0) return null;
-  return { chips, places, days };
+  const trip = toTripCard(field(parsed, "trip"));
+
+  const bookings = list(field(parsed, "bookings"), 6)
+    .map(toBookingCard)
+    .filter((booking): booking is BookingCard => booking !== null);
+
+  if (chips.length + places.length + days.length + bookings.length === 0 && !trip) return null;
+  return { chips, places, days, trip, bookings };
 }
 
 /** Splits a finished reply into the text to show and the cards after it. */
@@ -168,6 +293,9 @@ function describeTrip(trip: Record<string, unknown>, days: DayRow[]): string {
     `- Dates: ${trip.start_date} to ${trip.end_date}`,
   ];
   if (trip.description) lines.push(`- Description: ${trip.description}`);
+  lines.push(
+    `- It has ${days.length} day${days.length === 1 ? "" : "s"}, numbered 1 to ${days.length}. In day cards use these day numbers. You cannot add days: if a plan needs more days than this, say so and tell the traveller to change the trip's dates on the trip screen.`,
+  );
 
   let sent = 0;
   const planned: string[] = [];
@@ -201,13 +329,18 @@ function buildSystemPrompt(tripContext: string | null, interests: string[]): str
   const parts = [
     "You are the assistant inside a trip planning app. You help a traveller plan trips: where to go, what to do each day, what to eat, and how to pace it.",
     `Today is ${new Date().toISOString().slice(0, 10)}.`,
-    "You can only talk. You cannot create, save, or change a trip, an itinerary, a booking, or a picture, and you must never say that you did. If asked to save something, say that saving from the chat is not available yet.",
+    "You do not save anything yourself, and you must never say that you created, saved, added, or changed something. You propose cards, and the traveller saves a card with its own button: Create Trip or Save Draft on a trip card, Add to Trip on a day card, and Add to Bookings on a booking card. When asked to save or add something, give the card and tell them to tap its button.",
     "Keep replies short and practical. Ask one follow-up question when you need a detail such as dates, budget, or pace.",
     "Write in Markdown using only headings, bold, and lists. Never write a link, a URL, or an image.",
     [
       "After your text you may add one cards block, on its own at the very end, in exactly this form:",
-      '<cards>{"chips":["..."],"places":[{"name":"...","line":"..."}],"days":[{"title":"Day 1: ...","items":[{"time":"09:00","place":"...","activity":"..."}]}]}</cards>',
-      "Every key is optional. chips: up to 4 short follow-up messages the traveller might send next. places: up to 6 places, each with a name and one short line. days: up to 7 days, each with up to 8 items. Use days when you propose a day-by-day plan and places when you recommend specific places. The block must be valid JSON on one line, with no URLs. Do not mention the block in your text, and do not repeat its contents as a long list in the text.",
+      '<cards>{"chips":["..."],"places":[{"name":"...","line":"..."}],"trip":{"title":"...","destination":"City, Country","day_count":5,"traveler_count":2,"description":"..."},"days":[{"day":1,"title":"Day 1: ...","items":[{"time":"09:00","place":"...","activity":"..."}]}],"bookings":[{"kind":"hotel","name":"...","check_in":"2026-05-20","check_out":"2026-05-25"},{"kind":"car","company":"...","pickup_location":"..."},{"kind":"extra","title":"...","detail":"..."}]}</cards>',
+      "Every key is optional. The block must be valid JSON on one line, with no URLs. Do not mention the block in your text, and do not repeat its contents as a long list in the text.",
+      "chips: up to 4 short follow-up messages the traveller might send next.",
+      "places: up to 6 places, each with a name and one short line. Use it when you recommend specific places.",
+      "days: up to 7 days, each with its day number in day and up to 8 items. time is 24-hour HH:MM, or leave it out. Use it when you propose a day-by-day plan.",
+      "trip: only when no trip is selected and you propose a whole new trip. A short title, the destination, the number of days, the number of travellers, and a description of at most 200 characters. Send it together with the days of that plan. Never include where the traveller leaves from or the dates: the app asks for those.",
+      "bookings: up to 6, only when the traveller asks to add a booking. A hotel has a name and, only if the traveller gave them, check_in and check_out as YYYY-MM-DD. A car has a company and an optional pickup_location. An extra has a title and an optional detail, for anything else such as a rail pass or a ticket. A flight is {\"kind\":\"flight\",\"airline\":\"...\",\"flight_number\":\"...\"} and is allowed only when the traveller typed both the airline and the flight number themselves. Never invent a flight number, and never guess one: ask for it instead.",
     ].join("\n"),
   ];
 
@@ -219,6 +352,7 @@ function buildSystemPrompt(tripContext: string | null, interests: string[]): str
 }
 
 interface StoredMessage {
+  id: string;
   role: string;
   content: string;
   cards: unknown;
@@ -341,8 +475,11 @@ Deno.serve(async (request: Request) => {
   const message = typeof rawMessage === "string" ? rawMessage.trim() : "";
   const threadId = field(payload, "thread_id");
   const tripId = field(payload, "trip_id");
+  // Regenerate answers the last question again in place of the newest reply.
+  const regenerate = field(payload, "regenerate") === true;
 
-  if (!message) return json(400, { error: "Write a message first." });
+  if (regenerate && typeof threadId !== "string") return json(400, { error: NOTHING_TO_REDO });
+  if (!regenerate && !message) return json(400, { error: "Write a message first." });
   if (message.length > MAX_MESSAGE_LENGTH) {
     return json(400, { error: `Keep your message under ${MAX_MESSAGE_LENGTH} characters.` });
   }
@@ -382,7 +519,31 @@ Deno.serve(async (request: Request) => {
     thread = data;
   }
 
-  // Counted before the model is called, so a request over the cap never reaches it.
+  const { data: historyRows } = await supabase
+    .from("chat_messages")
+    .select("id, role, content, cards")
+    .eq("thread_id", thread.id)
+    .order("created_at", { ascending: false })
+    .limit(HISTORY_MESSAGES);
+  const stored = ((historyRows ?? []) as StoredMessage[]).reverse();
+
+  // What the model answers, and what came before it.
+  let question = message;
+  let history = stored;
+  let replaced: string[] = [];
+
+  if (regenerate) {
+    const lastQuestion = stored.map((row) => row.role).lastIndexOf("user");
+    replaced = stored.slice(lastQuestion + 1).map((row) => row.id);
+    // With no reply saved after it, a stopped or failed one, the question is
+    // simply answered again.
+    if (lastQuestion === -1) return json(409, { error: NOTHING_TO_REDO });
+    question = stored[lastQuestion].content;
+    history = stored.slice(0, lastQuestion);
+  }
+
+  // Counted before the model is called, so a request over the cap never
+  // reaches it. A regenerate is a request like any other.
   const { data: allowed, error: capError } = await supabase.rpc("consume_chat_request", {
     p_limit: DAILY_LIMIT,
   });
@@ -392,22 +553,15 @@ Deno.serve(async (request: Request) => {
   }
   if (!allowed) return json(429, { error: OVER_LIMIT });
 
-  const { data: historyRows } = await supabase
-    .from("chat_messages")
-    .select("role, content, cards")
-    .eq("thread_id", thread.id)
-    .order("created_at", { ascending: false })
-    .limit(HISTORY_MESSAGES);
-  const history = ((historyRows ?? []) as StoredMessage[]).reverse();
-
-  const { data: userMessage, error: userMessageError } = await supabase
-    .from("chat_messages")
-    .insert({ thread_id: thread.id, role: "user", content: message })
-    .select("id, created_at")
-    .single();
-  if (userMessageError || !userMessage) {
-    console.error("[chat] user message insert failed", userMessageError);
-    return json(500, { error: FAILED });
+  if (!regenerate) {
+    // The question is saved once. A regenerate answers the one already there.
+    const { error } = await supabase
+      .from("chat_messages")
+      .insert({ thread_id: thread.id, role: "user", content: question });
+    if (error) {
+      console.error("[chat] user message insert failed", error);
+      return json(500, { error: FAILED });
+    }
   }
 
   const { interests, tripContext } = await loadContext(supabase, userId, thread.trip_id);
@@ -419,7 +573,7 @@ Deno.serve(async (request: Request) => {
       headers: { "Content-Type": "application/json", "x-goog-api-key": modelKey },
       body: JSON.stringify({
         systemInstruction: { parts: [{ text: buildSystemPrompt(tripContext, interests) }] },
-        contents: toContents(history, message),
+        contents: toContents(history, question),
         generationConfig: { temperature: 0.7, maxOutputTokens: MAX_OUTPUT_TOKENS },
       }),
     });
@@ -443,7 +597,7 @@ Deno.serve(async (request: Request) => {
       const send = (event: Record<string, unknown>) =>
         controller.enqueue(encoder.encode(`data: ${JSON.stringify(event)}\n\n`));
 
-      send({ type: "thread", thread_id: thread.id, user_message: userMessage });
+      send({ type: "thread", thread_id: thread.id });
 
       let full = "";
       let shown = 0;
@@ -461,6 +615,11 @@ Deno.serve(async (request: Request) => {
         if (!content && !cards) {
           send({ type: "error", message: NO_ANSWER });
         } else {
+          // The old reply goes only now that there is a new one to take its place.
+          if (replaced.length > 0) {
+            const { error } = await supabase.from("chat_messages").delete().in("id", replaced);
+            if (error) console.error("[chat] old reply delete failed", error);
+          }
           const { data: saved, error } = await supabase
             .from("chat_messages")
             .insert({ thread_id: thread.id, role: "assistant", content, cards })

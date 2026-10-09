@@ -8,6 +8,7 @@ import {
   updateActivity,
 } from "../lib/itinerary";
 import {
+  activateTrip,
   deleteTrip,
   getTripDetail,
   sortActivities,
@@ -34,6 +35,8 @@ export interface UseTripDetailResult {
   toggleActivity: (activity: Activity) => Promise<string | null>;
   /** Deletes the trip and its files. */
   removeTrip: () => Promise<string | null>;
+  /** Moves a draft into the traveller's trips. */
+  activate: () => Promise<string | null>;
 }
 
 function withActivities(
@@ -142,6 +145,14 @@ export function useTripDetail(tripId: string): UseTripDetailResult {
     [],
   );
 
+  const activate = useCallback<UseTripDetailResult["activate"]>(async () => {
+    if (!trip) return null;
+    const result = await activateTrip(trip.id);
+    if (!result.success) return result.error;
+    setTrip((current) => (current ? { ...current, status: "active" } : current));
+    return null;
+  }, [trip]);
+
   const removeTrip = useCallback<UseTripDetailResult["removeTrip"]>(async () => {
     if (!trip) return null;
     const result = await deleteTrip(trip);
@@ -157,5 +168,6 @@ export function useTripDetail(tripId: string): UseTripDetailResult {
     removeActivity,
     toggleActivity,
     removeTrip,
+    activate,
   };
 }

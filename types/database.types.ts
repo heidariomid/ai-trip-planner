@@ -477,6 +477,24 @@ export type Database = {
           },
         ]
       }
+      place_usage: {
+        Row: {
+          day: string
+          request_count: number
+          user_id: string
+        }
+        Insert: {
+          day: string
+          request_count?: number
+          user_id: string
+        }
+        Update: {
+          day?: string
+          request_count?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_path: string | null
@@ -581,6 +599,7 @@ export type Database = {
           image_path: string | null
           source: string
           start_date: string
+          status: string
           title: string
           traveler_count: number
           updated_at: string
@@ -595,6 +614,7 @@ export type Database = {
           image_path?: string | null
           source: string
           start_date: string
+          status?: string
           title: string
           traveler_count?: number
           updated_at?: string
@@ -609,6 +629,7 @@ export type Database = {
           image_path?: string | null
           source?: string
           start_date?: string
+          status?: string
           title?: string
           traveler_count?: number
           updated_at?: string
@@ -635,6 +656,12 @@ export type Database = {
         }
         Returns: boolean
       }
+      consume_place_lookup: {
+        Args: {
+          p_limit: number
+        }
+        Returns: boolean
+      }
       create_trip: {
         Args: {
           p_activities?: Json
@@ -644,10 +671,18 @@ export type Database = {
           p_image_path?: string
           p_source: string
           p_start_date: string
+          p_status?: string
           p_title: string
           p_traveler_count?: number
         }
         Returns: string
+      }
+      replace_day_activities: {
+        Args: {
+          p_activities: Json
+          p_day_id: string
+        }
+        Returns: number
       }
       reschedule_trip: {
         Args: {

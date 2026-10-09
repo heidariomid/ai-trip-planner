@@ -18,9 +18,26 @@ export interface DayCardItem {
 }
 
 export interface DayCard {
+  /** Which day of the trip, from 1. */
+  day: number;
   title: string;
   items: DayCardItem[];
 }
+
+/** The summary a new trip is made from. It has no source and no dates: a form asks. */
+export interface TripSummaryCard {
+  title: string;
+  destination: string;
+  dayCount: number;
+  travelerCount: number;
+  description: string;
+}
+
+export type BookingCard =
+  | { kind: "hotel"; name: string; checkIn: string | null; checkOut: string | null }
+  | { kind: "car"; company: string; pickupLocation: string | null }
+  | { kind: "extra"; title: string; detail: string | null }
+  | { kind: "flight"; airline: string; flightNumber: string };
 
 /**
  * What the assistant attached to a reply. Part of the transcript only: a day
@@ -30,6 +47,8 @@ export interface ChatCards {
   chips: string[];
   places: PlaceCard[];
   days: DayCard[];
+  trip: TripSummaryCard | null;
+  bookings: BookingCard[];
 }
 
 export interface ChatMessage {
@@ -54,6 +73,61 @@ function asList(value: unknown): unknown[] {
   return Array.isArray(value) ? value : [];
 }
 
+function asCount(value: unknown, fallback: number): number {
+  return typeof value === "number" && Number.isInteger(value) && value > 0 ? value : fallback;
+}
+
+function toTripCard(value: unknown): TripSummaryCard | null {
+  if (!isRecord(value)) return null;
+  const title = asText(value.title);
+  const destination = asText(value.destination);
+  if (!title || !destination) return null;
+  return {
+    title,
+    destination,
+    dayCount: asCount(value.day_count, 1),
+    travelerCount: asCount(value.traveler_count, 1),
+    description: asText(value.description),
+  };
+}
+
+function toBookingCard(value: unknown): BookingCard | null {
+  if (!isRecord(value)) return null;
+  switch (value.kind) {
+    case "hotel":
+      return asText(value.name)
+        ? {
+            kind: "hotel",
+            name: asText(value.name),
+            checkIn: asText(value.check_in) || null,
+            checkOut: asText(value.check_out) || null,
+          }
+        : null;
+    case "car":
+      return asText(value.company)
+        ? {
+            kind: "car",
+            company: asText(value.company),
+            pickupLocation: asText(value.pickup_location) || null,
+          }
+        : null;
+    case "extra":
+      return asText(value.title)
+        ? { kind: "extra", title: asText(value.title), detail: asText(value.detail) || null }
+        : null;
+    case "flight":
+      return asText(value.airline) && asText(value.flight_number)
+        ? {
+            kind: "flight",
+            airline: asText(value.airline),
+            flightNumber: asText(value.flight_number),
+          }
+        : null;
+    default:
+      return null;
+  }
+}
+
 /** Reads cards back out of a `jsonb` column, keeping only the shapes the app draws. */
 function toCards(value: unknown): ChatCards | null {
   if (!isRecord(value)) return null;
@@ -65,7 +139,9 @@ function toCards(value: unknown): ChatCards | null {
     .filter((place) => place.name);
   const days = asList(value.days)
     .filter(isRecord)
-    .map((day) => ({
+    .map((day, index) => ({
+      // A card saved before days were numbered counts from its place in the list.
+      day: asCount(day.day, index + 1),
       title: asText(day.title),
       items: asList(day.items)
         .filter(isRecord)
@@ -78,8 +154,13 @@ function toCards(value: unknown): ChatCards | null {
     }))
     .filter((day) => day.title && day.items.length > 0);
 
-  if (chips.length + places.length + days.length === 0) return null;
-  return { chips, places, days };
+  const trip = toTripCard(value.trip);
+  const bookings = asList(value.bookings)
+    .map(toBookingCard)
+    .filter((booking): booking is BookingCard => booking !== null);
+
+  if (chips.length + places.length + days.length + bookings.length === 0 && !trip) return null;
+  return { chips, places, days, trip, bookings };
 }
 
 function toMessage(row: {
@@ -153,8 +234,123 @@ export async function getLatestThread(tripId: string | null): Promise<ThreadResu
   }
 }
 
+/** One saved conversation, as the history lists it. */
+export interface ChatThreadSummary {
+  id: string;
+  /** How the conversation began: the traveller's first message. */
+  title: string;
+  /** The trip it is about, or null. */
+  tripTitle: string | null;
+  /** ISO timestamp of its newest message. */
+  updatedAt: string;
+}
+
+export interface ThreadListResult {
+  success: boolean;
+  data: ChatThreadSummary[];
+  error: string | null;
+}
+
+const HISTORY_FAILED = "We couldn't load your conversations. Please try again.";
+const DELETE_FAILED = "We couldn't delete this conversation. Please try again.";
+const MAX_THREADS = 50;
+
+/** The traveller's conversations, newest first. Row-level security limits them to their own. */
+export async function listThreads(): Promise<ThreadListResult> {
+  try {
+    const { data, error } = await supabase
+      .from("chat_threads")
+      .select("id, updated_at, trips(title), chat_messages(content, role)")
+      .order("updated_at", { ascending: false })
+      .order("created_at", { referencedTable: "chat_messages", ascending: true })
+      .limit(1, { referencedTable: "chat_messages" })
+      .limit(MAX_THREADS);
+
+    if (error) {
+      return { success: false, data: [], error: toReadableError("chat", error, HISTORY_FAILED) };
+    }
+    const threads = data
+      // A thread whose first message never saved has nothing to open.
+      .filter((thread) => thread.chat_messages.length > 0)
+      .map((thread) => ({
+        id: thread.id,
+        title: thread.chat_messages[0].content,
+        tripTitle: thread.trips?.title ?? null,
+        updatedAt: thread.updated_at,
+      }));
+    return { success: true, data: threads, error: null };
+  } catch (error) {
+    return { success: false, data: [], error: toReadableError("chat", error, HISTORY_FAILED) };
+  }
+}
+
+export interface OpenThreadResult extends ThreadResult {
+  /** The trip the conversation is about, or null. */
+  tripId: string | null;
+}
+
+/** One conversation by its id, for opening it from the history. */
+export async function getThread(threadId: string): Promise<OpenThreadResult> {
+  const failed = (error: unknown): OpenThreadResult => ({
+    success: false,
+    threadId: null,
+    tripId: null,
+    messages: [],
+    error: toReadableError("chat", error, LOAD_FAILED),
+  });
+
+  try {
+    const { data, error } = await supabase
+      .from("chat_threads")
+      .select("id, trip_id, chat_messages(id, role, content, cards, created_at)")
+      .eq("id", threadId)
+      .order("created_at", { referencedTable: "chat_messages", ascending: true })
+      .maybeSingle();
+
+    if (error) return failed(error);
+    if (!data) return failed("thread not found");
+
+    return {
+      success: true,
+      threadId: data.id,
+      tripId: data.trip_id,
+      messages: data.chat_messages.map(toMessage),
+      error: null,
+    };
+  } catch (error) {
+    return failed(error);
+  }
+}
+
+/** Deletes a conversation and, through the cascade, its messages. */
+export async function deleteThread(
+  threadId: string,
+): Promise<{ success: boolean; error: string | null }> {
+  try {
+    const { data, error } = await supabase
+      .from("chat_threads")
+      .delete()
+      .eq("id", threadId)
+      .select("id");
+
+    // No row back means row-level security refused the delete.
+    if (error || data.length === 0) {
+      return {
+        success: false,
+        error: toReadableError("chat", error ?? "no row deleted", DELETE_FAILED),
+      };
+    }
+    return { success: true, error: null };
+  } catch (error) {
+    return { success: false, error: toReadableError("chat", error, DELETE_FAILED) };
+  }
+}
+
 export interface SendChatOptions {
+  /** Empty when `regenerate` is set: the last question is answered again. */
   message: string;
+  /** Replaces the newest reply in the thread instead of adding a message. */
+  regenerate?: boolean;
   /** Null starts a new conversation. */
   threadId: string | null;
   /** Used only when a new conversation starts. */
@@ -259,6 +455,7 @@ export async function sendChatMessage(options: SendChatOptions): Promise<SendCha
         },
         body: JSON.stringify({
           message: options.message,
+          regenerate: options.regenerate === true,
           thread_id: options.threadId,
           trip_id: options.tripId,
         }),

@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 import {
   getLatestThread,
+  getThread,
   MAX_CHAT_MESSAGE_LENGTH,
   sendChatMessage,
   type ChatMessage,
@@ -19,9 +20,13 @@ export interface UseChatResult {
   isSending: boolean;
   error: string | null;
   send: (text: string) => void;
+  /** Answers the last question again, in place of the newest reply. */
+  regenerate: () => void;
   stop: () => void;
   /** Clears the screen. The next message starts a new conversation. */
   startNew: () => void;
+  /** Opens a saved conversation, and selects the trip it is about. */
+  openThread: (threadId: string) => void;
 }
 
 let localId = 0;
@@ -30,12 +35,34 @@ function nextLocalId(): string {
   return `local-${localId}`;
 }
 
+/** What the screen is showing: the newest thread of a trip, one saved thread, or nothing yet. */
+type Target =
+  | { kind: "latest"; tripId: string | null }
+  | { kind: "thread"; threadId: string }
+  | { kind: "fresh" };
+
+export interface UseChatOptions {
+  tripId?: string | null;
+  /** Open this saved conversation instead of the newest one. */
+  threadId?: string | null;
+  /** Open empty, so the first message starts a new conversation. */
+  startFresh?: boolean;
+}
+
+function toTarget({ tripId = null, threadId, startFresh }: UseChatOptions): Target {
+  if (threadId) return { kind: "thread", threadId };
+  if (startFresh) return { kind: "fresh" };
+  return { kind: "latest", tripId };
+}
+
 /**
  * One conversation with the assistant. It opens on the newest thread for the
- * selected trip, so leaving and coming back lands on the same one.
+ * selected trip, so leaving and coming back lands on the same one, unless it
+ * is told to open a saved thread or to start empty.
  */
-export function useChat(initialTripId: string | null): UseChatResult {
-  const [tripId, setTripId] = useState<string | null>(initialTripId);
+export function useChat(options: UseChatOptions = {}): UseChatResult {
+  const [target, setTarget] = useState<Target>(() => toTarget(options));
+  const [tripId, setTripId] = useState<string | null>(options.tripId ?? null);
   const [threadId, setThreadId] = useState<string | null>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [streamingText, setStreamingText] = useState<string | null>(null);
@@ -51,13 +78,28 @@ export function useChat(initialTripId: string | null): UseChatResult {
   const generation = useRef(0);
 
   useEffect(() => {
-    let active = true;
-    setIsLoading(true);
     setError(null);
     setMessages([]);
     setThreadId(null);
 
-    void getLatestThread(tripId).then((result) => {
+    if (target.kind === "fresh") {
+      setIsLoading(false);
+      return;
+    }
+
+    let active = true;
+    setIsLoading(true);
+
+    const load =
+      target.kind === "thread"
+        ? getThread(target.threadId).then((result) => {
+            // A saved conversation brings its own trip with it.
+            if (active && result.success) setTripId(result.tripId);
+            return result;
+          })
+        : getLatestThread(target.tripId);
+
+    void load.then((result) => {
       if (!active) return;
       setThreadId(result.threadId);
       setMessages(result.messages);
@@ -68,31 +110,39 @@ export function useChat(initialTripId: string | null): UseChatResult {
     return () => {
       active = false;
     };
-  }, [tripId]);
+  }, [target]);
 
   // Leaving the screen mid-reply stops the request with it.
   useEffect(() => () => controller.current?.abort(), []);
 
-  const send = useCallback(
-    (text: string) => {
-      const message = text.trim().slice(0, MAX_CHAT_MESSAGE_LENGTH);
-      if (!message || controller.current) return;
+  /** Runs one request: a new message, or with null the last question again. */
+  const run = useCallback(
+    (message: string | null) => {
+      if (controller.current) return;
 
       const abort = new AbortController();
       controller.current = abort;
       const startedIn = generation.current;
       const isCurrent = () => generation.current === startedIn;
       let reply = "";
+      // What a regenerate takes off the screen, kept to put back if it fails:
+      // the server only deletes the old reply once it has a new one.
+      let replaced: ChatMessage[] = [];
 
       setError(null);
-      setMessages((current) => [
-        ...current,
-        { id: nextLocalId(), role: "user", content: message, cards: null },
-      ]);
+      setMessages((current) => {
+        if (message !== null) {
+          return [...current, { id: nextLocalId(), role: "user", content: message, cards: null }];
+        }
+        const lastQuestion = current.map((item) => item.role).lastIndexOf("user");
+        replaced = current.slice(lastQuestion + 1);
+        return current.slice(0, lastQuestion + 1);
+      });
       setStreamingText("");
 
       void sendChatMessage({
-        message,
+        message: message ?? "",
+        regenerate: message === null,
         threadId: threadRef.current,
         tripId,
         signal: abort.signal,
@@ -113,9 +163,11 @@ export function useChat(initialTripId: string | null): UseChatResult {
           setMessages((current) => [...current, finished]);
           return;
         }
-        // What had arrived stays on screen, so a stopped or failed reply never
-        // leaves an empty bubble behind.
-        if (reply.trim()) {
+        if (message === null) {
+          setMessages((current) => [...current, ...replaced]);
+        } else if (reply.trim()) {
+          // What had arrived stays on screen, so a stopped or failed reply
+          // never leaves an empty bubble behind.
           setMessages((current) => [
             ...current,
             { id: nextLocalId(), role: "assistant", content: reply, cards: null },
@@ -127,27 +179,52 @@ export function useChat(initialTripId: string | null): UseChatResult {
     [tripId],
   );
 
+  const send = useCallback(
+    (text: string) => {
+      const message = text.trim().slice(0, MAX_CHAT_MESSAGE_LENGTH);
+      if (message) run(message);
+    },
+    [run],
+  );
+
+  const regenerate = useCallback(() => {
+    // Nothing is saved until the first reply, so there is no thread to redo in.
+    if (threadRef.current) run(null);
+  }, [run]);
+
   const stop = useCallback(() => {
     controller.current?.abort();
   }, []);
 
-  const startNew = useCallback(() => {
+  /** Drops whatever reply is still arriving, before the screen moves on. */
+  const leaveConversation = useCallback(() => {
     controller.current?.abort();
     controller.current = null;
     generation.current += 1;
     setStreamingText(null);
-    setThreadId(null);
-    setMessages([]);
-    setError(null);
   }, []);
 
-  const selectTrip = useCallback((next: string | null) => {
-    controller.current?.abort();
-    controller.current = null;
-    generation.current += 1;
-    setStreamingText(null);
-    setTripId(next);
-  }, []);
+  const startNew = useCallback(() => {
+    leaveConversation();
+    setTarget({ kind: "fresh" });
+  }, [leaveConversation]);
+
+  const selectTrip = useCallback(
+    (next: string | null) => {
+      leaveConversation();
+      setTripId(next);
+      setTarget({ kind: "latest", tripId: next });
+    },
+    [leaveConversation],
+  );
+
+  const openThread = useCallback(
+    (id: string) => {
+      leaveConversation();
+      setTarget({ kind: "thread", threadId: id });
+    },
+    [leaveConversation],
+  );
 
   return {
     tripId,
@@ -158,7 +235,9 @@ export function useChat(initialTripId: string | null): UseChatResult {
     isSending: streamingText !== null,
     error,
     send,
+    regenerate,
     stop,
     startNew,
+    openThread,
   };
 }

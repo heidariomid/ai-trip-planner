@@ -95,6 +95,7 @@ export default function TripScreen() {
     removeActivity,
     toggleActivity,
     removeTrip,
+    activate,
   } = useTripDetail(id);
   const bookings = useBookings(id);
   const packing = usePacking(id);
@@ -348,6 +349,15 @@ export default function TripScreen() {
           setIsMenuOpen(false);
           router.push({ pathname: "/chat", params: { tripId: trip.id } });
         }}
+        onActivate={
+          trip.status === "draft"
+            ? () => {
+                setIsMenuOpen(false);
+                setTickError(null);
+                void activate().then(setTickError);
+              }
+            : undefined
+        }
         onEdit={() => {
           setIsMenuOpen(false);
           router.push({ pathname: "/trip/[id]/edit", params: { id: trip.id } });

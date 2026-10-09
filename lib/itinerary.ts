@@ -16,6 +16,7 @@ export interface ActivityDeleteResult {
 
 const SAVE_FAILED = "We couldn't save this activity. Please try again.";
 const DELETE_FAILED = "We couldn't delete this activity. Please try again.";
+const SAVE_MANY_FAILED = "We couldn't add these activities. Please try again.";
 const TICK_FAILED = "We couldn't update that activity. Please try again.";
 
 const COLUMNS = "id, day_id, sort_order, starts_at, ends_at, place, activity, notes, is_done";
@@ -115,3 +116,48 @@ export async function setActivityDone(
     return { success: false, error: toReadableError("itinerary", error, TICK_FAILED) };
   }
 }
+
+/** One activity to add to a day, as a card in the chat proposes it. */
+export interface NewActivity {
+  /** `HH:MM`, or null. */
+  startsAt: string | null;
+  place: string | null;
+  activity: string;
+}
+
+/**
+ * Adds several activities to one day in a single insert, after the ones
+ * already there. One statement, so the day is never left half written.
+ */
+export async function addActivities(
+  dayId: string,
+  firstSortOrder: number,
+  activities: NewActivity[],
+): Promise<ActivityDeleteResult> {
+  try {
+    const { data, error } = await supabase
+      .from("itinerary_activities")
+      .insert(
+        activities.map((item, index) => ({
+          day_id: dayId,
+          sort_order: firstSortOrder + index,
+          starts_at: item.startsAt,
+          place: item.place,
+          activity: item.activity,
+        })),
+      )
+      .select("id");
+
+    // Fewer rows back than sent means row-level security refused the insert.
+    if (error || data.length !== activities.length) {
+      return {
+        success: false,
+        error: toReadableError("itinerary", error ?? "not every row saved", SAVE_MANY_FAILED),
+      };
+    }
+    return { success: true, error: null };
+  } catch (error) {
+    return { success: false, error: toReadableError("itinerary", error, SAVE_MANY_FAILED) };
+  }
+}
+

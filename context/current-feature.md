@@ -53,3 +53,5 @@
   tags (spec 10)
 - feat: add the AI chat with a streaming Gemini Edge Function, saved
   threads, and a daily cap (spec 11)
+- feat: let the chat create trips, save drafts, add days and bookings,
+  show place photos, and keep past conversations (spec 12)

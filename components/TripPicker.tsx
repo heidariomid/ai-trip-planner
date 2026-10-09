@@ -31,7 +31,11 @@ export function TripPicker({ trips, selectedId, onSelect }: TripPickerProps) {
 
   const options: Option[] = [
     NO_TRIP,
-    ...trips.map((trip) => ({ id: trip.id, title: trip.title, detail: trip.destination })),
+    ...trips.map((trip) => ({
+      id: trip.id,
+      title: trip.title,
+      detail: trip.status === "draft" ? `${trip.destination} · Draft` : trip.destination,
+    })),
   ];
   const selected = options.find((option) => option.id === selectedId) ?? NO_TRIP;
 

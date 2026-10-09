@@ -1,4 +1,4 @@
-import { Pencil, Sparkles, Trash2, type LucideIcon } from "lucide-react-native";
+import { Check, Pencil, Sparkles, Trash2, type LucideIcon } from "lucide-react-native";
 import { Modal, Pressable, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -9,6 +9,8 @@ import { Text } from "./Text";
 export interface TripMenuProps {
   visible: boolean;
   onAsk: () => void;
+  /** Given for a draft only: turns it into one of the traveller's trips. */
+  onActivate?: () => void;
   onEdit: () => void;
   onDelete: () => void;
   onClose: () => void;
@@ -34,7 +36,14 @@ function MenuRow({ icon: Icon, label, onPress }: MenuRowProps) {
 }
 
 /** The banner's options, as a sheet at the bottom of the screen. */
-export function TripMenu({ visible, onAsk, onEdit, onDelete, onClose }: TripMenuProps) {
+export function TripMenu({
+  visible,
+  onAsk,
+  onActivate,
+  onEdit,
+  onDelete,
+  onClose,
+}: TripMenuProps) {
   const { bottom } = useSafeAreaInsets();
 
   return (
@@ -50,6 +59,9 @@ export function TripMenu({ visible, onAsk, onEdit, onDelete, onClose }: TripMenu
         />
         <View className="w-full max-w-[380px]">
           <Card>
+            {onActivate ? (
+              <MenuRow icon={Check} label="Move to my trips" onPress={onActivate} />
+            ) : null}
             <MenuRow icon={Sparkles} label="Ask the assistant" onPress={onAsk} />
             <MenuRow icon={Pencil} label="Edit trip" onPress={onEdit} />
             <MenuRow icon={Trash2} label="Delete trip" onPress={onDelete} />

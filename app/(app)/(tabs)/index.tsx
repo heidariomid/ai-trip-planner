@@ -30,7 +30,11 @@ export default function HomeScreen() {
 
   const name = profile?.full_name ?? user?.email ?? "Traveller";
   const tripsToContinue = trips.trips
-    .filter((trip) => getTripStatus(trip.start_date, trip.end_date) !== "Past")
+    // A draft is not a trip yet. It waits on My Trips until it is moved there.
+    .filter(
+      (trip) =>
+        trip.status !== "draft" && getTripStatus(trip.start_date, trip.end_date) !== "Past",
+    )
     .slice(0, MAX_TRIPS_ON_HOME);
 
   function refresh() {

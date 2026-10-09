@@ -6,14 +6,21 @@ import { MAX_CHAT_MESSAGE_LENGTH } from "../lib/chat";
 import { colors, shadows } from "../lib/theme";
 
 export interface ChatComposerProps {
+  /** A message already typed when the screen opens. It is not sent. */
+  initialText?: string;
   isSending: boolean;
   onSend: (text: string) => void;
   onStop: () => void;
 }
 
 /** The message field and its one button: send, or stop while a reply is being written. */
-export function ChatComposer({ isSending, onSend, onStop }: ChatComposerProps) {
-  const [text, setText] = useState("");
+export function ChatComposer({
+  initialText = "",
+  isSending,
+  onSend,
+  onStop,
+}: ChatComposerProps) {
+  const [text, setText] = useState(initialText);
   const canSend = text.trim().length > 0 && !isSending;
 
   function submit() {

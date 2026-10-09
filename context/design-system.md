@@ -254,18 +254,47 @@ Use these. Do not restyle them per screen.
   assistant's is a `surface` bubble on the left with `shadows.soft`,
   its text drawn by `Markdown` (headings, bold, and lists, in Outfit;
   never a link or an image). Under a reply come its cards, each a
-  `surface` block with `rounded-2xl`: a day card with a time column, a
-  place card with the 56pt shared placeholder, and suggestion chips as
-  white 44pt capsules with `ink` text. A button for something the chat
-  cannot do yet (`LockedAction`: Add to Trip, Create Trip, Save Draft,
-  Regenerate) is a small outlined capsule at 45% opacity that does
-  nothing. The composer is a white capsule with one 40pt round button:
+  `surface` block with `rounded-2xl`: a day card with a time column, place
+  cards in a row that scrolls sideways (each 210pt wide: a 132pt photo
+  of the place or the shared placeholder on top, then the name
+  with a small up-right arrow, a `subtle` line, the address with a pin,
+  and a `muted` 11px photo credit; tapping one opens Google Maps), a
+  trip summary card (a
+  `subtle` "New trip" label, the title, then facts as label above
+  value), a booking card (a Lucide icon in a `canvas` circle, the kind
+  as a label, the name in bold), and suggestion chips as white 44pt
+  capsules with `ink` text. A card's button is a `CardAction`: a 44pt
+  capsule, outlined with `ink` text, and filled `accent` only for
+  Create Trip. Once a card is saved its button reads "Added" at 45%
+  opacity. A day card also has Edit, which turns each stop into an
+  outlined `line` block with a remove cross and a `TimeField`, and Done
+  to leave it. The place on a stop is a link: a pin, the name in medium
+  `ink`, and a small arrow. With no trip selected, a card that needs one shows a
+  `subtle` line in place of the button. The composer is a white capsule with one 40pt round button:
   `accent` with an up arrow to send, `canvas` with a square to stop.
   The trip picker is a white capsule that opens a sheet at the bottom,
   like `TripMenu`. While a reply has no text yet the bubble holds a
   small `subtle` spinner. A `muted` 12px line under the composer says
   the assistant can be wrong. Accent here is the traveller's bubbles
   and the send button, nothing else
+
+- `components/DayPickerSheet.tsx` — a sheet at the bottom, like
+  `TripMenu`, that asks which existing day of a trip a day card goes
+  onto. A day is a 48pt row; the chosen one is `accent-soft` with
+  `accent` text and a check. When that day already has activities, two
+  tinted options sit under the list, "Keep the N already there" and
+  "Replace those N", the chosen one `accent-soft`. Cancel is `secondary`,
+  and the primary button says what it will do: "Add 2 activities" or
+  "Replace with 2". It is the confirmation, so
+  no dialog follows it
+- `app/(app)/chat-history.tsx` — past conversations: a round back
+  button, the screen title, then one `surface` row per conversation
+  with `rounded-2xl` and `shadows.soft`. A row is the first message in
+  medium `ink` (two lines at most), a `subtle` line with the trip and
+  the date, and a `muted` bin on the right that asks first. The chat's
+  header has two round buttons on the right, history and new
+- A draft trip shows a quiet `Draft` badge wherever Upcoming, Ongoing,
+  or Past would be
 
 A plan's picture is bundled, not private: `getExploreImage(key)` from
 `lib/explore-images.ts` returns it, or the placeholder for an unknown

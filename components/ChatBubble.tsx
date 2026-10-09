@@ -2,7 +2,7 @@ import { ActivityIndicator, View } from "react-native";
 
 import type { ChatMessage } from "../lib/chat";
 import { colors, shadows } from "../lib/theme";
-import { ChatCards, LockedAction } from "./ChatCards";
+import { CardAction, ChatCards, type ChatCardActions } from "./ChatCards";
 import { Markdown } from "./Markdown";
 import { Text } from "./Text";
 
@@ -10,14 +10,26 @@ export interface ChatBubbleProps {
   message: ChatMessage;
   /** The newest reply in the conversation, with nothing being written after it. */
   isLatestReply?: boolean;
+  actions: ChatCardActions;
+  /** The selected trip's destination, or empty. */
+  near: string;
   onPickChip?: (chip: string) => void;
+  /** Only the newest reply can be regenerated. */
+  onRegenerate?: () => void;
 }
 
 /**
  * One message. The traveller's is `accent` with white text on the right; the
  * assistant's is a white surface on the left, with its cards under it.
  */
-export function ChatBubble({ message, isLatestReply = false, onPickChip }: ChatBubbleProps) {
+export function ChatBubble({
+  message,
+  isLatestReply = false,
+  actions,
+  near,
+  onPickChip,
+  onRegenerate,
+}: ChatBubbleProps) {
   if (message.role === "user") {
     return (
       <View className="mb-3 max-w-[85%] self-end rounded-[20px] rounded-br-md bg-accent px-4 py-2.5">
@@ -38,12 +50,18 @@ export function ChatBubble({ message, isLatestReply = false, onPickChip }: ChatB
       ) : null}
 
       {message.cards ? (
-        <ChatCards cards={message.cards} onPickChip={isLatestReply ? onPickChip : undefined} />
+        <ChatCards
+          messageId={message.id}
+          cards={message.cards}
+          actions={actions}
+          near={near}
+          onPickChip={isLatestReply ? onPickChip : undefined}
+        />
       ) : null}
 
-      {isLatestReply ? (
+      {isLatestReply && onRegenerate ? (
         <View className="mt-2 flex-row">
-          <LockedAction label="Regenerate" />
+          <CardAction label="Regenerate" onPress={onRegenerate} />
         </View>
       ) : null}
     </View>

@@ -10,6 +10,7 @@ import { EmptyState } from "../../../../components/EmptyState";
 import { PlanBanner } from "../../../../components/PlanBanner";
 import { Text } from "../../../../components/Text";
 import { useExplorePlan } from "../../../../hooks/useExplorePlan";
+import { pluralize } from "../../../../lib/dates";
 import { colors } from "../../../../lib/theme";
 
 const CONTENT_STYLE = {
@@ -74,6 +75,25 @@ export default function ExplorePlanScreen() {
                   label="Copy to my trips"
                   onPress={() =>
                     router.push({ pathname: "/explore/[id]/copy", params: { id: plan.id } })
+                  }
+                />
+              </View>
+              {/* Opens an empty chat with this typed and not sent. */}
+              <View className="mt-3">
+                <Button
+                  label="Plan with AI"
+                  variant="secondary"
+                  onPress={() =>
+                    router.push({
+                      pathname: "/chat",
+                      params: {
+                        fresh: "1",
+                        draft: `Plan a trip like "${plan.title}" for ${pluralize(
+                          plan.days.length,
+                          "day",
+                        )}.`,
+                      },
+                    })
                   }
                 />
               </View>

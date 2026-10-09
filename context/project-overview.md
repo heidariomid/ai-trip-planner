@@ -32,7 +32,7 @@ from Home and from a trip.
 
 ## Current state
 
-Specs 1 through 11 are done. Specs 12 through 17 are written and not built.
+Specs 1 through 12 are done. Specs 13 through 17 are written and not built.
 
 - Expo Router, email and Google sign-in, and a `profiles` row on first
   sign-up. Verified on Expo Go and web
@@ -65,8 +65,15 @@ Specs 1 through 11 are done. Specs 12 through 17 are written and not built.
 - The assistant opens from the Home ask bar and from a trip. It streams
   replies from Google Gemini through a Supabase Edge Function, shows
   day cards, place cards, and suggestion chips, saves the conversation,
-  and is capped at 30 requests a day. It cannot create or change a trip
-  yet. The user saw it answer on a phone
+  and is capped at 30 requests a day. The user saw it answer on a phone
+- From the chat a traveller can create a trip or save it as a draft,
+  add a day card's stops to an existing day or replace that day, add a
+  hotel, car, extra, or flight to bookings, edit a day card before
+  saving, and regenerate a reply. The model only proposes cards; the
+  app saves after a tap. Place cards show real photos from Wikipedia
+  where it has one and open in Google Maps, a trip made in the chat
+  gets a photo of its destination as its cover, and past conversations
+  are listed and can be reopened. Checked on web, not yet on a phone
 
 No app build has been deployed: no EAS build, no store listing. The
 `chat` Edge Function is deployed on the Supabase project.
@@ -184,6 +191,7 @@ Full columns live in the spec that creates the table.
 | interest tags | spec 10 | `interests` on `profiles`, at most 6 from a fixed list |
 | chat | spec 11 | threads and messages. A card in a message is a transcript, not the itinerary |
 | `trips.status` | spec 12 | `active` or `draft` |
+| place lookups | spec 12 | `place_usage`, a daily count per user for the Google Places lookup, which is built and switched off |
 | cover generation | spec 13 | a second model, Google Gemini `gemini-3.1-flash-lite-image`, writing only the cover file |
 | saved places | spec 14 | a heart on a place, listed on Profile |
 | members, join code | spec 15 | owner stays on `trips`. Other people are members. Join is a function |
@@ -223,7 +231,7 @@ and inside the chat.
 | Photos and notes | 9, done |
 | Edit profile and interest tags | 10, done |
 | AI chat | 11, done |
-| AI creates and updates a trip | 12 |
+| AI creates and updates a trip | 12, done |
 | AI cover image | 13 |
 | Saved places | 14 |
 | Family share | 15 |
@@ -256,7 +264,9 @@ Versions are authoritative in @AGENTS.md, not here.
 - Supabase Realtime. Family share refetches on focus
 - Voice input. The mic icon is not a feature
 - A live map. The pin and the mini map are static art
-- A place-search or geocoding API
+- A place-search or geocoding API for typing a trip's source or
+  destination. The chat does look a recommended place up in Google
+  Places for its photo and address, through an Edge Function
 - A travelers table. Traveler count is a number on the trip
 - A document-upload screen. The `documents` bucket exists for a later file
 - Web as a supported target. `react-native-web` is installed and is not
@@ -302,7 +312,8 @@ and when it is done.
     Done
 11. @context/features/spec11-ai-chat.md — the assistant talks, and does not
     write a trip. Done
-12. @context/features/spec12-ai-trip-actions.md — create, draft, and update
+12. @context/features/spec12-ai-trip-actions.md — create, draft, and update.
+    Done
 13. @context/features/spec13-ai-cover.md — generate a cover, separate from
     writing trip rows
 14. @context/features/spec14-saved-places.md — hearts, listed on Profile

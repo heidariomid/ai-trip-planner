@@ -2,7 +2,7 @@ import type { Tables } from "../types/database.types";
 import { toReadableError } from "./errors";
 import { removeImage, removeTripFiles } from "./storage";
 import { supabase } from "./supabase";
-import { saveCover, type NewTrip } from "./trips";
+import { saveCover, toTripStatus, type NewTrip, type TripStatusValue } from "./trips";
 
 export type Activity = Pick<
   Tables<"itinerary_activities">,
@@ -34,6 +34,7 @@ export type TripDetail = Pick<
   | "description"
   | "traveler_count"
 > & {
+  status: TripStatusValue;
   days: ItineraryDay[];
 };
 
@@ -67,7 +68,7 @@ const ROW_FAILED =
   "The trip's pictures were removed, but the trip itself could not be deleted. Please try again.";
 
 const TRIP_COLUMNS =
-  "id, user_id, title, source, destination, start_date, end_date, image_path, description, traveler_count";
+  "id, user_id, title, source, destination, start_date, end_date, image_path, description, traveler_count, status";
 const ACTIVITY_COLUMNS =
   "id, day_id, sort_order, starts_at, ends_at, place, activity, notes, is_done";
 
@@ -95,7 +96,7 @@ export async function getTripDetail(tripId: string): Promise<TripDetailResult> {
     }
     if (!data) return { success: true, data: null, error: null };
 
-    const { itinerary_days, ...trip } = data;
+    const { itinerary_days, status, ...trip } = data;
     const days = itinerary_days
       .map(({ itinerary_activities, ...day }) => ({
         ...day,
@@ -103,7 +104,7 @@ export async function getTripDetail(tripId: string): Promise<TripDetailResult> {
       }))
       .sort((a, b) => a.day_number - b.day_number);
 
-    return { success: true, data: { ...trip, days }, error: null };
+    return { success: true, data: { ...trip, status: toTripStatus(status), days }, error: null };
   } catch (error) {
     return { success: false, data: null, error: toReadableError("trip", error, LOAD_FAILED) };
   }
@@ -152,6 +153,28 @@ async function saveDetails(tripId: string, changes: NewTrip): Promise<boolean> {
   if (error) console.error("[trip] update failed", error);
   // No row back means row-level security refused the update.
   return !error && data.length > 0;
+}
+
+/** Turns a draft into a trip of the traveller's own. */
+export async function activateTrip(tripId: string): Promise<TripChangeResult> {
+  try {
+    const { data, error } = await supabase
+      .from("trips")
+      .update({ status: "active" })
+      .eq("id", tripId)
+      .select("id");
+
+    // No row back means row-level security refused the update.
+    if (error || data.length === 0) {
+      return {
+        success: false,
+        error: toReadableError("trip", error ?? "no row updated", SAVE_FAILED),
+      };
+    }
+    return { success: true, error: null };
+  } catch (error) {
+    return { success: false, error: toReadableError("trip", error, SAVE_FAILED) };
+  }
 }
 
 /**

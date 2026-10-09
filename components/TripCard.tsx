@@ -64,7 +64,11 @@ export function TripCard({ trip, onPress }: TripCardProps) {
             </View>
 
             <View className="mt-3 flex-row">
-              <Badge label={status} highlighted={status === "Ongoing"} />
+              {trip.status === "draft" ? (
+                <Badge label="Draft" />
+              ) : (
+                <Badge label={status} highlighted={status === "Ongoing"} />
+              )}
             </View>
           </View>
 
