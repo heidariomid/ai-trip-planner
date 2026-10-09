@@ -80,6 +80,7 @@ export default function ChatScreen() {
   const actions = useMemo<ChatCardActions>(
     () => ({
       hasTrip: trip !== null,
+      canEditTrip: trip !== null && trip.role !== "viewer",
       isAdded: saving.isAdded,
       onCreateTrip: (plan, status) => {
         setPendingPlan({ plan, status });

@@ -68,7 +68,11 @@ export default function EditTripScreen() {
 
   return (
     <FormScreen title="Edit trip" onBack={close}>
-      {trip ? (
+      {trip && trip.role === "viewer" ? (
+        <Text className="py-6 text-center text-[14px] leading-5 text-subtle">
+          You can view this trip, but only its owner and editors can change it.
+        </Text>
+      ) : trip ? (
         <EditTripForm trip={trip} onClose={close} />
       ) : isLoading ? (
         <View className="py-10">

@@ -63,7 +63,7 @@ not on this screen yet.
 
 ## Out of scope
 
-- Password reset, account deletion, and a privacy policy — spec 16
+- Account deletion and a privacy policy — spec 16. Password reset — spec 18
 - Changing the email or the password
 - Notification settings. Push is out of the product
 - Saved places and family share

@@ -16,6 +16,8 @@ export interface ItineraryItemProps {
   destination: string;
   isLast: boolean;
   isEditing: boolean;
+  /** False for a viewer: the row is read-only and has no tick. */
+  canEdit: boolean;
   onEdit: (target: EditingTarget) => void;
   onSave: (
     day: ItineraryDay,
@@ -33,11 +35,15 @@ export function ItineraryItem({
   destination,
   isLast,
   isEditing,
+  canEdit,
   onEdit,
   onSave,
   onDelete,
   onToggleDone,
 }: ItineraryItemProps) {
+  if (!canEdit) {
+    return <ActivityRow activity={activity} destination={destination} isLast={isLast} />;
+  }
   if (!isEditing) {
     return (
       <ActivityRow
@@ -65,12 +71,19 @@ export function ItineraryItem({
 export interface ItineraryFooterProps {
   day: ItineraryDay;
   isAdding: boolean;
+  canEdit: boolean;
   onEdit: (target: EditingTarget) => void;
   onSave: ItineraryItemProps["onSave"];
 }
 
 /** Below the timeline: the empty sentence, then the add button or the add form. */
-export function ItineraryFooter({ day, isAdding, onEdit, onSave }: ItineraryFooterProps) {
+export function ItineraryFooter({
+  day,
+  isAdding,
+  canEdit,
+  onEdit,
+  onSave,
+}: ItineraryFooterProps) {
   return (
     <View>
       {day.activities.length === 0 && !isAdding ? (
@@ -79,7 +92,7 @@ export function ItineraryFooter({ day, isAdding, onEdit, onSave }: ItineraryFoot
         </Text>
       ) : null}
 
-      {isAdding ? (
+      {!canEdit ? null : isAdding ? (
         <ActivityForm
           activity={null}
           onSave={(fields) => onSave(day, fields, null)}

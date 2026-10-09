@@ -54,6 +54,7 @@ import { usePacking } from "../../../../hooks/usePacking";
 import { usePhotos } from "../../../../hooks/usePhotos";
 import { useTripDetail } from "../../../../hooks/useTripDetail";
 import { todayISO } from "../../../../lib/dates";
+import { leaveTrip } from "../../../../lib/members";
 import type { PackingItem } from "../../../../lib/packing";
 import { colors } from "../../../../lib/theme";
 import type { Activity, ItineraryDay } from "../../../../lib/trip-detail";
@@ -116,6 +117,9 @@ export default function TripScreen() {
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
   const [tickError, setTickError] = useState<string | null>(null);
+  const [isConfirmingLeave, setIsConfirmingLeave] = useState(false);
+  const [isLeaving, setIsLeaving] = useState(false);
+  const [leaveError, setLeaveError] = useState<string | null>(null);
 
   function goBack() {
     if (router.canGoBack()) router.back();
@@ -146,6 +150,15 @@ export default function TripScreen() {
     else goBack();
   }
 
+  async function handleLeave() {
+    setLeaveError(null);
+    setIsLeaving(true);
+    const result = await leaveTrip(id);
+    setIsLeaving(false);
+    if (!result.success) setLeaveError(result.error);
+    else router.replace("/trips");
+  }
+
   if (!trip) {
     return (
       <View className="flex-1 bg-canvas">
@@ -168,6 +181,9 @@ export default function TripScreen() {
     );
   }
 
+  const isOwner = trip.role === "owner";
+  // A viewer reads the trip and changes nothing on it.
+  const canEdit = trip.role !== "viewer";
   const day = trip.days.find((item) => item.id === selectedDayId) ?? defaultDay(trip.days);
   const showsItinerary = section === "Itinerary" && day !== null;
   const showsBookings = section === "Bookings";
@@ -230,7 +246,14 @@ export default function TripScreen() {
             contentContainerStyle={CONTENT_STYLE}
             ListHeaderComponent={
               <View className="pb-5">
-                <TripBanner trip={trip} onBack={goBack} onOpenMenu={() => setIsMenuOpen(true)} />
+                <TripBanner
+                  trip={trip}
+                  onBack={goBack}
+                  onShare={() =>
+                    router.push({ pathname: "/trip/[id]/share", params: { id: trip.id } })
+                  }
+                  onOpenMenu={() => setIsMenuOpen(true)}
+                />
                 <View className="mt-3">
                   <FormMessage message={error ?? tickError ?? sectionError} />
                 </View>
@@ -273,6 +296,7 @@ export default function TripScreen() {
                     editing={editingBooking}
                     tripStart={trip.start_date}
                     tripEnd={trip.end_date}
+                    canEdit={canEdit}
                     onEdit={setEditingBooking}
                     onSave={bookings.saveBooking}
                     onDelete={bookings.removeBooking}
@@ -284,6 +308,7 @@ export default function TripScreen() {
                   <PackingListItem
                     row={row.row}
                     editing={editingPacking}
+                    canEdit={canEdit}
                     onEdit={setEditingPacking}
                     onSave={packing.saveItem}
                     onDelete={packing.removeItem}
@@ -296,7 +321,7 @@ export default function TripScreen() {
                   <PhotoListItem
                     row={row.row}
                     isUploading={photos.isUploading}
-                    onAdd={() => void handleAddPhotos(trip.user_id)}
+                    onAdd={canEdit ? () => void handleAddPhotos(trip.user_id) : undefined}
                     onOpen={(photo) => setOpenPhotoId(photo.id)}
                   />
                 );
@@ -306,6 +331,7 @@ export default function TripScreen() {
                   <NoteListItem
                     row={row.row}
                     editing={editingNote}
+                    canEdit={canEdit}
                     onEdit={setEditingNote}
                     onSave={notes.saveNote}
                     onDelete={notes.removeNote}
@@ -319,6 +345,7 @@ export default function TripScreen() {
                   destination={trip.destination}
                   isLast={row.isLast}
                   isEditing={editing === row.activity.id}
+                  canEdit={canEdit}
                   onEdit={setEditing}
                   onSave={saveActivity}
                   onDelete={removeActivity}
@@ -331,6 +358,7 @@ export default function TripScreen() {
                 <ItineraryFooter
                   day={day}
                   isAdding={editing === "new"}
+                  canEdit={canEdit}
                   onEdit={setEditing}
                   onSave={saveActivity}
                 />
@@ -357,7 +385,7 @@ export default function TripScreen() {
           router.push({ pathname: "/chat", params: { tripId: trip.id } });
         }}
         onActivate={
-          trip.status === "draft"
+          isOwner && trip.status === "draft"
             ? () => {
                 setIsMenuOpen(false);
                 setTickError(null);
@@ -365,18 +393,36 @@ export default function TripScreen() {
               }
             : undefined
         }
-        onEdit={() => {
-          setIsMenuOpen(false);
-          router.push({ pathname: "/trip/[id]/edit", params: { id: trip.id } });
-        }}
-        onDelete={() => {
-          setIsMenuOpen(false);
-          setDeleteError(null);
-          setIsConfirmingDelete(true);
-        }}
+        onEdit={
+          canEdit
+            ? () => {
+                setIsMenuOpen(false);
+                router.push({ pathname: "/trip/[id]/edit", params: { id: trip.id } });
+              }
+            : undefined
+        }
+        onDelete={
+          isOwner
+            ? () => {
+                setIsMenuOpen(false);
+                setDeleteError(null);
+                setIsConfirmingDelete(true);
+              }
+            : undefined
+        }
+        onLeave={
+          isOwner
+            ? undefined
+            : () => {
+                setIsMenuOpen(false);
+                setLeaveError(null);
+                setIsConfirmingLeave(true);
+              }
+        }
       />
       <PhotoViewer
         photo={photos.photos.find((photo) => photo.id === openPhotoId) ?? null}
+        canEdit={canEdit}
         onSaveCaption={photos.saveCaption}
         onDelete={photos.removePhoto}
         onClose={() => setOpenPhotoId(null)}
@@ -390,6 +436,16 @@ export default function TripScreen() {
         error={deleteError}
         onConfirm={() => void handleDelete()}
         onCancel={() => setIsConfirmingDelete(false)}
+      />
+      <ConfirmDialog
+        visible={isConfirmingLeave}
+        title="Leave this trip?"
+        message="It will be taken off your trips. To come back you will need the join code again."
+        confirmLabel="Leave trip"
+        loading={isLeaving}
+        error={leaveError}
+        onConfirm={() => void handleLeave()}
+        onCancel={() => setIsConfirmingLeave(false)}
       />
     </View>
   );

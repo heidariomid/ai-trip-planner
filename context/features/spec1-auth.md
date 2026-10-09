@@ -257,7 +257,7 @@ Named so they do not get built by accident:
 - Password reset, email change, account deletion
 - Profile editing — spec 10
 - Any AI — spec 11, spec 12, and spec 13
-- Password reset and account deletion — spec 16
+- Account deletion — spec 16. Password reset — spec 18
 
 ## Verification
 

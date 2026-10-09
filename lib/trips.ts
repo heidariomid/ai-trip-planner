@@ -1,5 +1,6 @@
 import type { Tables } from "../types/database.types";
 import { toReadableError } from "./errors";
+import { getCurrentUserId, getTripRole, type TripRole } from "./members";
 import { uploadTripCover, type LocalImage } from "./storage";
 import { supabase } from "./supabase";
 
@@ -11,6 +12,8 @@ export type Trip = Pick<
 > & {
   /** A draft is a plan saved from the chat that is not a trip yet. */
   status: TripStatusValue;
+  /** Owner of the trip, or what the traveller may do on someone else's. */
+  role: TripRole;
   /** From 0 to 1: activities ticked off and items packed, half each. */
   planningProgress: number;
 };
@@ -95,18 +98,22 @@ export async function listTrips(): Promise<TripsResult> {
     const { data, error } = await supabase
       .from("trips")
       .select(
-        "id, title, source, destination, start_date, end_date, image_path, status, itinerary_days(itinerary_activities(is_done)), packing_items(is_packed)",
+        "id, user_id, title, source, destination, start_date, end_date, image_path, status, itinerary_days(itinerary_activities(is_done)), packing_items(is_packed), trip_members(user_id, role)",
       )
       .order("created_at", { ascending: false });
 
     if (error) {
       return { success: false, data: [], error: toReadableError("trips", error, LOAD_FAILED) };
     }
-    const trips = data.map(({ itinerary_days, packing_items, status, ...trip }) => ({
-      ...trip,
-      status: toTripStatus(status),
-      planningProgress: getPlanningProgress(itinerary_days, packing_items),
-    }));
+    const userId = await getCurrentUserId();
+    const trips = data.map(
+      ({ itinerary_days, packing_items, trip_members, user_id, status, ...trip }) => ({
+        ...trip,
+        status: toTripStatus(status),
+        role: getTripRole(user_id, trip_members, userId),
+        planningProgress: getPlanningProgress(itinerary_days, packing_items),
+      }),
+    );
     return { success: true, data: trips, error: null };
   } catch (error) {
     return { success: false, data: [], error: toReadableError("trips", error, LOAD_FAILED) };

@@ -58,6 +58,8 @@ export function buildPackingRows(items: PackingItem[]): PackingListRow[] {
 export interface PackingListItemProps {
   row: PackingListRow;
   editing: PackingEditing;
+  /** False for a viewer: nothing can be added, edited, or ticked. */
+  canEdit: boolean;
   onEdit: (target: PackingEditing) => void;
   onSave: (fields: PackingFields, existing: PackingItem | null) => Promise<string | null>;
   onDelete: (item: PackingItem) => Promise<string | null>;
@@ -67,6 +69,7 @@ export interface PackingListItemProps {
 export function PackingListItem({
   row,
   editing,
+  canEdit,
   onEdit,
   onSave,
   onDelete,
@@ -86,21 +89,26 @@ export function PackingListItem({
             {row.packed} of {row.total} packed
           </Text>
         </View>
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel={`Add an item to ${row.category}`}
-          onPress={() => onEdit({ id: "new", category: row.category })}
-          className="h-11 flex-row items-center pl-3 active:opacity-60"
-        >
-          <Plus size={16} color={colors.ink} />
-          <Text className="ml-1 text-[14px] font-medium text-ink">Add</Text>
-        </Pressable>
+        {canEdit ? (
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={`Add an item to ${row.category}`}
+            onPress={() => onEdit({ id: "new", category: row.category })}
+            className="h-11 flex-row items-center pl-3 active:opacity-60"
+          >
+            <Plus size={16} color={colors.ink} />
+            <Text className="ml-1 text-[14px] font-medium text-ink">Add</Text>
+          </Pressable>
+        ) : (
+          <View className="h-11" />
+        )}
       </View>
     );
   }
 
   if (row.type === "item") {
     const { item } = row;
+    if (!canEdit) return <PackingRow item={item} />;
     if (editing?.id !== item.id) {
       return (
         <PackingRow
@@ -122,7 +130,7 @@ export function PackingListItem({
     );
   }
 
-  const isNew = editing?.id === "new" && "category" in editing;
+  const isNew = canEdit && editing?.id === "new" && "category" in editing;
 
   if (row.type === "footer") {
     const isAdding = isNew && editing.category === row.category;
@@ -147,11 +155,13 @@ export function PackingListItem({
     <View>
       {row.isEmpty && !isAdding ? (
         <Text className="mb-5 text-center text-[14px] leading-5 text-subtle">
-          Nothing to pack yet. Add an item and give it a category, such as Clothes.
+          {canEdit
+            ? "Nothing to pack yet. Add an item and give it a category, such as Clothes."
+            : "Nothing to pack yet."}
         </Text>
       ) : null}
 
-      {isAdding ? (
+      {!canEdit ? null : isAdding ? (
         <PackingForm
           item={null}
           onSave={(fields) => onSave(fields, null)}

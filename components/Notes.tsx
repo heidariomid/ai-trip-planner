@@ -27,17 +27,30 @@ export function buildNoteRows(notes: TripNote[]): NoteListRow[] {
 export interface NoteListItemProps {
   row: NoteListRow;
   editing: NoteEditing;
+  /** False for a viewer: notes can be read and nothing else. */
+  canEdit: boolean;
   onEdit: (target: NoteEditing) => void;
   onSave: (body: string, existing: TripNote | null) => Promise<string | null>;
   onDelete: (note: TripNote) => Promise<string | null>;
 }
 
-export function NoteListItem({ row, editing, onEdit, onSave, onDelete }: NoteListItemProps) {
+export function NoteListItem({
+  row,
+  editing,
+  canEdit,
+  onEdit,
+  onSave,
+  onDelete,
+}: NoteListItemProps) {
   if (row.type === "header") {
-    const isAdding = editing === "new";
+    const isAdding = canEdit && editing === "new";
     return (
       <View className="mb-2">
-        <AddHeader title="Notes" addLabel="Add a note" onAdd={() => onEdit("new")} />
+        <AddHeader
+          title="Notes"
+          addLabel="Add a note"
+          onAdd={canEdit ? () => onEdit("new") : undefined}
+        />
         {isAdding ? (
           <View className="mb-1 mt-2">
             <NoteForm
@@ -48,7 +61,9 @@ export function NoteListItem({ row, editing, onEdit, onSave, onDelete }: NoteLis
           </View>
         ) : row.isEmpty ? (
           <Text className="mt-1 text-[14px] leading-5 text-subtle">
-            No notes yet. Add a door code, a reminder, or anything worth keeping.
+            {canEdit
+              ? "No notes yet. Add a door code, a reminder, or anything worth keeping."
+              : "No notes yet."}
           </Text>
         ) : null}
       </View>
@@ -56,7 +71,7 @@ export function NoteListItem({ row, editing, onEdit, onSave, onDelete }: NoteLis
   }
 
   const { note } = row;
-  if (editing === note.id) {
+  if (canEdit && editing === note.id) {
     return (
       <View className="mb-3">
         <NoteForm
@@ -71,8 +86,9 @@ export function NoteListItem({ row, editing, onEdit, onSave, onDelete }: NoteLis
 
   return (
     <Pressable
-      accessibilityRole="button"
-      accessibilityLabel="Edit note"
+      accessibilityRole={canEdit ? "button" : undefined}
+      accessibilityLabel={canEdit ? "Edit note" : undefined}
+      disabled={!canEdit}
       onPress={() => onEdit(note.id)}
       className="mb-3 active:opacity-80"
     >
@@ -84,9 +100,11 @@ export function NoteListItem({ row, editing, onEdit, onSave, onDelete }: NoteLis
               {formatDate(toISODate(new Date(note.created_at)))}
             </Text>
           </View>
-          <View className="h-10 w-8 items-end justify-start pt-0.5">
-            <Pencil size={16} color={colors.muted} />
-          </View>
+          {canEdit ? (
+            <View className="h-10 w-8 items-end justify-start pt-0.5">
+              <Pencil size={16} color={colors.muted} />
+            </View>
+          ) : null}
         </View>
       </Card>
     </Pressable>

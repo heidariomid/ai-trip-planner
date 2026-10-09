@@ -61,3 +61,5 @@
   a daily cap (spec 13)
 - feat: add saved places with a heart on chat place cards, a list from
   Profile, and a city on every place card (spec 14)
+- feat: add family share with join codes, member roles, and a
+  read-only trip for viewers (spec 15)

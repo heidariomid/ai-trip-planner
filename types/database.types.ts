@@ -585,6 +585,71 @@ export type Database = {
         }
         Relationships: []
       }
+      trip_join_codes: {
+        Row: {
+          code: string
+          trip_id: string
+          updated_at: string
+        }
+        Insert: {
+          code: string
+          trip_id: string
+          updated_at?: string
+        }
+        Update: {
+          code?: string
+          trip_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trip_join_codes_trip_id_fkey"
+            columns: ["trip_id"]
+            isOneToOne: true
+            referencedRelation: "trips"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      trip_members: {
+        Row: {
+          created_at: string
+          id: string
+          role: string
+          trip_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role?: string
+          trip_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: string
+          trip_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trip_members_trip_id_fkey"
+            columns: ["trip_id"]
+            isOneToOne: false
+            referencedRelation: "trips"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trip_members_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       trip_notes: {
         Row: {
           body: string
@@ -744,6 +809,12 @@ export type Database = {
         }
         Returns: string
       }
+      join_trip: {
+        Args: {
+          p_code: string
+        }
+        Returns: string
+      }
       replace_day_activities: {
         Args: {
           p_activities: Json
@@ -759,6 +830,25 @@ export type Database = {
           p_trip_id: string
         }
         Returns: undefined
+      }
+      rotate_trip_code: {
+        Args: {
+          p_trip_id: string
+        }
+        Returns: string
+      }
+      trip_people: {
+        Args: {
+          p_trip_id: string
+        }
+        Returns: {
+          avatar_path: string
+          avatar_url: string
+          full_name: string
+          id: string
+          is_you: boolean
+          role: string
+        }[]
       }
     }
     Enums: {

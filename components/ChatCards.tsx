@@ -49,6 +49,8 @@ const PLACE_LIST_CONTENT = { gap: 10, paddingVertical: 4, paddingRight: 4 } as c
 export interface ChatCardActions {
   /** False when no trip is selected, so there is nothing to add a card to. */
   hasTrip: boolean;
+  /** False when the selected trip is someone else's and the traveller only views it. */
+  canEditTrip: boolean;
   /** True once the card with this key was saved. */
   isAdded: (key: string) => boolean;
   onCreateTrip: (plan: ChatPlan, status: TripStatusValue) => void;
@@ -90,10 +92,11 @@ export function CardAction({ label, onPress, primary = false, disabled = false }
   );
 }
 
-function NeedsTrip() {
+/** Why a card has no button: there is no trip to add it to, or the traveller only views it. */
+function NeedsTrip({ actions }: { actions: ChatCardActions }) {
   return (
     <Text className="mt-2 text-[13px] leading-[18px] text-subtle">
-      Pick a trip at the top to add this.
+      {actions.hasTrip ? "Only editors can add to this trip." : "Pick a trip at the top to add this."}
     </Text>
   );
 }
@@ -325,7 +328,7 @@ function DayCardView({ day, cardKey, actions, near, isPartOfNewTrip }: DayCardPr
       ) : null}
 
       <View className="mt-3 flex-row flex-wrap gap-2">
-        {actions.hasTrip && !isEditing ? (
+        {actions.canEditTrip && !isEditing ? (
           <CardAction
             label={isAdded ? "Added" : "Add to Trip"}
             disabled={isAdded || isEmpty}
@@ -341,7 +344,7 @@ function DayCardView({ day, cardKey, actions, near, isPartOfNewTrip }: DayCardPr
           />
         )}
       </View>
-      {actions.hasTrip || isPartOfNewTrip ? null : <NeedsTrip />}
+      {actions.canEditTrip || isPartOfNewTrip ? null : <NeedsTrip actions={actions} />}
     </View>
   );
 }
@@ -391,7 +394,7 @@ function BookingCardView({ booking, cardKey, actions }: BookingCardProps) {
           ) : null}
         </View>
       </View>
-      {actions.hasTrip ? (
+      {actions.canEditTrip ? (
         <View className="mt-3 flex-row">
           <CardAction
             label={isAdded ? "Added" : "Add to Bookings"}
@@ -400,7 +403,7 @@ function BookingCardView({ booking, cardKey, actions }: BookingCardProps) {
           />
         </View>
       ) : (
-        <NeedsTrip />
+        <NeedsTrip actions={actions} />
       )}
     </View>
   );
@@ -429,7 +432,7 @@ function PackingCardView({ groups, cardKey, actions }: PackingCardProps) {
           ))}
         </View>
       ))}
-      {actions.hasTrip ? (
+      {actions.canEditTrip ? (
         <View className="mt-3 flex-row">
           <CardAction
             label={isAdded ? "Added" : "Add to Packing"}
@@ -438,7 +441,7 @@ function PackingCardView({ groups, cardKey, actions }: PackingCardProps) {
           />
         </View>
       ) : (
-        <NeedsTrip />
+        <NeedsTrip actions={actions} />
       )}
     </View>
   );

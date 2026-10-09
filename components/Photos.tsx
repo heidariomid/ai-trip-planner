@@ -56,7 +56,8 @@ function PhotoThumbnail({ photo, onPress }: PhotoThumbnailProps) {
 export interface PhotoListItemProps {
   row: PhotoListRow;
   isUploading: boolean;
-  onAdd: () => void;
+  /** Left out for a viewer, who cannot add photos. */
+  onAdd?: () => void;
   onOpen: (photo: TripPhoto) => void;
 }
 
@@ -73,7 +74,7 @@ export function PhotoListItem({ row, isUploading, onAdd, onOpen }: PhotoListItem
         />
         {row.count === 0 ? (
           <Text className="mt-1 text-[14px] leading-5 text-subtle">
-            No photos yet. Add the ones you want to keep with this trip.
+            {onAdd ? "No photos yet. Add the ones you want to keep with this trip." : "No photos yet."}
           </Text>
         ) : null}
       </View>

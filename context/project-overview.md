@@ -17,7 +17,7 @@ step that builds it.
 | --- | --- |
 | Name | AI Trip Planner |
 | Slug / package | `ai-trip-planner` |
-| Platforms | iOS and Android, from one Expo codebase |
+| Platforms | A web app added to the home screen on iOS and Android, from one Expo codebase. A store release is later |
 | Audience | A traveller planning their own trip, who can later invite family |
 | Language | English, left-to-right |
 
@@ -32,7 +32,7 @@ from Home and from a trip.
 
 ## Current state
 
-Specs 1 through 14 are done. Specs 15 through 17 are written and not built.
+Specs 1 through 15 are done. Specs 16 through 18 are written and not built.
 
 - Expo Router, email and Google sign-in, and a `profiles` row on first
   sign-up. Verified on Expo Go and web
@@ -85,6 +85,11 @@ Specs 1 through 14 are done. Specs 15 through 17 are written and not built.
   it was recommended for. Profile has a Saved places row with the count
   that opens the list, where a row opens Google Maps and its heart
   removes it. Checked on web, not yet on a phone
+- A trip is shared with a join code. The owner sees the code and the
+  member list on a share screen, sets each member to editor or viewer,
+  and can remove them; a member joins from Profile and can leave. A
+  viewer's trip is read-only. The owner's side was checked on web; a
+  member's side and the phone were not
 
 No app build has been deployed: no EAS build, no store listing. The
 `chat`, `place-photo`, and `trip-cover` Edge Functions are deployed on
@@ -95,7 +100,7 @@ the Supabase project.
 ## Approach — one spec at a time
 
 The build order is @context/features/spec1-auth.md through
-@context/features/spec17-release.md. A step does not start before the
+@context/features/spec18-password-reset-and-email.md. A step does not start before the
 one it depends on.
 
 Auth and the data model come before AI, because changing where a trip is
@@ -162,8 +167,8 @@ chat with a message already typed.
 
 **Profile.** Name, avatar, sign out, and interest tags the assistant can
 read. A row opens the saved places list. Joining a family trip is one code field,
-not a list of the owner's codes. Password reset, account deletion, and a
-privacy policy come before release.
+not a list of the owner's codes. Account deletion and a privacy policy come
+before release. Password reset is spec 18, after it.
 
 **AI chat.** A streaming conversation about the selected trip. Chips,
 day cards, and place cards. Place cards are text and a placeholder,
@@ -207,7 +212,8 @@ Full columns live in the spec that creates the table.
 | cover generation | spec 13 | a second model, FLUX.2 klein 4B on Cloudflare Workers AI's free allowance, writing only the cover file |
 | `saved_places` | spec 14 | a name, a label, and a city per user, unique on name and city. No picture |
 | members, join code | spec 15 | owner stays on `trips`. Other people are members. Join is a function |
-| account | spec 16 | password reset, deletion, privacy policy, Sign in with Apple |
+| account | spec 16 | deletion through an Edge Function, privacy policy. No new table |
+| email | spec 18 | password reset by code, custom SMTP through Resend, email confirmation |
 
 `auth.users` is owned by Supabase and must not be written to directly.
 
@@ -246,8 +252,9 @@ and inside the chat.
 | AI creates and updates a trip | 12, done |
 | AI cover image | 13, done |
 | Saved places | 14, done |
-| Family share | 15 |
-| Account, privacy policy, Sign in with Apple | 16 |
+| Family share | 15, done |
+| Web app shell, install hint, delete account, privacy policy | 16 |
+| Password reset | 18 |
 
 ---
 
@@ -281,8 +288,9 @@ Versions are authoritative in @AGENTS.md, not here.
   Places for its photo and address, through an Edge Function
 - A travelers table. Traveler count is a number on the trip
 - A document-upload screen. The `documents` bucket exists for a later file
-- Web as a supported target. `react-native-web` is installed and is not
-  maintained as a real platform
+- An App Store or Google Play release, and Sign in with Apple. The first
+  release is the web app (user decision, 2026-10-09)
+- Offline use. The web app has no service worker
 - Multi-language and RTL
 
 ---
@@ -296,7 +304,8 @@ Versions are authoritative in @AGENTS.md, not here.
 4. Describing a trip in the chat can create or update that trip
 5. A family member can join with a code and see only what their role allows
 6. A traveller can delete the account the app let them create
-7. The app runs on a real iPhone, not only in a bundler
+7. The app runs on a real iPhone from its home screen icon, not only in
+   a bundler
 8. No secret ever ships inside the app bundle
 
 ---
@@ -330,7 +339,10 @@ and when it is done.
     writing trip rows. Done
 14. @context/features/spec14-saved-places.md — hearts, listed from Profile.
     Done
-15. @context/features/spec15-family-share.md — members and a join code
-16. @context/features/spec16-account-and-store.md — password reset, account
-    deletion, privacy policy, Sign in with Apple
-17. @context/features/spec17-release.md — EAS, icons, email confirmation on
+15. @context/features/spec15-family-share.md — members and a join code.
+    Done
+16. @context/features/spec16-account-and-store.md — the web app shell, the
+    install hint, account deletion, privacy policy
+17. @context/features/spec17-release.md — the web app on a public address
+18. @context/features/spec18-password-reset-and-email.md — password reset
+    by code, Resend, email confirmation on. Not scheduled

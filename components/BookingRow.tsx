@@ -17,8 +17,8 @@ import { Text } from "./Text";
 
 export interface BookingRowProps {
   booking: Booking;
-  /** Opens the row for editing. */
-  onPress: () => void;
+  /** Opens the row for editing. Left out, the row is read-only. */
+  onPress?: () => void;
 }
 
 const ICONS: Record<BookingKind, LucideIcon> = {
@@ -100,15 +100,16 @@ function describe(booking: Booking): { title: string; lines: (string | null)[] }
   }
 }
 
-/** One saved booking. Tapping it opens it for editing. */
+/** One saved booking. Tapping it opens it for editing, unless it is read-only. */
 export function BookingRow({ booking, onPress }: BookingRowProps) {
   const Icon = ICONS[booking.kind];
   const { title, lines } = describe(booking);
 
   return (
     <Pressable
-      accessibilityRole="button"
-      accessibilityLabel={`Edit ${title}`}
+      accessibilityRole={onPress ? "button" : undefined}
+      accessibilityLabel={onPress ? `Edit ${title}` : undefined}
+      disabled={!onPress}
       onPress={onPress}
       className="mb-3 active:opacity-80"
     >
@@ -127,9 +128,11 @@ export function BookingRow({ booking, onPress }: BookingRowProps) {
               ) : null,
             )}
           </View>
-          <View className="h-10 w-8 items-end justify-center">
-            <Pencil size={16} color={colors.muted} />
-          </View>
+          {onPress ? (
+            <View className="h-10 w-8 items-end justify-center">
+              <Pencil size={16} color={colors.muted} />
+            </View>
+          ) : null}
         </View>
       </Card>
     </Pressable>

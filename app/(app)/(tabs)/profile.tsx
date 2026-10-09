@@ -1,5 +1,5 @@
 import { useFocusEffect, useRouter } from "expo-router";
-import { ChevronRight, Heart } from "lucide-react-native";
+import { ChevronRight, Heart, Users } from "lucide-react-native";
 import { useCallback, useState } from "react";
 import { ActivityIndicator, Pressable, View } from "react-native";
 
@@ -95,6 +95,18 @@ export default function ProfileScreen() {
         <Heart size={18} color={colors.ink} />
         <Text className="ml-3 flex-1 text-[15px] font-medium text-ink">Saved places</Text>
         <Text className="mr-1 text-[14px] text-subtle">{savedPlaces.length}</Text>
+        <ChevronRight size={18} color={colors.muted} />
+      </Pressable>
+
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel="Join a trip with a code"
+        onPress={() => router.push("/join-trip")}
+        style={shadows.soft}
+        className="mt-3 min-h-[56px] flex-row items-center rounded-2xl bg-surface px-4 active:bg-canvas"
+      >
+        <Users size={18} color={colors.ink} />
+        <Text className="ml-3 flex-1 text-[15px] font-medium text-ink">Join a trip</Text>
         <ChevronRight size={18} color={colors.muted} />
       </Pressable>
 

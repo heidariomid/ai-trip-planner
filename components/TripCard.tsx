@@ -24,7 +24,7 @@ export interface TripCardProps {
 // size of a bundled image, and the placeholder is one.
 const COVER_SIZE = { width: 92, height: "100%", minHeight: 116 } as const;
 
-/** A traveller's own trip, on Home and on My Trips. */
+/** A trip the traveller owns or was given, on Home and on My Trips. */
 export function TripCard({ trip, onPress }: TripCardProps) {
   const cover = useImageSource(trip.image_path);
   const status = getTripStatus(trip.start_date, trip.end_date);
@@ -63,12 +63,13 @@ export function TripCard({ trip, onPress }: TripCardProps) {
               </Text>
             </View>
 
-            <View className="mt-3 flex-row">
+            <View className="mt-3 flex-row flex-wrap gap-2">
               {trip.status === "draft" ? (
                 <Badge label="Draft" />
               ) : (
                 <Badge label={status} highlighted={status === "Ongoing"} />
               )}
+              {trip.role === "owner" ? null : <Badge label="Shared" />}
             </View>
           </View>
 

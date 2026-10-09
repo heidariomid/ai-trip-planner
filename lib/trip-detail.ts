@@ -1,5 +1,6 @@
 import type { Tables } from "../types/database.types";
 import { toReadableError } from "./errors";
+import { getCurrentUserId, getTripRole, type TripRole } from "./members";
 import { removeImage, removeTripFiles } from "./storage";
 import { supabase } from "./supabase";
 import { saveCover, toTripStatus, type NewTrip, type TripStatusValue } from "./trips";
@@ -35,6 +36,10 @@ export type TripDetail = Pick<
   | "traveler_count"
 > & {
   status: TripStatusValue;
+  /** Owner of the trip, or what the traveller may do on someone else's. */
+  role: TripRole;
+  /** The owner and every member. */
+  peopleCount: number;
   days: ItineraryDay[];
 };
 
@@ -64,6 +69,7 @@ const DATES_FAILED = "We couldn't change the dates, so nothing was saved. Please
 const DETAILS_FAILED = "Your new dates are saved, but the other changes are not. Please try again.";
 const COVER_NOT_SAVED = "Your changes are saved, but the new cover picture did not save.";
 const FILES_FAILED = "The trip's pictures could not be removed, so the trip was not deleted.";
+const NOT_OWNER = "Only the person who made this trip can delete it.";
 const ROW_FAILED =
   "The trip's pictures were removed, but the trip itself could not be deleted. Please try again.";
 
@@ -86,7 +92,7 @@ export async function getTripDetail(tripId: string): Promise<TripDetailResult> {
     const { data, error } = await supabase
       .from("trips")
       .select(
-        `${TRIP_COLUMNS}, itinerary_days(id, day_number, date, itinerary_activities(${ACTIVITY_COLUMNS}))`,
+        `${TRIP_COLUMNS}, itinerary_days(id, day_number, date, itinerary_activities(${ACTIVITY_COLUMNS})), trip_members(user_id, role)`,
       )
       .eq("id", tripId)
       .maybeSingle();
@@ -96,7 +102,8 @@ export async function getTripDetail(tripId: string): Promise<TripDetailResult> {
     }
     if (!data) return { success: true, data: null, error: null };
 
-    const { itinerary_days, status, ...trip } = data;
+    const { itinerary_days, trip_members, status, ...trip } = data;
+    const userId = await getCurrentUserId();
     const days = itinerary_days
       .map(({ itinerary_activities, ...day }) => ({
         ...day,
@@ -104,7 +111,17 @@ export async function getTripDetail(tripId: string): Promise<TripDetailResult> {
       }))
       .sort((a, b) => a.day_number - b.day_number);
 
-    return { success: true, data: { ...trip, status: toTripStatus(status), days }, error: null };
+    return {
+      success: true,
+      data: {
+        ...trip,
+        status: toTripStatus(status),
+        role: getTripRole(trip.user_id, trip_members, userId),
+        peopleCount: trip_members.length + 1,
+        days,
+      },
+      error: null,
+    };
   } catch (error) {
     return { success: false, data: null, error: toReadableError("trip", error, LOAD_FAILED) };
   }
@@ -225,6 +242,10 @@ export async function updateTrip(
  * whole. The row cascades to its days and activities.
  */
 export async function deleteTrip(trip: TripDetail): Promise<TripChangeResult> {
+  // An editor may remove the trip's files but not its row, so without this
+  // the pictures would go and the trip would stay.
+  if (trip.role !== "owner") return { success: false, error: NOT_OWNER };
+
   const files = await removeTripFiles(trip.user_id, trip.id);
   if (!files.success) return { success: false, error: FILES_FAILED };
 

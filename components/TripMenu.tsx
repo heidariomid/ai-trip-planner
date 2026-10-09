@@ -1,4 +1,4 @@
-import { Check, Pencil, Sparkles, Trash2, type LucideIcon } from "lucide-react-native";
+import { Check, LogOut, Pencil, Sparkles, Trash2, type LucideIcon } from "lucide-react-native";
 import { Modal, Pressable, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -9,10 +9,14 @@ import { Text } from "./Text";
 export interface TripMenuProps {
   visible: boolean;
   onAsk: () => void;
-  /** Given for a draft only: turns it into one of the traveller's trips. */
+  /** Given for the owner's draft only: turns it into one of their trips. */
   onActivate?: () => void;
-  onEdit: () => void;
-  onDelete: () => void;
+  /** Left out for a viewer. */
+  onEdit?: () => void;
+  /** Given to the owner only. */
+  onDelete?: () => void;
+  /** Given to a member: takes them off a trip that is not theirs. */
+  onLeave?: () => void;
   onClose: () => void;
 }
 
@@ -42,6 +46,7 @@ export function TripMenu({
   onActivate,
   onEdit,
   onDelete,
+  onLeave,
   onClose,
 }: TripMenuProps) {
   const { bottom } = useSafeAreaInsets();
@@ -63,8 +68,9 @@ export function TripMenu({
               <MenuRow icon={Check} label="Move to my trips" onPress={onActivate} />
             ) : null}
             <MenuRow icon={Sparkles} label="Ask the assistant" onPress={onAsk} />
-            <MenuRow icon={Pencil} label="Edit trip" onPress={onEdit} />
-            <MenuRow icon={Trash2} label="Delete trip" onPress={onDelete} />
+            {onEdit ? <MenuRow icon={Pencil} label="Edit trip" onPress={onEdit} /> : null}
+            {onDelete ? <MenuRow icon={Trash2} label="Delete trip" onPress={onDelete} /> : null}
+            {onLeave ? <MenuRow icon={LogOut} label="Leave trip" onPress={onLeave} /> : null}
           </Card>
         </View>
       </View>

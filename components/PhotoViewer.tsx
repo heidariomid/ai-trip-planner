@@ -15,6 +15,8 @@ import { TextField } from "./TextField";
 export interface PhotoViewerProps {
   /** The photo to show, or null when the viewer is closed. */
   photo: TripPhoto | null;
+  /** False for a viewer: the caption shows, with nothing to change or delete. */
+  canEdit: boolean;
   /** Each resolves to a sentence on failure, or null when it worked. */
   onSaveCaption: (photo: TripPhoto, caption: string) => Promise<string | null>;
   onDelete: (photo: TripPhoto) => Promise<string | null>;
@@ -27,13 +29,14 @@ const FILL = { width: "100%", height: "100%" } as const;
 
 interface PanelProps {
   photo: TripPhoto;
+  canEdit: boolean;
   onSaveCaption: PhotoViewerProps["onSaveCaption"];
   onDelete: PhotoViewerProps["onDelete"];
   onClose: () => void;
 }
 
 /** The sheet under the photo: its caption, the caption form, or the delete question. */
-function Panel({ photo, onSaveCaption, onDelete, onClose }: PanelProps) {
+function Panel({ photo, canEdit, onSaveCaption, onDelete, onClose }: PanelProps) {
   const [mode, setMode] = useState<Mode>("view");
   const [caption, setCaption] = useState(photo.caption ?? "");
   const [isBusy, setIsBusy] = useState(false);
@@ -106,26 +109,34 @@ function Panel({ photo, onSaveCaption, onDelete, onClose }: PanelProps) {
       <Text className={`mb-4 text-[15px] leading-5 ${photo.caption ? "text-ink" : "text-subtle"}`}>
         {photo.caption ?? "No caption yet."}
       </Text>
-      <View className="flex-row items-center justify-between">
-        <Pressable
-          accessibilityRole="button"
-          onPress={() => show("delete")}
-          className="h-11 justify-center pr-3"
-        >
-          <Text className="ml-1 text-[14px] font-medium text-red-600">Delete</Text>
-        </Pressable>
-        <Button
-          label={photo.caption ? "Edit caption" : "Add caption"}
-          variant="secondary"
-          onPress={() => show("caption")}
-        />
-      </View>
+      {canEdit ? (
+        <View className="flex-row items-center justify-between">
+          <Pressable
+            accessibilityRole="button"
+            onPress={() => show("delete")}
+            className="h-11 justify-center pr-3"
+          >
+            <Text className="ml-1 text-[14px] font-medium text-red-600">Delete</Text>
+          </Pressable>
+          <Button
+            label={photo.caption ? "Edit caption" : "Add caption"}
+            variant="secondary"
+            onPress={() => show("caption")}
+          />
+        </View>
+      ) : null}
     </View>
   );
 }
 
 /** One gallery photo, full screen, with its caption and what can be done to it. */
-export function PhotoViewer({ photo, onSaveCaption, onDelete, onClose }: PhotoViewerProps) {
+export function PhotoViewer({
+  photo,
+  canEdit,
+  onSaveCaption,
+  onDelete,
+  onClose,
+}: PhotoViewerProps) {
   const insets = useSafeAreaInsets();
   // The last photo stays drawn while the viewer fades out.
   const [shown, setShown] = useState<TripPhoto | null>(photo);
@@ -161,6 +172,7 @@ export function PhotoViewer({ photo, onSaveCaption, onDelete, onClose }: PhotoVi
             <Panel
               key={shown.id}
               photo={shown}
+              canEdit={canEdit}
               onSaveCaption={onSaveCaption}
               onDelete={onDelete}
               onClose={onClose}

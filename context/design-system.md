@@ -322,6 +322,46 @@ Use these. Do not restyle them per screen.
   header has two round buttons on the right, history and new
 - A draft trip shows a quiet `Draft` badge wherever Upcoming, Ongoing,
   or Past would be
+- A trip that is not the traveller's own shows a quiet `Shared` badge
+  beside that one, on `TripCard` and under it on `TripBanner`. Roles
+  never get a colour of their own
+- `components/TripBanner.tsx` has two controls on the right of the
+  cover: a white 44pt capsule with a Lucide `Users` icon and, when more
+  than one person is on the trip, the number in semibold `ink`; then
+  the round options button. The first opens the share screen
+- A viewer's trip is read-only. Every section drops its "+ Add", its
+  pencils, and its ticks (a packed item still shows its filled circle),
+  a note and a booking are plain cards, and the photo viewer shows the
+  caption alone. Nothing is greyed out; the controls are simply not
+  there. In the chat a card that would write to that trip shows the
+  `subtle` line "Only editors can add to this trip." in place of its
+  button
+- `app/(app)/trip/[id]/share.tsx`, `components/PersonRow.tsx` — who a
+  trip is shared with. A round back button, the screen title, a
+  `subtle` count, then one `surface` row per person with `rounded-2xl`
+  and `shadows.soft`: a 44pt `Avatar`, the name in medium `ink` (with
+  "(You)"), and the role in `subtle` under it: "Owner", "Can edit", or
+  "Can view". For the owner a member's row has a `muted` ellipsis that
+  opens the row in place: two 44pt capsules for the role, the chosen
+  one `accent-soft` with `accent` text and the other `canvas` with
+  `subtle` text, and a quiet `ink` "Remove" on the right, which asks
+  first with `ConfirmDialog`. Under the list the owner sees one `Card`:
+  a `subtle` "Join code" label, the code in bold 28px `ink` with wide
+  letter spacing as `XXXX-XXXX`, a `subtle` line of help, and two
+  buttons, "Copy code" (`primary`, reads "Copied" once it worked) and
+  "New code" (`secondary`, asks first). A member sees a `subtle` line
+  instead of the card. It is a screen and not a sheet, because it opens
+  a dialog and a modal over a modal is unreliable on iOS
+- `app/(app)/join-trip.tsx` — a `FormScreen` with a `subtle` line of
+  help, one code field in capitals, and a "Join trip" button. A join shows
+  an `info` `FormMessage` for a moment and then opens My Trips
+- The Profile tab has two rows under the card, "Saved places" and
+  "Join a trip": each a 56pt `surface` row with `rounded-2xl` and
+  `shadows.soft`, a Lucide icon in `ink`, the label in medium `ink`,
+  and a `muted` chevron
+- `components/TripMenu.tsx` shows a row only to someone who may use it:
+  "Edit trip" to the owner and an editor, "Delete trip" and "Move to my
+  trips" to the owner, and "Leave trip" to a member
 - **The heart on a place card** — a small 30pt white circle with
   `shadows.soft` on the top right corner of the card's photo, holding a
   16pt Lucide heart (user request, 2026-10-09: the 44pt circle was too
