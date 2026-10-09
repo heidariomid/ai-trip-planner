@@ -27,6 +27,10 @@ export default function RootLayout() {
     Outfit_500Medium,
     Outfit_600SemiBold,
     Outfit_700Bold,
+    IRANSansX_400Regular: require("../assets/fonts/IRANSansX-Regular.ttf"),
+    IRANSansX_500Medium: require("../assets/fonts/IRANSansX-Medium.ttf"),
+    IRANSansX_600DemiBold: require("../assets/fonts/IRANSansX-DemiBold.ttf"),
+    IRANSansX_700Bold: require("../assets/fonts/IRANSansX-Bold.ttf"),
   });
   const fontsReady = fontsLoaded || fontError !== null;
 

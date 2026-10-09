@@ -1,8 +1,9 @@
 import { addActivities } from "./itinerary";
 import { saveBooking } from "./bookings";
-import type { BookingCard, DayCard, TripSummaryCard } from "./chat";
-import { addDays, formatDate } from "./dates";
+import type { BookingCard, DayCard, PackingCard, TripSummaryCard } from "./chat";
+import { addDays, formatDate, pluralize } from "./dates";
 import { toReadableError } from "./errors";
+import { addPackingItems, type PackingAddResult } from "./packing";
 import { findDestinationPicture } from "./places";
 import { supabase } from "./supabase";
 import { createTrip, type CreateTripResult, type TripStatusValue } from "./trips";
@@ -216,9 +217,15 @@ function toBookingDraft(card: BookingCard, trip: BookingTrip): BookingDraft {
         kind: "car",
         fields: {
           company: card.company,
+          vehicle: "",
           pickupLocation: card.pickupLocation ?? "",
+          dropoffLocation: "",
           pickupOn: trip.start_date,
           pickupAt: null,
+          dropoffOn: trip.end_date,
+          dropoffAt: null,
+          confirmationCode: "",
+          notes: card.line ?? "",
         },
       };
     case "extra":
@@ -232,6 +239,10 @@ function toBookingDraft(card: BookingCard, trip: BookingTrip): BookingDraft {
           departsOn: trip.start_date,
           departsAt: null,
           arrivesAt: null,
+          route: "",
+          seat: "",
+          confirmationCode: "",
+          notes: "",
         },
       };
   }
@@ -288,4 +299,25 @@ export function describeBooking(card: BookingCard, trip: BookingTrip): string {
 /** Adds one booking through the same call the trip screen uses. Never edits one. */
 export function addBookingCard(card: BookingCard, trip: BookingTrip) {
   return saveBooking(trip.id, toBookingDraft(card, trip), null);
+}
+
+export function countPackingItems(groups: PackingCard[]): number {
+  return groups.reduce((total, group) => total + group.items.length, 0);
+}
+
+/** Says what accepting the packing card writes, for the dialog that asks first. */
+export function describePacking(groups: PackingCard[], trip: BookingTrip): string {
+  return `This adds ${pluralize(countPackingItems(groups), "item")} to the packing list of ${
+    trip.title
+  }. Anything already on the list is skipped.`;
+}
+
+/** Adds a packing card's items to the trip's packing list. Never ticks or removes one. */
+export function addPackingCard(groups: PackingCard[], trip: BookingTrip): Promise<PackingAddResult> {
+  return addPackingItems(
+    trip.id,
+    groups.flatMap((group) =>
+      group.items.map((label) => ({ category: group.category, label })),
+    ),
+  );
 }

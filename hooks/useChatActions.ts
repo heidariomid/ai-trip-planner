@@ -1,9 +1,10 @@
 import { useCallback, useState } from "react";
 
-import type { BookingCard, DayCard } from "../lib/chat";
+import type { BookingCard, DayCard, PackingCard } from "../lib/chat";
 import {
   addBookingCard,
   addDayCardToDay,
+  addPackingCard,
   listTripDays,
   replaceDayWithCard,
   type BookingTrip,
@@ -25,11 +26,18 @@ export interface BookingTarget {
   card: BookingCard;
 }
 
+/** A packing card waiting for the traveller to confirm. */
+export interface PackingTarget {
+  key: string;
+  groups: PackingCard[];
+}
+
 export interface UseChatActionsResult {
   /** True once the card with this key was saved, while the screen stays open. */
   isAdded: (key: string) => boolean;
   dayTarget: DayTarget | null;
   bookingTarget: BookingTarget | null;
+  packingTarget: PackingTarget | null;
   isSaving: boolean;
   /** A failure from the open sheet or dialog. */
   error: string | null;
@@ -42,6 +50,8 @@ export interface UseChatActionsResult {
   editDay: (key: string, card: DayCard) => void;
   openBooking: (key: string, card: BookingCard) => void;
   confirmBooking: () => Promise<void>;
+  openPacking: (key: string, groups: PackingCard[]) => void;
+  confirmPacking: () => Promise<void>;
   /** Closes whichever is open. Nothing is written. */
   close: () => void;
 }
@@ -55,6 +65,7 @@ export function useChatActions(trip: BookingTrip | null): UseChatActionsResult {
   const [edits, setEdits] = useState<Readonly<Record<string, DayCard>>>({});
   const [dayTarget, setDayTarget] = useState<DayTarget | null>(null);
   const [bookingTarget, setBookingTarget] = useState<BookingTarget | null>(null);
+  const [packingTarget, setPackingTarget] = useState<PackingTarget | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -120,6 +131,26 @@ export function useChatActions(trip: BookingTrip | null): UseChatActionsResult {
     setBookingTarget(null);
   }, [bookingTarget, trip, markAdded]);
 
+  const openPacking = useCallback((key: string, groups: PackingCard[]) => {
+    setError(null);
+    setPackingTarget({ key, groups });
+  }, []);
+
+  const confirmPacking = useCallback(async () => {
+    if (!packingTarget || !trip) return;
+    setError(null);
+    setIsSaving(true);
+    const result = await addPackingCard(packingTarget.groups, trip);
+    setIsSaving(false);
+
+    if (!result.success) {
+      setError(result.error);
+      return;
+    }
+    markAdded(packingTarget.key);
+    setPackingTarget(null);
+  }, [packingTarget, trip, markAdded]);
+
   const getDay = useCallback(
     (key: string, proposed: DayCard) => edits[key] ?? proposed,
     [edits],
@@ -132,6 +163,7 @@ export function useChatActions(trip: BookingTrip | null): UseChatActionsResult {
   const close = useCallback(() => {
     setDayTarget(null);
     setBookingTarget(null);
+    setPackingTarget(null);
     setError(null);
   }, []);
 
@@ -139,6 +171,7 @@ export function useChatActions(trip: BookingTrip | null): UseChatActionsResult {
     isAdded: (key) => added.has(key),
     dayTarget,
     bookingTarget,
+    packingTarget,
     isSaving,
     error,
     openDay,
@@ -147,6 +180,8 @@ export function useChatActions(trip: BookingTrip | null): UseChatActionsResult {
     editDay,
     openBooking,
     confirmBooking,
+    openPacking,
+    confirmPacking,
     close,
   };
 }

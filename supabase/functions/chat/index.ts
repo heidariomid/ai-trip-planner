@@ -83,10 +83,16 @@ interface TripCard {
 }
 
 type BookingCard =
-  | { kind: "hotel"; name: string; check_in: string | null; check_out: string | null }
-  | { kind: "car"; company: string; pickup_location: string | null }
+  | { kind: "hotel"; name: string; check_in: string | null; check_out: string | null; line: string | null }
+  | { kind: "car"; company: string; pickup_location: string | null; line: string | null }
   | { kind: "extra"; title: string; detail: string | null }
   | { kind: "flight"; airline: string; flight_number: string };
+
+/** Things to pack, under the heading the packing list files them by. */
+interface PackingCard {
+  category: string;
+  items: string[];
+}
 
 interface Cards {
   chips: string[];
@@ -94,6 +100,7 @@ interface Cards {
   days: DayCard[];
   trip: TripCard | null;
   bookings: BookingCard[];
+  packing: PackingCard[];
 }
 
 /** A short plain string. A URL the model wrote is dropped, never passed on. */
@@ -145,13 +152,24 @@ function toBookingCard(value: unknown): BookingCard | null {
       // Both dates or neither: the app fills a missing pair from the trip.
       const hasDates = checkIn !== null && checkOut !== null && checkOut >= checkIn;
       return name
-        ? { kind: "hotel", name, check_in: hasDates ? checkIn : null, check_out: hasDates ? checkOut : null }
+        ? {
+            kind: "hotel",
+            name,
+            check_in: hasDates ? checkIn : null,
+            check_out: hasDates ? checkOut : null,
+            line: clean(field(value, "line"), 100) || null,
+          }
         : null;
     }
     case "car": {
       const company = clean(field(value, "company"), 80);
       return company
-        ? { kind: "car", company, pickup_location: clean(field(value, "pickup_location"), 80) || null }
+        ? {
+            kind: "car",
+            company,
+            pickup_location: clean(field(value, "pickup_location"), 80) || null,
+            line: clean(field(value, "line"), 100) || null,
+          }
         : null;
     }
     case "extra": {
@@ -240,8 +258,20 @@ function toCards(raw: string): Cards | null {
     .map(toBookingCard)
     .filter((booking): booking is BookingCard => booking !== null);
 
-  if (chips.length + places.length + days.length + bookings.length === 0 && !trip) return null;
-  return { chips, places, days, trip, bookings };
+  // The lengths are the packing list's own column limits.
+  const packing = list(field(parsed, "packing"), 6)
+    .map((group) => ({
+      category: clean(field(group, "category"), 40) || "Essentials",
+      items: list(field(group, "items"), 12)
+        .map((item) => clean(item, 80))
+        .filter(Boolean),
+    }))
+    .filter((group) => group.items.length > 0);
+
+  const isEmpty =
+    chips.length + places.length + days.length + bookings.length + packing.length === 0 && !trip;
+  if (isEmpty) return null;
+  return { chips, places, days, trip, bookings, packing };
 }
 
 /** Splits a finished reply into the text to show and the cards after it. */
@@ -329,18 +359,20 @@ function buildSystemPrompt(tripContext: string | null, interests: string[]): str
   const parts = [
     "You are the assistant inside a trip planning app. You help a traveller plan trips: where to go, what to do each day, what to eat, and how to pace it.",
     `Today is ${new Date().toISOString().slice(0, 10)}.`,
-    "You do not save anything yourself, and you must never say that you created, saved, added, or changed something. You propose cards, and the traveller saves a card with its own button: Create Trip or Save Draft on a trip card, Add to Trip on a day card, and Add to Bookings on a booking card. When asked to save or add something, give the card and tell them to tap its button.",
+    "You do not save anything yourself, and you must never say that you created, saved, added, or changed something. You propose cards, and the traveller saves a card with its own button: Create Trip or Save Draft on a trip card, Add to Trip on a day card, Add to Bookings on a booking card, and Add to Packing on a packing card. When asked to save or add something, give the card and tell them to tap its button.",
+    "The app has a section for the itinerary, for bookings, and for the packing list. Whenever your reply recommends something that belongs in one of them (a day plan, a hotel, a car rental, a pass or ticket, things to pack), you must attach the matching card, because the card's button is the only way the traveller can save it. A recommendation without its card cannot be saved.",
     "Keep replies short and practical. Ask one follow-up question when you need a detail such as dates, budget, or pace.",
     "Write in Markdown using only headings, bold, and lists. Never write a link, a URL, or an image.",
     [
       "After your text you may add one cards block, on its own at the very end, in exactly this form:",
-      '<cards>{"chips":["..."],"places":[{"name":"...","line":"..."}],"trip":{"title":"...","destination":"City, Country","day_count":5,"traveler_count":2,"description":"..."},"days":[{"day":1,"title":"Day 1: ...","items":[{"time":"09:00","place":"...","activity":"..."}]}],"bookings":[{"kind":"hotel","name":"...","check_in":"2026-05-20","check_out":"2026-05-25"},{"kind":"car","company":"...","pickup_location":"..."},{"kind":"extra","title":"...","detail":"..."}]}</cards>',
+      '<cards>{"chips":["..."],"places":[{"name":"...","line":"..."}],"trip":{"title":"...","destination":"City, Country","day_count":5,"traveler_count":2,"description":"..."},"days":[{"day":1,"title":"Day 1: ...","items":[{"time":"09:00","place":"...","activity":"..."}]}],"bookings":[{"kind":"hotel","name":"...","line":"...","check_in":"2026-05-20","check_out":"2026-05-25"},{"kind":"car","company":"...","pickup_location":"...","line":"..."},{"kind":"extra","title":"...","detail":"..."}],"packing":[{"category":"Clothing","items":["...","..."]}]}</cards>',
       "Every key is optional. The block must be valid JSON on one line, with no URLs. Do not mention the block in your text, and do not repeat its contents as a long list in the text.",
       "chips: up to 4 short follow-up messages the traveller might send next.",
       "places: up to 6 places, each with a name and one short line. Use it when you recommend specific places.",
       "days: up to 7 days, each with its day number in day and up to 8 items. time is 24-hour HH:MM, or leave it out. Use it when you propose a day-by-day plan.",
       "trip: only when no trip is selected and you propose a whole new trip. A short title, the destination, the number of days, the number of travellers, and a description of at most 200 characters. Send it together with the days of that plan. Never include where the traveller leaves from or the dates: the app asks for those.",
-      "bookings: up to 6, only when the traveller asks to add a booking. A hotel has a name and, only if the traveller gave them, check_in and check_out as YYYY-MM-DD. A car has a company and an optional pickup_location. An extra has a title and an optional detail, for anything else such as a rail pass or a ticket. A flight is {\"kind\":\"flight\",\"airline\":\"...\",\"flight_number\":\"...\"} and is allowed only when the traveller typed both the airline and the flight number themselves. Never invent a flight number, and never guess one: ask for it instead.",
+      "bookings: up to 6. Use it whenever the traveller asks where to stay, about a hotel, a car rental, a pass, or a ticket, whenever you recommend one, and whenever they ask to add a booking. Each one you name gets its own booking card, so it can be saved. When the traveller asks for a suggestion and has not named the exact one they want, give 3 different options of that kind, for example one cheaper, one mid-range, and one special, each as its own card, so they can compare and choose. A hotel and a car each take a line of at most 100 characters that helps choose: the area, the price level, and who it suits. A hotel has a name and, only if the traveller gave them, check_in and check_out as YYYY-MM-DD. A car has a company and an optional pickup_location. An extra has a title and an optional detail, for anything else such as a rail pass or a ticket. A flight is {\"kind\":\"flight\",\"airline\":\"...\",\"flight_number\":\"...\"} and is allowed only when the traveller typed both the airline and the flight number themselves. Never invent a flight number, and never guess one: ask for it instead.",
+      "packing: whenever the traveller asks what to pack, bring, or wear, or asks about gear. Up to 6 groups, each with a short category such as Clothing, Gear, Toiletries, Documents, or Electronics, and up to 12 items. An item is a short name of at most 80 characters, with a count in it when that matters, such as \"2 pairs of hiking socks\". Fit the list to the destination, the season, and what is planned. Keep the text to a sentence or two, because the card holds the list.",
     ].join("\n"),
   ];
 

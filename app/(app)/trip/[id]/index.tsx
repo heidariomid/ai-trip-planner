@@ -16,6 +16,7 @@ import {
   type BookingEditing,
   type BookingItem,
 } from "../../../../components/Bookings";
+import { AssistantButton } from "../../../../components/AssistantButton";
 import { Button } from "../../../../components/Button";
 import { Chip } from "../../../../components/Chip";
 import { ConfirmDialog } from "../../../../components/ConfirmDialog";
@@ -74,7 +75,8 @@ const CONTENT_STYLE = {
   alignSelf: "center",
   paddingHorizontal: 20,
   paddingTop: 12,
-  paddingBottom: 40,
+  // Room for the floating assistant button.
+  paddingBottom: 96,
 } as const;
 
 /** Today's day while the trip is on, otherwise the first one. */
@@ -250,7 +252,7 @@ export default function TripScreen() {
                 </ScrollView>
 
                 {showsItinerary ? (
-                  <View className="mt-4">
+                  <View className="mb-4 mt-4">
                     <DayChips
                       days={trip.days}
                       selectedId={day.id}
@@ -340,6 +342,11 @@ export default function TripScreen() {
             }
           />
         </KeyboardAvoidingView>
+        <View pointerEvents="box-none" className="absolute bottom-5 right-5">
+          <AssistantButton
+            onPress={() => router.push({ pathname: "/chat", params: { tripId: trip.id } })}
+          />
+        </View>
       </SafeAreaView>
 
       <TripMenu

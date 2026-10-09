@@ -28,6 +28,7 @@ export interface PackingChangeResult {
 const LOAD_FAILED = "We couldn't load this trip's packing list. Please try again.";
 const SAVE_FAILED = "We couldn't save this item. Please try again.";
 const DELETE_FAILED = "We couldn't delete this item. Please try again.";
+const ADD_FAILED = "We couldn't add these items. Nothing was added.";
 const TICK_FAILED = "We couldn't update that item. Please try again.";
 
 const COLUMNS = "id, category, label, is_packed, created_at";
@@ -77,6 +78,47 @@ export async function savePackingItem(
     return { success: true, data, error: null };
   } catch (error) {
     return { success: false, data: null, error: toReadableError("packing", error, SAVE_FAILED) };
+  }
+}
+
+export interface PackingAddResult {
+  success: boolean;
+  /** How many items were written. Ones already on the list are left out. */
+  added: number;
+  error: string | null;
+}
+
+/**
+ * Adds several items in one insert. An item the trip already lists, whatever
+ * its category or capitals, is skipped, so adding the same list twice is safe.
+ */
+export async function addPackingItems(
+  tripId: string,
+  items: PackingFields[],
+): Promise<PackingAddResult> {
+  try {
+    const existing = await listPackingItems(tripId);
+    if (!existing.success) return { success: false, added: 0, error: ADD_FAILED };
+
+    const seen = new Set(existing.data.map((item) => item.label.trim().toLowerCase()));
+    const rows: { trip_id: string; category: string; label: string }[] = [];
+    for (const item of items) {
+      const label = item.label.trim();
+      const category = item.category.trim();
+      const key = label.toLowerCase();
+      if (!label || !category || seen.has(key)) continue;
+      seen.add(key);
+      rows.push({ trip_id: tripId, category, label });
+    }
+    if (rows.length === 0) return { success: true, added: 0, error: null };
+
+    const { error } = await supabase.from("packing_items").insert(rows);
+    if (error) {
+      return { success: false, added: 0, error: toReadableError("packing", error, ADD_FAILED) };
+    }
+    return { success: true, added: rows.length, error: null };
+  } catch (error) {
+    return { success: false, added: 0, error: toReadableError("packing", error, ADD_FAILED) };
   }
 }
 

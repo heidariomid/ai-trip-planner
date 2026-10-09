@@ -16,6 +16,7 @@ import type {
   BookingCard,
   ChatCards as ChatCardsData,
   DayCard,
+  PackingCard,
   PlaceCard,
   TripSummaryCard,
 } from "../lib/chat";
@@ -33,6 +34,8 @@ const PLACE_CARD_WIDTH = 210;
 // A style object, not classes: on web a class does not override the intrinsic
 // size of a bundled image, and the placeholder is one.
 const PLACE_PHOTO_SIZE = { width: "100%", height: 132 } as const;
+// Wikimedia refuses the name Android's image loader sends by default.
+const PHOTO_HEADERS = { "User-Agent": "AITripPlanner/1.0 (Expo; React Native)" } as const;
 const PLACE_LIST_CONTENT = { gap: 10, paddingVertical: 4, paddingRight: 4 } as const;
 
 /**
@@ -51,6 +54,7 @@ export interface ChatCardActions {
   /** Keeps an edited day card. Nothing is saved to a trip by this. */
   onEditDay: (key: string, day: DayCard) => void;
   onAddBooking: (key: string, booking: BookingCard) => void;
+  onAddPacking: (key: string, groups: PackingCard[]) => void;
 }
 
 export interface CardActionProps {
@@ -148,7 +152,9 @@ function PlaceCardView({ place, near }: PlaceCardProps) {
       className="rounded-2xl bg-surface active:opacity-80"
     >
       <Image
-        source={info?.photoUrl ? { uri: info.photoUrl } : PLACEHOLDER_IMAGE}
+        source={
+          info?.photoUrl ? { uri: info.photoUrl, headers: PHOTO_HEADERS } : PLACEHOLDER_IMAGE
+        }
         resizeMode="cover"
         style={PLACE_PHOTO_SIZE}
         className="rounded-t-2xl bg-canvas"
@@ -323,11 +329,13 @@ const BOOKING_ICONS = {
 
 function getBookingDetail(booking: BookingCard): string | null {
   switch (booking.kind) {
+    case "hotel":
+      return booking.line;
     case "car":
-      return booking.pickupLocation;
+      return [booking.pickupLocation, booking.line].filter(Boolean).join(" · ") || null;
     case "extra":
       return booking.detail;
-    default:
+    case "flight":
       return null;
   }
 }
@@ -353,7 +361,7 @@ function BookingCardView({ booking, cardKey, actions }: BookingCardProps) {
           <Text className="text-[13px] text-subtle">{getBookingKindLabel(booking)}</Text>
           <Text className="text-[15px] font-semibold text-ink">{getBookingTitle(booking)}</Text>
           {detail ? (
-            <Text className="text-[13px] leading-[18px] text-subtle">{detail}</Text>
+            <Text className="mt-0.5 text-[13px] leading-[18px] text-subtle">{detail}</Text>
           ) : null}
         </View>
       </View>
@@ -363,6 +371,44 @@ function BookingCardView({ booking, cardKey, actions }: BookingCardProps) {
             label={isAdded ? "Added" : "Add to Bookings"}
             disabled={isAdded}
             onPress={() => actions.onAddBooking(cardKey, booking)}
+          />
+        </View>
+      ) : (
+        <NeedsTrip />
+      )}
+    </View>
+  );
+}
+
+interface PackingCardProps {
+  groups: PackingCard[];
+  cardKey: string;
+  actions: ChatCardActions;
+}
+
+/** Every packing group of a reply as one card, saved with one tap. */
+function PackingCardView({ groups, cardKey, actions }: PackingCardProps) {
+  const isAdded = actions.isAdded(cardKey);
+
+  return (
+    <View style={shadows.soft} className="rounded-2xl bg-surface p-4">
+      <Text className="text-[13px] text-subtle">Packing list</Text>
+      {groups.map((group, index) => (
+        <View key={index} className="mt-2">
+          <Text className="text-[15px] font-semibold text-ink">{group.category}</Text>
+          {group.items.map((item, itemIndex) => (
+            <Text key={itemIndex} className="mt-0.5 text-[14px] leading-5 text-subtle">
+              {item}
+            </Text>
+          ))}
+        </View>
+      ))}
+      {actions.hasTrip ? (
+        <View className="mt-3 flex-row">
+          <CardAction
+            label={isAdded ? "Added" : "Add to Packing"}
+            disabled={isAdded}
+            onPress={() => actions.onAddPacking(cardKey, groups)}
           />
         </View>
       ) : (
@@ -405,7 +451,7 @@ export interface ChatCardsProps {
   onPickChip?: (chip: string) => void;
 }
 
-/** What the assistant attached to a reply: the trip, its days, bookings, places, then chips. */
+/** What the assistant attached to a reply: the trip, its days, bookings, packing, places, then chips. */
 export function ChatCards({ messageId, cards, actions, near, onPickChip }: ChatCardsProps) {
   // A new trip proposed in this reply names its own city.
   const city = cards.trip?.destination ?? near;
@@ -443,6 +489,14 @@ export function ChatCards({ messageId, cards, actions, near, onPickChip }: ChatC
           actions={actions}
         />
       ))}
+
+      {cards.packing.length > 0 ? (
+        <PackingCardView
+          groups={cards.packing}
+          cardKey={`${messageId}:packing`}
+          actions={actions}
+        />
+      ) : null}
 
       {places.length > 0 ? (
         <FlatList

@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Pressable, TextInput, View } from "react-native";
 
 import { MAX_CHAT_MESSAGE_LENGTH } from "../lib/chat";
+import { hasPersian, isRightToLeft, RIGHT_TO_LEFT } from "../lib/persian";
 import { colors, shadows } from "../lib/theme";
 
 export interface ChatComposerProps {
@@ -44,7 +45,10 @@ export function ChatComposer({
         multiline
         maxLength={MAX_CHAT_MESSAGE_LENGTH}
         accessibilityLabel="Message"
-        className="max-h-28 min-h-[40px] flex-1 py-2.5 font-regular text-[16px] text-ink caret-accent outline-none"
+        style={isRightToLeft(text) ? RIGHT_TO_LEFT : undefined}
+        className={`max-h-28 min-h-[40px] flex-1 py-2.5 ${
+          hasPersian(text) ? "font-fa-regular" : "font-regular"
+        } text-[16px] text-ink caret-accent outline-none`}
       />
       {isSending ? (
         <Pressable

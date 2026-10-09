@@ -24,7 +24,7 @@ import { useChat } from "../../hooks/useChat";
 import { useChatActions } from "../../hooks/useChatActions";
 import { useTrips } from "../../hooks/useTrips";
 import type { ChatMessage } from "../../lib/chat";
-import { describeBooking, setPendingPlan } from "../../lib/chat-actions";
+import { describeBooking, describePacking, setPendingPlan } from "../../lib/chat-actions";
 import { colors, shadows } from "../../lib/theme";
 
 // Shown before the first message, so an empty conversation has somewhere to start.
@@ -89,6 +89,7 @@ export default function ChatScreen() {
       getDay: saving.getDay,
       onEditDay: saving.editDay,
       onAddBooking: saving.openBooking,
+      onAddPacking: saving.openPacking,
     }),
     [
       trip,
@@ -97,6 +98,7 @@ export default function ChatScreen() {
       saving.getDay,
       saving.editDay,
       saving.openBooking,
+      saving.openPacking,
       router,
     ],
   );
@@ -110,8 +112,10 @@ export default function ChatScreen() {
     else router.replace("/");
   }
 
+  // A saved conversation opens on its newest message at once; only a reply
+  // being written glides down.
   function scrollToEnd() {
-    list.current?.scrollToEnd({ animated: true });
+    list.current?.scrollToEnd({ animated: chat.isSending });
   }
 
   return (
@@ -157,7 +161,12 @@ export default function ChatScreen() {
                 keyboardShouldPersistTaps="handled"
                 keyboardDismissMode="interactive"
                 contentContainerStyle={LIST_CONTENT}
+                // Every message is drawn on the first pass. Drawn a few at a
+                // time, the list does not know its full height yet, and the
+                // jump to the end lands partway up a long conversation.
+                initialNumToRender={Math.max(10, chat.messages.length)}
                 onContentSizeChange={scrollToEnd}
+                onLayout={scrollToEnd}
                 renderItem={({ item }) => (
                   <ChatBubble
                     message={item}
@@ -243,6 +252,18 @@ export default function ChatScreen() {
         }
         confirmLabel="Add booking"
         onConfirm={() => void saving.confirmBooking()}
+        onCancel={saving.close}
+        loading={saving.isSaving}
+        error={saving.error}
+      />
+      <ConfirmDialog
+        visible={saving.packingTarget !== null}
+        title="Add to the packing list?"
+        message={
+          saving.packingTarget && trip ? describePacking(saving.packingTarget.groups, trip) : ""
+        }
+        confirmLabel="Add items"
+        onConfirm={() => void saving.confirmPacking()}
         onCancel={saving.close}
         loading={saving.isSaving}
         error={saving.error}

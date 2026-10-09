@@ -45,18 +45,29 @@ function initialDraft(
           departsOn: flight?.departs_on ?? tripStart,
           departsAt: toTimeValue(flight?.departs_at ?? null),
           arrivesAt: toTimeValue(flight?.arrives_at ?? null),
+          route: flight?.route ?? "",
+          seat: flight?.seat ?? "",
+          confirmationCode: flight?.confirmation_code ?? "",
+          notes: flight?.notes ?? "",
         },
       };
     }
     case "car": {
       const car = booking?.kind === "car" ? booking : null;
+      const pickupOn = car?.pickup_on ?? tripStart;
       return {
         kind,
         fields: {
           company: car?.company ?? "",
+          vehicle: car?.vehicle ?? "",
           pickupLocation: car?.pickup_location ?? "",
-          pickupOn: car?.pickup_on ?? tripStart,
+          dropoffLocation: car?.dropoff_location ?? "",
+          pickupOn,
           pickupAt: toTimeValue(car?.pickup_at ?? null),
+          dropoffOn: car?.dropoff_on ?? (tripEnd >= pickupOn ? tripEnd : pickupOn),
+          dropoffAt: toTimeValue(car?.dropoff_at ?? null),
+          confirmationCode: car?.confirmation_code ?? "",
+          notes: car?.notes ?? "",
         },
       };
     }
@@ -143,7 +154,9 @@ export function BookingForm({
 
   const allErrors = validateBooking(draft);
   // The date order is checked as soon as a date changes.
-  const errors: BookingErrors = hasSubmitted ? allErrors : { checkOut: allErrors.checkOut };
+  const errors: BookingErrors = hasSubmitted
+    ? allErrors
+    : { checkOut: allErrors.checkOut, dropoffOn: allErrors.dropoffOn };
   const isBusy = pending !== null;
 
   async function run(action: "save" | "delete", work: () => Promise<string | null>) {

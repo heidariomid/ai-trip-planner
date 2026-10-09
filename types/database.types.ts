@@ -20,30 +20,48 @@ export type Database = {
       booking_car_rentals: {
         Row: {
           company: string
+          confirmation_code: string | null
           created_at: string
+          dropoff_at: string | null
+          dropoff_location: string | null
+          dropoff_on: string | null
           id: string
+          notes: string | null
           pickup_at: string | null
           pickup_location: string | null
           pickup_on: string | null
           trip_id: string
+          vehicle: string | null
         }
         Insert: {
           company: string
+          confirmation_code?: string | null
           created_at?: string
+          dropoff_at?: string | null
+          dropoff_location?: string | null
+          dropoff_on?: string | null
           id?: string
+          notes?: string | null
           pickup_at?: string | null
           pickup_location?: string | null
           pickup_on?: string | null
           trip_id: string
+          vehicle?: string | null
         }
         Update: {
           company?: string
+          confirmation_code?: string | null
           created_at?: string
+          dropoff_at?: string | null
+          dropoff_location?: string | null
+          dropoff_on?: string | null
           id?: string
+          notes?: string | null
           pickup_at?: string | null
           pickup_location?: string | null
           pickup_on?: string | null
           trip_id?: string
+          vehicle?: string | null
         }
         Relationships: [
           {
@@ -91,31 +109,43 @@ export type Database = {
         Row: {
           airline: string
           arrives_at: string | null
+          confirmation_code: string | null
           created_at: string
           departs_at: string | null
           departs_on: string | null
           flight_number: string
           id: string
+          notes: string | null
+          route: string | null
+          seat: string | null
           trip_id: string
         }
         Insert: {
           airline: string
           arrives_at?: string | null
+          confirmation_code?: string | null
           created_at?: string
           departs_at?: string | null
           departs_on?: string | null
           flight_number: string
           id?: string
+          notes?: string | null
+          route?: string | null
+          seat?: string | null
           trip_id: string
         }
         Update: {
           airline?: string
           arrives_at?: string | null
+          confirmation_code?: string | null
           created_at?: string
           departs_at?: string | null
           departs_on?: string | null
           flight_number?: string
           id?: string
+          notes?: string | null
+          route?: string | null
+          seat?: string | null
           trip_id?: string
         }
         Relationships: [

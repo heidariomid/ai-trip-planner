@@ -178,13 +178,23 @@ export interface FlightFields {
   /** `HH:MM`, or null when not chosen. */
   departsAt: string | null;
   arrivesAt: string | null;
+  route: string;
+  seat: string;
+  confirmationCode: string;
+  notes: string;
 }
 
 export interface CarRentalFields {
   company: string;
+  vehicle: string;
   pickupLocation: string;
+  dropoffLocation: string;
   pickupOn: string;
   pickupAt: string | null;
+  dropoffOn: string;
+  dropoffAt: string | null;
+  confirmationCode: string;
+  notes: string;
 }
 
 export interface HotelFields {
@@ -220,6 +230,9 @@ export function validateBooking(draft: BookingDraft): BookingErrors {
       break;
     case "car":
       if (!draft.fields.company.trim()) errors.company = "Enter the rental company.";
+      if (draft.fields.dropoffOn < draft.fields.pickupOn) {
+        errors.dropoffOn = "Drop-off can't be before pickup.";
+      }
       break;
     case "hotel":
       if (!draft.fields.name.trim()) errors.name = "Enter the hotel's name.";

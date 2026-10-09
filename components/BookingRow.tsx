@@ -38,6 +38,10 @@ function joined(parts: (string | null)[], separator: string): string | null {
   return present.length > 0 ? present.join(separator) : null;
 }
 
+function codeText(booking: { confirmation_code: string | null }): string | null {
+  return booking.confirmation_code ? `Confirmation ${booking.confirmation_code}` : null;
+}
+
 /** The bold line of a booking and the quiet lines under it. */
 function describe(booking: Booking): { title: string; lines: (string | null)[] } {
   switch (booking.kind) {
@@ -45,22 +49,40 @@ function describe(booking: Booking): { title: string; lines: (string | null)[] }
       return {
         title: `${booking.airline} · ${booking.flight_number}`,
         lines: [
+          booking.route,
           booking.departs_on ? formatDate(booking.departs_on) : null,
           joined([timeText(booking.departs_at), timeText(booking.arrives_at)], " → "),
+          joined([booking.seat ? `Seat ${booking.seat}` : null, codeText(booking)], " · "),
+          booking.notes,
         ],
       };
     case "car":
       return {
         title: booking.company,
         lines: [
-          booking.pickup_location,
+          booking.vehicle,
+          joined([booking.pickup_location, booking.dropoff_location], " → "),
           joined(
             [
-              booking.pickup_on ? formatDate(booking.pickup_on) : null,
-              timeText(booking.pickup_at),
+              joined(
+                [
+                  booking.pickup_on ? formatDate(booking.pickup_on) : null,
+                  timeText(booking.pickup_at),
+                ],
+                " · ",
+              ),
+              joined(
+                [
+                  booking.dropoff_on ? formatDate(booking.dropoff_on) : null,
+                  timeText(booking.dropoff_at),
+                ],
+                " · ",
+              ),
             ],
-            " · ",
+            " → ",
           ),
+          codeText(booking),
+          booking.notes,
         ],
       };
     case "hotel": {

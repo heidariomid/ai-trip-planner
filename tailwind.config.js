@@ -18,7 +18,12 @@ module.exports = {
       regular: ["Outfit_400Regular"],
       medium: ["Outfit_500Medium"],
       semibold: ["Outfit_600SemiBold"],
-      bold: ["Outfit_700Bold"]
+      bold: ["Outfit_700Bold"],
+      // Persian text. `components/Text.tsx` swaps to these by weight.
+      "fa-regular": ["IRANSansX_400Regular"],
+      "fa-medium": ["IRANSansX_500Medium"],
+      "fa-semibold": ["IRANSansX_600DemiBold"],
+      "fa-bold": ["IRANSansX_700Bold"]
     },
     fontWeight: {},
     extend: {

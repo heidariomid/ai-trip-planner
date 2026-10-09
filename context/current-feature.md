@@ -55,3 +55,5 @@
   threads, and a daily cap (spec 11)
 - feat: let the chat create trips, save drafts, add days and bookings,
   show place photos, and keep past conversations (spec 12)
+- feat: add booking details, a Persian font with right-to-left text,
+  and chat packing and booking options

@@ -34,10 +34,23 @@ export interface TripSummaryCard {
 }
 
 export type BookingCard =
-  | { kind: "hotel"; name: string; checkIn: string | null; checkOut: string | null }
-  | { kind: "car"; company: string; pickupLocation: string | null }
+  | {
+      kind: "hotel";
+      name: string;
+      checkIn: string | null;
+      checkOut: string | null;
+      /** Why this one: the area, the price level, who it suits. */
+      line: string | null;
+    }
+  | { kind: "car"; company: string; pickupLocation: string | null; line: string | null }
   | { kind: "extra"; title: string; detail: string | null }
   | { kind: "flight"; airline: string; flightNumber: string };
+
+/** Things to pack, under the category the packing list files them by. */
+export interface PackingCard {
+  category: string;
+  items: string[];
+}
 
 /**
  * What the assistant attached to a reply. Part of the transcript only: a day
@@ -49,6 +62,7 @@ export interface ChatCards {
   days: DayCard[];
   trip: TripSummaryCard | null;
   bookings: BookingCard[];
+  packing: PackingCard[];
 }
 
 export interface ChatMessage {
@@ -101,6 +115,7 @@ function toBookingCard(value: unknown): BookingCard | null {
             name: asText(value.name),
             checkIn: asText(value.check_in) || null,
             checkOut: asText(value.check_out) || null,
+            line: asText(value.line) || null,
           }
         : null;
     case "car":
@@ -109,6 +124,7 @@ function toBookingCard(value: unknown): BookingCard | null {
             kind: "car",
             company: asText(value.company),
             pickupLocation: asText(value.pickup_location) || null,
+            line: asText(value.line) || null,
           }
         : null;
     case "extra":
@@ -159,8 +175,18 @@ function toCards(value: unknown): ChatCards | null {
     .map(toBookingCard)
     .filter((booking): booking is BookingCard => booking !== null);
 
-  if (chips.length + places.length + days.length + bookings.length === 0 && !trip) return null;
-  return { chips, places, days, trip, bookings };
+  const packing = asList(value.packing)
+    .filter(isRecord)
+    .map((group) => ({
+      category: asText(group.category),
+      items: asList(group.items).map(asText).filter(Boolean),
+    }))
+    .filter((group) => group.category && group.items.length > 0);
+
+  const isEmpty =
+    chips.length + places.length + days.length + bookings.length + packing.length === 0 && !trip;
+  if (isEmpty) return null;
+  return { chips, places, days, trip, bookings, packing };
 }
 
 function toMessage(row: {

@@ -72,6 +72,14 @@ applies `font-regular` unless a weight class is present. React Native has
 no inherited font, so a bare `Text` falls back to the system font. A
 `TextInput` carries `font-regular` in its own classes.
 
+Persian text is drawn in IRANSansX, because Outfit has no Persian
+letters. `Text`, `TextField`, and the chat composer switch to it on their
+own when the string holds a Persian letter, at the same weight
+(`font-fa-regular`, `font-fa-medium`, `font-fa-semibold`, `font-fa-bold`).
+Never write those classes by hand. A string whose first letter
+is Persian also reads right to left and is aligned right, unless its
+class already aligns it. Only the text flips, not the layout.
+
 | Role | Classes |
 | --- | --- |
 | Screen title | `text-[32px] font-bold leading-tight tracking-tight text-ink` |
@@ -259,6 +267,9 @@ Use these. Do not restyle them per screen.
   of the place or the shared placeholder on top, then the name
   with a small up-right arrow, a `subtle` line, the address with a pin,
   and a `muted` 11px photo credit; tapping one opens Google Maps), a
+  packing card (a `subtle` "Packing list" label, each category in
+  semibold `ink` with its items in `subtle` under it, and one Add to
+  Packing button), a
   trip summary card (a
   `subtle` "New trip" label, the title, then facts as label above
   value), a booking card (a Lucide icon in a `canvas` circle, the kind
@@ -278,6 +289,10 @@ Use these. Do not restyle them per screen.
   the assistant can be wrong. Accent here is the traveller's bubbles
   and the send button, nothing else
 
+- `components/AssistantButton.tsx` — a white 48pt capsule with a Lucide
+  sparkles icon and "Assistant" in semibold `ink`, floating at the bottom
+  right of a trip with `shadows.card`. It opens that trip's conversation.
+  White, not `accent`: the trip screen already carries enough of it
 - `components/DayPickerSheet.tsx` — a sheet at the bottom, like
   `TripMenu`, that asks which existing day of a trip a day card goes
   onto. A day is a 48pt row; the chosen one is `accent-soft` with

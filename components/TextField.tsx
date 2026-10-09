@@ -1,6 +1,7 @@
 import { forwardRef, useState } from "react";
 import { TextInput, View, type TextInputProps } from "react-native";
 
+import { hasPersian, isRightToLeft, RIGHT_TO_LEFT } from "../lib/persian";
 import { colors } from "../lib/theme";
 import { Text } from "./Text";
 
@@ -49,7 +50,9 @@ export const TextField = forwardRef<TextInput, TextFieldProps>(
           textAlignVertical={inputProps.multiline ? "top" : "center"}
           selectionColor={colors.accent}
           cursorColor={colors.accent}
-          className={`rounded-2xl border px-4 font-regular text-[16px] text-ink caret-accent outline-none ${
+          className={`rounded-2xl border px-4 ${
+            hasPersian(inputProps.value) ? "font-fa-regular" : "font-regular"
+          } text-[16px] text-ink caret-accent outline-none ${
             inputProps.multiline ? "h-24 py-3" : "h-[50px]"
           } ${borderFor(
             isFocused,
@@ -57,6 +60,7 @@ export const TextField = forwardRef<TextInput, TextFieldProps>(
           )}`}
           placeholderTextColor={colors.muted}
           {...inputProps}
+          style={isRightToLeft(inputProps.value) ? [inputProps.style, RIGHT_TO_LEFT] : inputProps.style}
         />
         {error ? (
           <Text className="ml-1 mt-1.5 text-[13px] text-red-600">{error}</Text>

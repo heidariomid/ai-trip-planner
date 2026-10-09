@@ -85,7 +85,7 @@ export function ActivityRow({
             accessibilityLabel={`Open ${place} in Maps`}
             hitSlop={10}
             onPress={() => void openInMaps(place, destination)}
-            className="mt-1 flex-row items-center self-start active:opacity-60"
+            className="mt-2 flex-row items-center self-start active:opacity-60"
           >
             <MapPin size={13} color={colors.ink} />
             <Text className="ml-1 shrink text-[14px] font-medium text-ink">{place}</Text>
@@ -93,7 +93,7 @@ export function ActivityRow({
           </Pressable>
         ) : null}
         {activity.notes ? (
-          <Text className="mt-1 text-[14px] leading-5 text-subtle">{activity.notes}</Text>
+          <Text className="mt-2 text-[14px] leading-5 text-subtle">{activity.notes}</Text>
         ) : null}
       </View>
 

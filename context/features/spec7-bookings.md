@@ -13,8 +13,10 @@ plan. It does not book anything.
 - A migration. Each table has `trip_id` referencing `trips` on delete
   cascade. Select uses `private.can_access_trip`. Insert, update, and
   delete use `private.can_edit_trip`. Index `trip_id`
-- Flights: airline, flight number, departure time, arrival time
-- Car rentals: company, pickup location, pickup time
+- Flights: airline, route, flight number, seat, date, departure time,
+  arrival time, confirmation code, notes
+- Car rentals: company, vehicle, pickup and drop-off location, pickup and
+  drop-off date and time, confirmation code, notes
 - Hotels: name, check-in date, check-out date. Check-out is on or after
   check-in
 - Extras: a title and a short detail, for a rail pass, a bus, or an event

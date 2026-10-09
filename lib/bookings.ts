@@ -5,12 +5,33 @@ import type { BookingDraft, BookingKind } from "./validation";
 
 export type Flight = Pick<
   Tables<"booking_flights">,
-  "id" | "airline" | "flight_number" | "departs_on" | "departs_at" | "arrives_at" | "created_at"
+  | "id"
+  | "airline"
+  | "flight_number"
+  | "route"
+  | "seat"
+  | "departs_on"
+  | "departs_at"
+  | "arrives_at"
+  | "confirmation_code"
+  | "notes"
+  | "created_at"
 > & { kind: "flight" };
 
 export type CarRental = Pick<
   Tables<"booking_car_rentals">,
-  "id" | "company" | "pickup_location" | "pickup_on" | "pickup_at" | "created_at"
+  | "id"
+  | "company"
+  | "vehicle"
+  | "pickup_location"
+  | "dropoff_location"
+  | "pickup_on"
+  | "pickup_at"
+  | "dropoff_on"
+  | "dropoff_at"
+  | "confirmation_code"
+  | "notes"
+  | "created_at"
 > & { kind: "car" };
 
 export type Hotel = Pick<
@@ -46,8 +67,9 @@ const SAVE_FAILED = "We couldn't save this booking. Please try again.";
 const DELETE_FAILED = "We couldn't delete this booking. Please try again.";
 
 const FLIGHT_COLUMNS =
-  "id, airline, flight_number, departs_on, departs_at, arrives_at, created_at";
-const CAR_COLUMNS = "id, company, pickup_location, pickup_on, pickup_at, created_at";
+  "id, airline, flight_number, route, seat, departs_on, departs_at, arrives_at, confirmation_code, notes, created_at";
+const CAR_COLUMNS =
+  "id, company, vehicle, pickup_location, dropoff_location, pickup_on, pickup_at, dropoff_on, dropoff_at, confirmation_code, notes, created_at";
 const HOTEL_COLUMNS = "id, name, check_in, check_out, created_at";
 const EXTRA_COLUMNS = "id, title, detail, created_at";
 
@@ -115,6 +137,10 @@ async function writeFlight(tripId: string, draft: DraftOf<"flight">, id: string 
     departs_on: draft.fields.departsOn,
     departs_at: draft.fields.departsAt,
     arrives_at: draft.fields.arrivesAt,
+    route: draft.fields.route.trim() || null,
+    seat: draft.fields.seat.trim() || null,
+    confirmation_code: draft.fields.confirmationCode.trim() || null,
+    notes: draft.fields.notes.trim() || null,
   };
   const table = supabase.from("booking_flights");
   const { data, error } = id
@@ -129,6 +155,12 @@ async function writeCar(tripId: string, draft: DraftOf<"car">, id: string | null
     pickup_location: draft.fields.pickupLocation.trim() || null,
     pickup_on: draft.fields.pickupOn,
     pickup_at: draft.fields.pickupAt,
+    vehicle: draft.fields.vehicle.trim() || null,
+    dropoff_location: draft.fields.dropoffLocation.trim() || null,
+    dropoff_on: draft.fields.dropoffOn,
+    dropoff_at: draft.fields.dropoffAt,
+    confirmation_code: draft.fields.confirmationCode.trim() || null,
+    notes: draft.fields.notes.trim() || null,
   };
   const table = supabase.from("booking_car_rentals");
   const { data, error } = id

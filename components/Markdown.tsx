@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { View } from "react-native";
 
+import { isRightToLeft } from "../lib/persian";
 import { Text } from "./Text";
 
 export interface MarkdownProps {
@@ -107,12 +108,20 @@ export function Markdown({ children }: MarkdownProps) {
             </Text>
           );
         }
+        const isReversed = isRightToLeft(block.text);
         return (
-          <View key={index} className="flex-row">
-            <Text className="w-5 text-[15px] leading-[22px] text-subtle">
+          <View key={index} className={isReversed ? "flex-row-reverse" : "flex-row"}>
+            <Text
+              className={`w-5 text-[15px] leading-[22px] text-subtle ${
+                isReversed ? "text-right" : ""
+              }`}
+            >
               {block.type === "bullet" ? "•" : block.marker}
             </Text>
-            <Text className="flex-1 text-[15px] leading-[22px] text-ink">
+            {/* `shrink`, not `flex-1`: in a bubble that hugs its text, a
+                zero-basis item is measured at one width and drawn at another,
+                and its last lines spill out under the bubble. */}
+            <Text className="shrink text-[15px] leading-[22px] text-ink">
               {renderInline(block.text)}
             </Text>
           </View>

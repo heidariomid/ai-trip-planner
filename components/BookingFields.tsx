@@ -19,6 +19,48 @@ interface InputsProps<Fields> {
   disabled: boolean;
 }
 
+interface ReferenceInputsProps {
+  confirmationCode: string;
+  notes: string;
+  onChangeCode: (confirmationCode: string) => void;
+  onChangeNotes: (notes: string) => void;
+  disabled: boolean;
+}
+
+/** The two fields a flight and a car rental share. */
+function ReferenceInputs({
+  confirmationCode,
+  notes,
+  onChangeCode,
+  onChangeNotes,
+  disabled,
+}: ReferenceInputsProps) {
+  return (
+    <View>
+      <TextField
+        label="Confirmation code"
+        value={confirmationCode}
+        onChangeText={onChangeCode}
+        placeholder="Optional"
+        autoCapitalize="characters"
+        autoCorrect={false}
+        maxLength={40}
+        editable={!disabled}
+      />
+      <TextField
+        label="Notes"
+        hint={`${notes.length}/${MAX_DETAIL_LENGTH}`}
+        value={notes}
+        onChangeText={onChangeNotes}
+        placeholder="Optional notes"
+        multiline
+        maxLength={MAX_DETAIL_LENGTH}
+        editable={!disabled}
+      />
+    </View>
+  );
+}
+
 export function FlightInputs({ fields, errors, onChange, disabled }: InputsProps<FlightFields>) {
   return (
     <View>
@@ -32,15 +74,41 @@ export function FlightInputs({ fields, errors, onChange, disabled }: InputsProps
         editable={!disabled}
       />
       <TextField
-        label="Flight number"
-        value={fields.flightNumber}
-        onChangeText={(flightNumber) => onChange({ ...fields, flightNumber })}
-        error={errors.flightNumber}
-        placeholder="NH 848"
+        label="Route"
+        value={fields.route}
+        onChangeText={(route) => onChange({ ...fields, route })}
+        placeholder="JFK → CDG"
         autoCapitalize="characters"
         autoCorrect={false}
+        maxLength={80}
         editable={!disabled}
       />
+      <View className="flex-row gap-3">
+        <View className="flex-1">
+          <TextField
+            label="Flight number"
+            value={fields.flightNumber}
+            onChangeText={(flightNumber) => onChange({ ...fields, flightNumber })}
+            error={errors.flightNumber}
+            placeholder="NH 848"
+            autoCapitalize="characters"
+            autoCorrect={false}
+            editable={!disabled}
+          />
+        </View>
+        <View className="flex-1">
+          <TextField
+            label="Seat"
+            value={fields.seat}
+            onChangeText={(seat) => onChange({ ...fields, seat })}
+            placeholder="14A"
+            autoCapitalize="characters"
+            autoCorrect={false}
+            maxLength={12}
+            editable={!disabled}
+          />
+        </View>
+      </View>
       <DateField
         label="Date"
         value={fields.departsOn}
@@ -49,20 +117,27 @@ export function FlightInputs({ fields, errors, onChange, disabled }: InputsProps
       />
       <View className="flex-row gap-3">
         <TimeField
-          label="Departs"
+          label="Departure"
           value={fields.departsAt}
           onChange={(departsAt) => onChange({ ...fields, departsAt })}
           optional
           disabled={disabled}
         />
         <TimeField
-          label="Arrives"
+          label="Arrival"
           value={fields.arrivesAt}
           onChange={(arrivesAt) => onChange({ ...fields, arrivesAt })}
           optional
           disabled={disabled}
         />
       </View>
+      <ReferenceInputs
+        confirmationCode={fields.confirmationCode}
+        notes={fields.notes}
+        onChangeCode={(confirmationCode) => onChange({ ...fields, confirmationCode })}
+        onChangeNotes={(notes) => onChange({ ...fields, notes })}
+        disabled={disabled}
+      />
     </View>
   );
 }
@@ -76,7 +151,7 @@ export function CarRentalInputs({
   return (
     <View>
       <TextField
-        label="Company"
+        label="Rental company"
         value={fields.company}
         onChangeText={(company) => onChange({ ...fields, company })}
         error={errors.company}
@@ -85,11 +160,30 @@ export function CarRentalInputs({
         editable={!disabled}
       />
       <TextField
+        label="Vehicle"
+        value={fields.vehicle}
+        onChangeText={(vehicle) => onChange({ ...fields, vehicle })}
+        placeholder="Toyota Yaris"
+        autoCapitalize="words"
+        maxLength={60}
+        editable={!disabled}
+      />
+      <TextField
         label="Pickup location"
         value={fields.pickupLocation}
         onChangeText={(pickupLocation) => onChange({ ...fields, pickupLocation })}
         placeholder="Narita Airport"
         autoCapitalize="words"
+        maxLength={80}
+        editable={!disabled}
+      />
+      <TextField
+        label="Drop-off location"
+        value={fields.dropoffLocation}
+        onChangeText={(dropoffLocation) => onChange({ ...fields, dropoffLocation })}
+        placeholder="Same as pickup"
+        autoCapitalize="words"
+        maxLength={80}
         editable={!disabled}
       />
       <View className="flex-row gap-3">
@@ -107,6 +201,29 @@ export function CarRentalInputs({
           disabled={disabled}
         />
       </View>
+      <View className="flex-row gap-3">
+        <DateField
+          label="Drop-off date"
+          value={fields.dropoffOn}
+          onChange={(dropoffOn) => onChange({ ...fields, dropoffOn })}
+          error={errors.dropoffOn}
+          disabled={disabled}
+        />
+        <TimeField
+          label="Drop-off time"
+          value={fields.dropoffAt}
+          onChange={(dropoffAt) => onChange({ ...fields, dropoffAt })}
+          optional
+          disabled={disabled}
+        />
+      </View>
+      <ReferenceInputs
+        confirmationCode={fields.confirmationCode}
+        notes={fields.notes}
+        onChangeCode={(confirmationCode) => onChange({ ...fields, confirmationCode })}
+        onChangeNotes={(notes) => onChange({ ...fields, notes })}
+        disabled={disabled}
+      />
     </View>
   );
 }
