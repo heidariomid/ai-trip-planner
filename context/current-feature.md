@@ -59,3 +59,5 @@
   and chat packing and booking options
 - feat: generate trip covers with AI through Cloudflare Workers AI, with
   a daily cap (spec 13)
+- feat: add saved places with a heart on chat place cards, a list from
+  Profile, and a city on every place card (spec 14)

@@ -32,7 +32,7 @@ from Home and from a trip.
 
 ## Current state
 
-Specs 1 through 13 are done. Specs 14 through 17 are written and not built.
+Specs 1 through 14 are done. Specs 15 through 17 are written and not built.
 
 - Expo Router, email and Google sign-in, and a `profiles` row on first
   sign-up. Verified on Expo Go and web
@@ -81,6 +81,10 @@ Specs 1 through 13 are done. Specs 14 through 17 are written and not built.
   Wikipedia has no photo of the destination. Checked on web; the model
   answered three requests from a phone, and the saved cover was not
   seen there by the assistant
+- A heart on a place card in the chat saves the place, with the city
+  it was recommended for. Profile has a Saved places row with the count
+  that opens the list, where a row opens Google Maps and its heart
+  removes it. Checked on web, not yet on a phone
 
 No app build has been deployed: no EAS build, no store listing. The
 `chat`, `place-photo`, and `trip-cover` Edge Functions are deployed on
@@ -157,7 +161,7 @@ Category chips filter the list. From spec 12 a plan can also open the
 chat with a message already typed.
 
 **Profile.** Name, avatar, sign out, and interest tags the assistant can
-read. Saved places come later. Joining a family trip is one code field,
+read. A row opens the saved places list. Joining a family trip is one code field,
 not a list of the owner's codes. Password reset, account deletion, and a
 privacy policy come before release.
 
@@ -170,7 +174,7 @@ existing day, and update bookings. It never inserts a day. Days come
 from the trip's dates. The assistant reads the selected trip's
 itinerary so it does not repeat a place. Spec 13
 generates the cover, on the form and automatically for a trip created
-in the chat. Hearts on a place card are spec 14.
+in the chat. A heart on a place card saves the place.
 
 **Family share.** From the trip, a member list and a join code. The
 joiner types the code on a Join a trip screen opened from Profile.
@@ -201,7 +205,7 @@ Full columns live in the spec that creates the table.
 | `trips.status` | spec 12 | `active` or `draft` |
 | place lookups | spec 12 | `place_usage`, a daily count per user for the Google Places lookup, which is built and switched off |
 | cover generation | spec 13 | a second model, FLUX.2 klein 4B on Cloudflare Workers AI's free allowance, writing only the cover file |
-| saved places | spec 14 | a heart on a place, listed on Profile |
+| `saved_places` | spec 14 | a name, a label, and a city per user, unique on name and city. No picture |
 | members, join code | spec 15 | owner stays on `trips`. Other people are members. Join is a function |
 | account | spec 16 | password reset, deletion, privacy policy, Sign in with Apple |
 
@@ -241,7 +245,7 @@ and inside the chat.
 | AI chat | 11, done |
 | AI creates and updates a trip | 12, done |
 | AI cover image | 13, done |
-| Saved places | 14 |
+| Saved places | 14, done |
 | Family share | 15 |
 | Account, privacy policy, Sign in with Apple | 16 |
 
@@ -324,7 +328,8 @@ and when it is done.
     Done
 13. @context/features/spec13-ai-cover.md — generate a cover, separate from
     writing trip rows. Done
-14. @context/features/spec14-saved-places.md — hearts, listed on Profile
+14. @context/features/spec14-saved-places.md — hearts, listed from Profile.
+    Done
 15. @context/features/spec15-family-share.md — members and a join code
 16. @context/features/spec16-account-and-store.md — password reset, account
     deletion, privacy policy, Sign in with Apple

@@ -558,6 +558,33 @@ export type Database = {
         }
         Relationships: []
       }
+      saved_places: {
+        Row: {
+          city: string
+          created_at: string
+          id: string
+          label: string
+          name: string
+          user_id: string
+        }
+        Insert: {
+          city?: string
+          created_at?: string
+          id?: string
+          label?: string
+          name: string
+          user_id?: string
+        }
+        Update: {
+          city?: string
+          created_at?: string
+          id?: string
+          label?: string
+          name?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       trip_notes: {
         Row: {
           body: string

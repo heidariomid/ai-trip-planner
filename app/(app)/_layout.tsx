@@ -1,5 +1,11 @@
 import { Stack } from "expo-router";
 
+import { SavedPlacesProvider } from "../../hooks/useSavedPlaces";
+
 export default function AppLayout() {
-  return <Stack screenOptions={{ headerShown: false }} />;
+  return (
+    <SavedPlacesProvider>
+      <Stack screenOptions={{ headerShown: false }} />
+    </SavedPlacesProvider>
+  );
 }

@@ -1,6 +1,7 @@
-import { useRouter } from "expo-router";
-import { useState } from "react";
-import { ActivityIndicator, View } from "react-native";
+import { useFocusEffect, useRouter } from "expo-router";
+import { ChevronRight, Heart } from "lucide-react-native";
+import { useCallback, useState } from "react";
+import { ActivityIndicator, Pressable, View } from "react-native";
 
 import { Avatar } from "../../../components/Avatar";
 import { Badge } from "../../../components/Badge";
@@ -11,16 +12,24 @@ import { Screen } from "../../../components/Screen";
 import { Text } from "../../../components/Text";
 import { useAuth } from "../../../hooks/useAuth";
 import { useProfile } from "../../../hooks/useProfile";
+import { useSavedPlaces } from "../../../hooks/useSavedPlaces";
 import { signOut } from "../../../lib/auth";
 import { toInterestLabel } from "../../../lib/profiles";
-import { colors } from "../../../lib/theme";
+import { colors, shadows } from "../../../lib/theme";
 
 export default function ProfileScreen() {
   const router = useRouter();
   const { user } = useAuth();
   const { profile, isLoading, error } = useProfile();
+  const { places: savedPlaces, refresh: refreshSavedPlaces } = useSavedPlaces();
   const [isSigningOut, setIsSigningOut] = useState(false);
   const [signOutError, setSignOutError] = useState<string | null>(null);
+
+  useFocusEffect(
+    useCallback(() => {
+      refreshSavedPlaces();
+    }, [refreshSavedPlaces]),
+  );
 
   async function handleSignOut() {
     setSignOutError(null);
@@ -75,6 +84,19 @@ export default function ProfileScreen() {
           </View>
         )}
       </Card>
+
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={`Saved places, ${savedPlaces.length}`}
+        onPress={() => router.push("/saved-places")}
+        style={shadows.soft}
+        className="mt-4 min-h-[56px] flex-row items-center rounded-2xl bg-surface px-4 active:bg-canvas"
+      >
+        <Heart size={18} color={colors.ink} />
+        <Text className="ml-3 flex-1 text-[15px] font-medium text-ink">Saved places</Text>
+        <Text className="mr-1 text-[14px] text-subtle">{savedPlaces.length}</Text>
+        <ChevronRight size={18} color={colors.muted} />
+      </Pressable>
 
       {profile ? (
         <View className="mt-6">

@@ -2,6 +2,7 @@ import {
   ArrowUpRight,
   BedDouble,
   Car,
+  Heart,
   MapPin,
   Plane,
   Ticket,
@@ -12,6 +13,7 @@ import { useState } from "react";
 import { FlatList, Image, Pressable, View } from "react-native";
 
 import { usePlaceInfo } from "../hooks/usePlaceInfo";
+import { useSavedPlaces } from "../hooks/useSavedPlaces";
 import type {
   BookingCard,
   ChatCards as ChatCardsData,
@@ -36,6 +38,8 @@ const PLACE_CARD_WIDTH = 210;
 const PLACE_PHOTO_SIZE = { width: "100%", height: 132 } as const;
 // Wikimedia refuses the name Android's image loader sends by default.
 const PHOTO_HEADERS = { "User-Agent": "AITripPlanner/1.0 (Expo; React Native)" } as const;
+// The heart's circle is 30pt; this widens what can be tapped to 44pt.
+const HEART_HIT_SLOP = 7;
 const PLACE_LIST_CONTENT = { gap: 10, paddingVertical: 4, paddingRight: 4 } as const;
 
 /**
@@ -131,62 +135,84 @@ function TripSummaryView({ trip, days, actions }: TripSummaryProps) {
 
 interface PlaceCardProps {
   place: PlaceCard;
-  /** The city the conversation is about, so the right place is found. */
+  /** The city the conversation is about, for a place that does not name its own. */
   near: string;
 }
 
 /**
  * A place the assistant recommends, with a real photo of it from Google Places
  * when there is one. The address of the picture comes from that lookup, never
- * from the model. Tapping the card opens the place in Google Maps.
+ * from the model. Tapping the card opens the place in Google Maps; the heart on
+ * its photo saves the place and is beside that link, not inside it.
  */
-function PlaceCardView({ place, near }: PlaceCardProps) {
+function PlaceCardView({ place, near: fallbackCity }: PlaceCardProps) {
+  // The place's own city first, so the same place is the same saved place in
+  // every reply, whether or not a trip is selected.
+  const near = place.city || fallbackCity;
   const info = usePlaceInfo(place.name, near);
+  const { isSaved, toggle } = useSavedPlaces();
+  const saved = isSaved(place.name, near);
 
   return (
-    <Pressable
-      accessibilityRole="link"
-      accessibilityLabel={`Open ${place.name} in Maps`}
-      onPress={() => void openPlace(info?.mapsUrl ?? null, place.name, near)}
-      style={[shadows.soft, { width: PLACE_CARD_WIDTH }]}
-      className="rounded-2xl bg-surface active:opacity-80"
-    >
-      <Image
-        source={
-          info?.photoUrl ? { uri: info.photoUrl, headers: PHOTO_HEADERS } : PLACEHOLDER_IMAGE
-        }
-        resizeMode="cover"
-        style={PLACE_PHOTO_SIZE}
-        className="rounded-t-2xl bg-canvas"
-        accessible={false}
-      />
-      <View className="px-3 pb-3 pt-2.5">
-        <View className="flex-row items-center">
-          <Text numberOfLines={1} className="flex-1 text-[15px] font-semibold text-ink">
-            {place.name}
-          </Text>
-          <ArrowUpRight size={14} color={colors.subtle} />
-        </View>
-        {place.line ? (
-          <Text numberOfLines={2} className="mt-0.5 text-[13px] leading-[18px] text-subtle">
-            {place.line}
-          </Text>
-        ) : null}
-        {info?.address ? (
-          <View className="mt-1.5 flex-row items-center">
-            <MapPin size={12} color={colors.subtle} />
-            <Text numberOfLines={1} className="ml-1 flex-1 text-[12px] text-subtle">
-              {info.address}
+    <View style={[shadows.soft, { width: PLACE_CARD_WIDTH }]} className="rounded-2xl bg-surface">
+      <Pressable
+        accessibilityRole="link"
+        accessibilityLabel={`Open ${place.name} in Maps`}
+        onPress={() => void openPlace(info?.mapsUrl ?? null, place.name, near)}
+        className="rounded-2xl active:opacity-80"
+      >
+        <Image
+          source={
+            info?.photoUrl ? { uri: info.photoUrl, headers: PHOTO_HEADERS } : PLACEHOLDER_IMAGE
+          }
+          resizeMode="cover"
+          style={PLACE_PHOTO_SIZE}
+          className="rounded-t-2xl bg-canvas"
+          accessible={false}
+        />
+        <View className="px-3 pb-3 pt-2.5">
+          <View className="flex-row items-center">
+            <Text numberOfLines={1} className="flex-1 text-[15px] font-semibold text-ink">
+              {place.name}
             </Text>
+            <ArrowUpRight size={14} color={colors.subtle} />
           </View>
-        ) : null}
-        {info?.photoUrl && info.photoCredit ? (
-          <Text numberOfLines={1} className="mt-1 text-[11px] text-muted">
-            Photo: {info.photoCredit}
-          </Text>
-        ) : null}
-      </View>
-    </Pressable>
+          {place.line ? (
+            <Text numberOfLines={2} className="mt-0.5 text-[13px] leading-[18px] text-subtle">
+              {place.line}
+            </Text>
+          ) : null}
+          {info?.address ? (
+            <View className="mt-1.5 flex-row items-center">
+              <MapPin size={12} color={colors.subtle} />
+              <Text numberOfLines={1} className="ml-1 flex-1 text-[12px] text-subtle">
+                {info.address}
+              </Text>
+            </View>
+          ) : null}
+          {info?.photoUrl && info.photoCredit ? (
+            <Text numberOfLines={1} className="mt-1 text-[11px] text-muted">
+              Photo: {info.photoCredit}
+            </Text>
+          ) : null}
+        </View>
+      </Pressable>
+      <Pressable
+        accessibilityRole="button"
+        accessibilityState={{ selected: saved }}
+        accessibilityLabel={saved ? `Remove ${place.name} from saved places` : `Save ${place.name}`}
+        onPress={() => void toggle({ name: place.name, label: place.line, city: near })}
+        hitSlop={HEART_HIT_SLOP}
+        style={shadows.soft}
+        className="absolute right-2 top-2 h-[30px] w-[30px] items-center justify-center rounded-full bg-surface active:bg-canvas"
+      >
+        <Heart
+          size={16}
+          color={saved ? colors.heart : colors.ink}
+          fill={saved ? colors.heart : "none"}
+        />
+      </Pressable>
+    </View>
   );
 }
 
@@ -433,7 +459,7 @@ function getPlacesFromDays(days: DayCard[]): PlaceCard[] {
       const key = item.place?.trim().toLowerCase();
       if (!item.place || !key || seen.has(key)) continue;
       seen.add(key);
-      places.push({ name: item.place, line: item.activity });
+      places.push({ name: item.place, line: item.activity, city: "" });
       if (places.length === MAX_PLACES_FROM_DAYS) return places;
     }
   }

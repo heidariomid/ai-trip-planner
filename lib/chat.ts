@@ -9,6 +9,8 @@ export const MAX_CHAT_MESSAGE_LENGTH = 2000;
 export interface PlaceCard {
   name: string;
   line: string;
+  /** "Lisbon, Portugal". Empty on a reply saved before the assistant named one. */
+  city: string;
 }
 
 export interface DayCardItem {
@@ -151,7 +153,11 @@ function toCards(value: unknown): ChatCards | null {
   const chips = asList(value.chips).map(asText).filter(Boolean);
   const places = asList(value.places)
     .filter(isRecord)
-    .map((place) => ({ name: asText(place.name), line: asText(place.line) }))
+    .map((place) => ({
+      name: asText(place.name),
+      line: asText(place.line),
+      city: asText(place.city),
+    }))
     .filter((place) => place.name);
   const days = asList(value.days)
     .filter(isRecord)

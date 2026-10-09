@@ -2,11 +2,11 @@
 
 # Pre-review برای spec 14: Saved Places
 
-تاریخ: ۲۰۲۶-۱۰-۰۹ — Status: Not Started. الان branch `feature/ai-cover-image` بازه و spec 13 هنوز commit نشده؛ feature لودشده هم spec 13 هست، نه این.
+تاریخ: ۲۰۲۶-۱۰-۰۹ — Status: Not Started. spec 13 روی `main` merge شده؛ spec 14 هنوز load نشده.
 
 ## نتیجه
 
-**Needs decisions.** خود feature کوچیکه و هیچ هزینه یا package جدیدی نداره، ولی spec قبل از عکس‌دار شدن place card نوشته شده و سه جاش با app امروز نمی‌خونه.
+**Decided (۲۰۲۶-۱۰-۰۹).** همه‌ی پیشنهادهای پایین توی spec نوشته شدن. خود feature کوچیکه و هیچ هزینه یا package جدیدی نداره، ولی spec قبل از عکس‌دار شدن place card نوشته شده و سه جاش با app امروز نمی‌خونه.
 
 **یه چیز رو یادت بمونه:** spec می‌گه یه place فقط با `name` ذخیره بشه. بدون شهر، نه میشه روی Maps پیداش کرد، نه دو تا جای هم‌اسم توی دو تا شهر رو از هم جدا کرد.
 
@@ -62,7 +62,6 @@
 
 | موضوع | نکته |
 | --- | --- |
-| ترتیب | اول spec 13 باید complete بشه. branch فعلی کار commit‌نشده داره |
 | migration | شماره‌ی `0018` رو spec 13 گرفته؛ این میشه `0019`. `drop` و statement `delete` نداره، پس اول MCP `apply_migration` |
 | table | `user_id` با default `auth.uid()` و `on delete cascade` به `auth.users` (برای account deletion توی spec 16). `name` تا ۸۰ و `label` تا ۱۶۰ character، همون سقف‌هایی که function `chat` روی card می‌ذاره |
 | grant و policy | فقط `select`، `insert`، `delete` برای `authenticated`؛ `update` لازم نیست. policy با `(select auth.uid()) = user_id` |
@@ -87,17 +86,17 @@
 
 ## رأی‌ها
 
-- [ ] ۱ — column `city` و unique روی user + name + city
-- [ ] ۲ — لیست توی screen جدا (`/saved-places`) با یه ردیف روی Profile  ·  یا: خود Profile scroll کنه
-- [ ] ۳ — tap روی row، Google Maps رو باز کنه
-- [ ] ۴ — لیست فقط متن، بدون عکس
-- [ ] ۵ — heart روی گوشه‌ی عکس؛ رنگ پر: `ink`  ·  `accent`  ·  قرمز
-- [ ] ۶ — پاک کردن با یه tap، بدون dialog
+کاربر گفت «خودت تصمیم بگیر» (۲۰۲۶-۱۰-۰۹). همه‌ی پیشنهادها رو assistant انتخاب کرده و توی `context/features/spec14-saved-places.md` نوشته؛ هر کدوم رو نخواستی بگو.
+
+- [x] ۱ — column `city` و unique روی user + name + city
+- [x] ۲ — لیست توی screen جدا (`/saved-places`) با یه ردیف روی Profile
+- [x] ۳ — tap روی row، Google Maps رو باز کنه
+- [x] ۴ — لیست فقط متن، بدون عکس
+- [x] ۵ — heart روی گوشه‌ی عکس؛ رنگ پر: `ink`
+- [x] ۶ — پاک کردن با یه tap، بدون dialog
 
 ## قدم بعدی
 
-1. spec 13 رو تموم کن (`/feature complete`).
-2. رأی‌ها رو بگو، یا بگو «خودت تصمیم بگیر» تا پیشنهادها توی spec نوشته بشن.
-3. بعد `/feature load spec14-saved-places` و `/feature start`.
+`/feature load spec14-saved-places` و بعد `/feature start`.
 
 </div>

@@ -58,6 +58,8 @@ function json(status: number, body: Record<string, unknown>): Response {
 interface PlaceCard {
   name: string;
   line: string;
+  /** "Lisbon, Portugal", so a place is found in the right city. Empty when the model left it out. */
+  city: string;
 }
 
 interface DayItem {
@@ -230,7 +232,11 @@ function toCards(raw: string): Cards | null {
     .filter(Boolean);
 
   const places = list(field(parsed, "places"), 6)
-    .map((place) => ({ name: clean(field(place, "name"), 80), line: clean(field(place, "line"), 160) }))
+    .map((place) => ({
+      name: clean(field(place, "name"), 80),
+      line: clean(field(place, "line"), 160),
+      city: clean(field(place, "city"), 80),
+    }))
     .filter((place) => place.name);
 
   const days = list(field(parsed, "days"), 7)
@@ -365,10 +371,10 @@ function buildSystemPrompt(tripContext: string | null, interests: string[]): str
     "Write in Markdown using only headings, bold, and lists. Never write a link, a URL, or an image.",
     [
       "After your text you may add one cards block, on its own at the very end, in exactly this form:",
-      '<cards>{"chips":["..."],"places":[{"name":"...","line":"..."}],"trip":{"title":"...","destination":"City, Country","day_count":5,"traveler_count":2,"description":"..."},"days":[{"day":1,"title":"Day 1: ...","items":[{"time":"09:00","place":"...","activity":"..."}]}],"bookings":[{"kind":"hotel","name":"...","line":"...","check_in":"2026-05-20","check_out":"2026-05-25"},{"kind":"car","company":"...","pickup_location":"...","line":"..."},{"kind":"extra","title":"...","detail":"..."}],"packing":[{"category":"Clothing","items":["...","..."]}]}</cards>',
+      '<cards>{"chips":["..."],"places":[{"name":"...","line":"...","city":"City, Country"}],"trip":{"title":"...","destination":"City, Country","day_count":5,"traveler_count":2,"description":"..."},"days":[{"day":1,"title":"Day 1: ...","items":[{"time":"09:00","place":"...","activity":"..."}]}],"bookings":[{"kind":"hotel","name":"...","line":"...","check_in":"2026-05-20","check_out":"2026-05-25"},{"kind":"car","company":"...","pickup_location":"...","line":"..."},{"kind":"extra","title":"...","detail":"..."}],"packing":[{"category":"Clothing","items":["...","..."]}]}</cards>',
       "Every key is optional. The block must be valid JSON on one line, with no URLs. Do not mention the block in your text, and do not repeat its contents as a long list in the text.",
       "chips: up to 4 short follow-up messages the traveller might send next.",
-      "places: up to 6 places, each with a name and one short line. Use it when you recommend specific places.",
+      "places: up to 6 places, each with a name, one short line, and city, the city and country the place is in, written the same way for every place in that city, such as \"Lisbon, Portugal\". Always give the city, so the place can be found on a map. Use it when you recommend specific places.",
       "days: up to 7 days, each with its day number in day and up to 8 items. time is 24-hour HH:MM, or leave it out. Use it when you propose a day-by-day plan.",
       "trip: only when no trip is selected and you propose a whole new trip. A short title, the destination, the number of days, the number of travellers, and a description of at most 200 characters. Send it together with the days of that plan. Never include where the traveller leaves from or the dates: the app asks for those.",
       "bookings: up to 6. Use it whenever the traveller asks where to stay, about a hotel, a car rental, a pass, or a ticket, whenever you recommend one, and whenever they ask to add a booking. Each one you name gets its own booking card, so it can be saved. When the traveller asks for a suggestion and has not named the exact one they want, give 3 different options of that kind, for example one cheaper, one mid-range, and one special, each as its own card, so they can compare and choose. A hotel and a car each take a line of at most 100 characters that helps choose: the area, the price level, and who it suits. A hotel has a name and, only if the traveller gave them, check_in and check_out as YYYY-MM-DD. A car has a company and an optional pickup_location. An extra has a title and an optional detail, for anything else such as a rail pass or a ticket. A flight is {\"kind\":\"flight\",\"airline\":\"...\",\"flight_number\":\"...\"} and is allowed only when the traveller typed both the airline and the flight number themselves. Never invent a flight number, and never guess one: ask for it instead.",

@@ -21,7 +21,7 @@ stays quiet around them.
 - No gradients, no blur, no decorative shapes, no warm tones, no second
   accent colour. The one exception is the AI planning card on Home,
   which carries a pale sky-to-peach wash. Do not spread it
-- Red is for errors only
+- Red is for errors only, apart from the `heart` token on a saved place
 
 ---
 
@@ -48,6 +48,7 @@ missing, add a token to `lib/theme.js` and list it here.
 | `accent-soft` | `#EEEBFD` | Tinted background for a selected chip or an info message |
 | `sky-soft` | `#E3F0FE` | One end of the wash on the AI planning card. Nowhere else |
 | `peach-soft` | `#FFEBDD` | The other end of that wash. Nowhere else |
+| `heart` | `#E5484D` | The filled heart of a saved place. Nowhere else |
 
 | Shadow | Use |
 | --- | --- |
@@ -321,6 +322,22 @@ Use these. Do not restyle them per screen.
   header has two round buttons on the right, history and new
 - A draft trip shows a quiet `Draft` badge wherever Upcoming, Ongoing,
   or Past would be
+- **The heart on a place card** — a small 30pt white circle with
+  `shadows.soft` on the top right corner of the card's photo, holding a
+  16pt Lucide heart (user request, 2026-10-09: the 44pt circle was too
+  much white around the heart). `hitSlop` keeps the tap target at 44pt: outlined `ink` when the place is not saved, filled
+  `heart` red when it is (user decision, 2026-10-09, after a filled
+  `ink` heart read as black). Never `accent`. It sits beside the card's link to Google
+  Maps, not inside it, and changes at once with no spinner
+- `app/(app)/saved-places.tsx` — saved places: a round back button, the
+  screen title, then one `surface` row per place with `rounded-2xl` and
+  `shadows.soft`, like the conversation list. A row is the name in
+  medium `ink`, a `subtle` line with the label and the city, and a
+  filled `heart` red heart on the right that removes it with one tap and no
+  dialog. Tapping the row opens Google Maps. No photo
+- The "Saved places" row on the Profile tab — a 56pt `surface` row with
+  `rounded-2xl` and `shadows.soft`: an `ink` heart, the label in medium
+  `ink`, the count in `subtle`, and a `muted` chevron
 
 A plan's picture is bundled, not private: `getExploreImage(key)` from
 `lib/explore-images.ts` returns it, or the placeholder for an unknown
