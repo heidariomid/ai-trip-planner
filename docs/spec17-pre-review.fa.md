@@ -68,7 +68,7 @@
 
 ### ۹. password account test توی repo نوشته شده
 
-- **الان:** سایت عمومی و development یه database دارن. `ada@gmail.com` با password `<removed>` توی `AGENTS.md` نوشته شده. repo الان هیچ remote نداره.
+- **الان:** سایت عمومی و development یه database دارن. password account test توی `AGENTS.md` نوشته شده بود و repo اون موقع هیچ remote نداشت. (۲۰۲۶-۱۰-۱۰: repo public شد؛ password عوض شد و از فایل و از history بیرون رفت.)
 - **اگه repo رو برای resume public کنی:** هر کسی با اون password وارد account test میشه. project ref و email خودت هم توی همون فایل هست.
 - **پیشنهاد:** قبل از public کردن repo، اون password عوض بشه و از فایل بیرون بره. تا repo private هست کاری لازم نیست.
 
