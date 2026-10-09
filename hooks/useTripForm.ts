@@ -1,6 +1,7 @@
 import * as ImagePicker from "expo-image-picker";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
+import { generateCover as requestCover, getCoversLeft } from "../lib/covers";
 import { addDays, todayISO } from "../lib/dates";
 import type { LocalImage } from "../lib/storage";
 import { countDaysToDrop, updateTrip, type TripDetail } from "../lib/trip-detail";
@@ -31,6 +32,13 @@ export interface UseTripFormResult {
    */
   daysToDrop: number | null;
   pickCover: () => Promise<void>;
+  /** Asks the image model for a cover from what the form already holds. */
+  generateCover: () => Promise<void>;
+  isGeneratingCover: boolean;
+  /** Why the last generation gave no picture. Saving is still possible. */
+  coverError: string | null;
+  /** Generations left today, or null while that is not known. */
+  coversLeft: number | null;
   /** Resolves true when the trip was saved with nothing left to tell. */
   save: () => Promise<boolean>;
   /** Saves after the traveller agreed to lose those days. */
@@ -87,6 +95,22 @@ export function useTripForm(trip?: TripDetail): UseTripFormResult {
   const [savedNotice, setSavedNotice] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [daysToDrop, setDaysToDrop] = useState<number | null>(null);
+  const [isGeneratingCover, setIsGeneratingCover] = useState(false);
+  const [coverError, setCoverError] = useState<string | null>(null);
+  const [coversLeft, setCoversLeft] = useState<number | null>(null);
+  // Counts every change to the cover, so a picture that arrives after the
+  // traveller picked or removed one is dropped instead of replacing theirs.
+  const coverChanges = useRef(0);
+
+  useEffect(() => {
+    let isCurrent = true;
+    void getCoversLeft().then((left) => {
+      if (isCurrent && left !== null) setCoversLeft(left);
+    });
+    return () => {
+      isCurrent = false;
+    };
+  }, []);
 
   const allErrors = validateTrip(values);
   // The date order is checked as soon as a date changes. An empty required
@@ -94,11 +118,39 @@ export function useTripForm(trip?: TripDetail): UseTripFormResult {
   const errors: TripFieldErrors = hasSubmitted ? allErrors : { endDate: allErrors.endDate };
 
   function setValue<K extends keyof TripFormValues>(key: K, value: TripFormValues[K]) {
+    if (key === "cover") coverChanges.current += 1;
     setValues((current) => ({ ...current, [key]: value }));
+  }
+
+  async function generateCover() {
+    // One tap is one generation: a second tap while it works is dropped.
+    if (isGeneratingCover) return;
+    if (!values.destination.trim()) {
+      setCoverError("Add where you're going first, so the cover can show it.");
+      return;
+    }
+
+    setCoverError(null);
+    setIsGeneratingCover(true);
+    const startedAt = coverChanges.current;
+    const result = await requestCover({
+      title: values.title.trim(),
+      destination: values.destination.trim(),
+      description: values.description.trim(),
+    });
+    setIsGeneratingCover(false);
+
+    if (result.remaining !== null) setCoversLeft(result.remaining);
+    if (!result.success || !result.data) {
+      setCoverError(result.error);
+      return;
+    }
+    if (coverChanges.current === startedAt) setValue("cover", result.data);
   }
 
   async function pickCover() {
     setFormError(null);
+    setCoverError(null);
     try {
       const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ["images"],
@@ -185,6 +237,10 @@ export function useTripForm(trip?: TripDetail): UseTripFormResult {
     isSaving,
     daysToDrop,
     pickCover,
+    generateCover,
+    isGeneratingCover,
+    coverError,
+    coversLeft,
     save,
     confirmDrop,
     cancelDrop: () => setDaysToDrop(null),

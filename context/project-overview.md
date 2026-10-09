@@ -32,7 +32,7 @@ from Home and from a trip.
 
 ## Current state
 
-Specs 1 through 12 are done. Specs 13 through 17 are written and not built.
+Specs 1 through 13 are done. Specs 14 through 17 are written and not built.
 
 - Expo Router, email and Google sign-in, and a `profiles` row on first
   sign-up. Verified on Expo Go and web
@@ -74,9 +74,17 @@ Specs 1 through 12 are done. Specs 13 through 17 are written and not built.
   where it has one and open in Google Maps, a trip made in the chat
   gets a photo of its destination as its cover, and past conversations
   are listed and can be reopened. Checked on web, not yet on a phone
+- The trip form can generate a cover with AI, on Add a trip and on Edit
+  trip. The picture comes from Cloudflare Workers AI on its free
+  allowance, through the `trip-cover` Edge Function, capped at 5 a day
+  per traveller. A trip made in the chat asks for one only when
+  Wikipedia has no photo of the destination. Checked on web; the model
+  answered three requests from a phone, and the saved cover was not
+  seen there by the assistant
 
 No app build has been deployed: no EAS build, no store listing. The
-`chat` Edge Function is deployed on the Supabase project.
+`chat`, `place-photo`, and `trip-cover` Edge Functions are deployed on
+the Supabase project.
 
 ---
 
@@ -192,7 +200,7 @@ Full columns live in the spec that creates the table.
 | chat | spec 11 | threads and messages. A card in a message is a transcript, not the itinerary |
 | `trips.status` | spec 12 | `active` or `draft` |
 | place lookups | spec 12 | `place_usage`, a daily count per user for the Google Places lookup, which is built and switched off |
-| cover generation | spec 13 | a second model, Google Gemini `gemini-3.1-flash-lite-image`, writing only the cover file |
+| cover generation | spec 13 | a second model, FLUX.2 klein 4B on Cloudflare Workers AI's free allowance, writing only the cover file |
 | saved places | spec 14 | a heart on a place, listed on Profile |
 | members, join code | spec 15 | owner stays on `trips`. Other people are members. Join is a function |
 | account | spec 16 | password reset, deletion, privacy policy, Sign in with Apple |
@@ -232,7 +240,7 @@ and inside the chat.
 | Edit profile and interest tags | 10, done |
 | AI chat | 11, done |
 | AI creates and updates a trip | 12, done |
-| AI cover image | 13 |
+| AI cover image | 13, done |
 | Saved places | 14 |
 | Family share | 15 |
 | Account, privacy policy, Sign in with Apple | 16 |
@@ -315,7 +323,7 @@ and when it is done.
 12. @context/features/spec12-ai-trip-actions.md — create, draft, and update.
     Done
 13. @context/features/spec13-ai-cover.md — generate a cover, separate from
-    writing trip rows
+    writing trip rows. Done
 14. @context/features/spec14-saved-places.md — hearts, listed on Profile
 15. @context/features/spec15-family-share.md — members and a join code
 16. @context/features/spec16-account-and-store.md — password reset, account

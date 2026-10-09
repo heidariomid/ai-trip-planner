@@ -51,7 +51,8 @@ and shows the card in My Trips and on Home.
 
 - Editing the trip after save. That is spec 5
 - Activities on the days. The days are empty on purpose
-- AI image generation. That is spec 13
+- AI image generation. That is spec 13, which enables the disabled
+  "Generate with AI" tile on this form through Cloudflare Workers AI
 - Bookings, packing, photos, notes
 
 ## Done when

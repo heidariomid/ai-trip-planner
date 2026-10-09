@@ -1,6 +1,7 @@
 import { addActivities } from "./itinerary";
 import { saveBooking } from "./bookings";
 import type { BookingCard, DayCard, PackingCard, TripSummaryCard } from "./chat";
+import { generateCover } from "./covers";
 import { addDays, formatDate, pluralize } from "./dates";
 import { toReadableError } from "./errors";
 import { addPackingItems, type PackingAddResult } from "./packing";
@@ -57,8 +58,10 @@ export function getPlanEndDate(startDate: string, plan: ChatPlan): string {
 /**
  * Creates the trip, its days, and every day card's activities in one call,
  * then gives it a photo of the destination as its cover, so a trip made in the
- * chat does not arrive with the grey placeholder. With no photo to be found,
- * or when the upload fails, the trip is still created.
+ * chat does not arrive with the grey placeholder. When there is no photo to be
+ * found, a cover is generated in its place, which uses one of the traveller's
+ * generations for the day. With neither, or when the upload fails, the trip is
+ * still created.
  */
 export async function createTripFromPlan(
   userId: string,
@@ -67,7 +70,15 @@ export async function createTripFromPlan(
   startDate: string,
   status: TripStatusValue,
 ): Promise<CreateTripResult> {
-  const cover = await findDestinationPicture(plan.trip.destination);
+  const cover =
+    (await findDestinationPicture(plan.trip.destination)) ??
+    (
+      await generateCover({
+        title: plan.trip.title,
+        destination: plan.trip.destination,
+        description: plan.trip.description,
+      })
+    ).data;
 
   return createTrip(userId, {
     title: plan.trip.title,

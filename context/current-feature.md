@@ -57,3 +57,5 @@
   show place photos, and keep past conversations (spec 12)
 - feat: add booking details, a Persian font with right-to-left text,
   and chat packing and booking options
+- feat: generate trip covers with AI through Cloudflare Workers AI, with
+  a daily cap (spec 13)

@@ -178,7 +178,18 @@ Use these. Do not restyle them per screen.
   above a 6pt `canvas` track with an `accent` fill
 - `components/Stepper.tsx` — a count in a filled row with minus and plus
 - `components/CoverPicker.tsx`, `components/TripForm.tsx` — the trip
-  form, for adding and editing
+  form, for adding and editing. With no cover the picker is two dashed
+  `canvas` tiles side by side, each a Lucide icon in `ink`, a medium
+  title, and a `subtle` caption: "Upload image" and "Generate with AI",
+  whose caption is the count left today ("3 left today", "Back
+  tomorrow"). While a cover is being generated the tile's icon becomes
+  a small `accent` spinner and the caption says how long it can take.
+  With a cover showing, three quiet text actions sit under it on the
+  right, "Change" and "Generate" in `ink` and "Remove" or "Undo" in
+  `subtle`, with a `subtle` line below for the count left or the wait.
+  A disabled tile or action is at 45% opacity. A generation that fails
+  shows an error `FormMessage` under the picker, where the traveller is
+  looking, not beside Save. Nothing here is `accent` but the spinner
 - `components/FormScreen.tsx` — a pushed screen holding one form: a
   round back button, the screen title, one `Card`, keyboard handling
 - `components/TimeField.tsx` — like `DateField`, opening an hour and

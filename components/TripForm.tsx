@@ -96,6 +96,10 @@ export function TripForm({
         existing={existingCover}
         onPick={() => void form.pickCover()}
         onRemove={() => setValue("cover", null)}
+        onGenerate={() => void form.generateCover()}
+        isGenerating={form.isGeneratingCover}
+        generationsLeft={form.coversLeft}
+        error={form.coverError}
         disabled={isLocked}
       />
 

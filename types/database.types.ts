@@ -686,11 +686,21 @@ export type Database = {
         }
         Returns: boolean
       }
+      consume_cover_generation: {
+        Args: {
+          p_limit: number
+        }
+        Returns: number
+      }
       consume_place_lookup: {
         Args: {
           p_limit: number
         }
         Returns: boolean
+      }
+      cover_generations_used: {
+        Args: never
+        Returns: number
       }
       create_trip: {
         Args: {

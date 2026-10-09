@@ -24,12 +24,25 @@ export interface LocalImage {
   uri: string;
   mimeType: string | null | undefined;
   fileSize?: number | null;
+  /** The picture's own bytes, when it was never a file: a generated cover. */
+  base64?: string;
 }
 
 export interface UploadResult {
   success: boolean;
   data: string | null;
   error: string | null;
+}
+
+// Read straight from the text: fetching a `data:` address is not reliable on a
+// phone, and it is the only form a generated picture has.
+function toArrayBuffer(base64: string): ArrayBuffer {
+  const binary = atob(base64);
+  const bytes = new Uint8Array(binary.length);
+  for (let index = 0; index < binary.length; index += 1) {
+    bytes[index] = binary.charCodeAt(index);
+  }
+  return bytes.buffer;
 }
 
 const signedUrls = new Map<string, { url: string; expiresAt: number }>();
@@ -104,8 +117,9 @@ async function uploadImage(
   try {
     // An ArrayBuffer rather than a Blob: a Blob built from a file URI uploads
     // as zero bytes on React Native.
-    const response = await fetch(image.uri);
-    const body = await response.arrayBuffer();
+    const body = image.base64
+      ? toArrayBuffer(image.base64)
+      : await (await fetch(image.uri)).arrayBuffer();
 
     const { error } = await supabase.storage
       .from(IMAGES_BUCKET)
