@@ -104,7 +104,10 @@ Use these. Do not restyle them per screen.
   runs edge to edge; the picture then rounds its own top corners
 - `components/Button.tsx` — a capsule, 48pt tall, centred by default.
   `primary` is accent with white text. `secondary` is white with a
-  `line` border. `fullWidth` only when the layout needs it
+  `line` border. `fullWidth` only when the layout needs it. `icon` puts a
+  Lucide icon before the label, and `compact` trims the side padding for
+  two buttons that share a row, as on a curated plan ("Copy to my trips"
+  beside "Plan with AI" with a sparkles icon)
 - `components/TextField.tsx` — label above, filled with `canvas`, accent
   border on focus, red border and message on error. `hint` puts quiet
   text right of the label, such as a character count. `multiline` makes

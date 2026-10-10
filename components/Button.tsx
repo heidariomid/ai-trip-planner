@@ -1,3 +1,4 @@
+import type { LucideIcon } from "lucide-react-native";
 import { ActivityIndicator, Pressable, View } from "react-native";
 
 import { colors, shadows } from "../lib/theme";
@@ -11,6 +12,10 @@ export interface ButtonProps {
   disabled?: boolean;
   /** Stretch to the container. Off by default — a centred capsule reads lighter. */
   fullWidth?: boolean;
+  /** Drawn before the label, in the label's colour. */
+  icon?: LucideIcon;
+  /** Less side padding, for two buttons that share a row. */
+  compact?: boolean;
 }
 
 const CONTAINER = {
@@ -35,6 +40,8 @@ export function Button({
   loading = false,
   disabled = false,
   fullWidth = false,
+  icon: Icon,
+  compact = false,
 }: ButtonProps) {
   const isBlocked = disabled || loading;
 
@@ -45,7 +52,7 @@ export function Button({
       disabled={isBlocked}
       onPress={onPress}
       style={SHADOW[variant]}
-      className={`h-12 flex-row items-center justify-center rounded-full px-8 ${
+      className={`h-12 flex-row items-center justify-center rounded-full ${compact ? "px-4" : "px-8"} ${
         fullWidth ? "w-full" : "self-center"
       } ${CONTAINER[variant]} ${isBlocked ? "opacity-45" : ""}`}
     >
@@ -55,6 +62,10 @@ export function Button({
             size="small"
             color={variant === "primary" ? colors.surface : colors.ink}
           />
+        </View>
+      ) : Icon ? (
+        <View className="mr-2">
+          <Icon size={18} color={variant === "primary" ? colors.surface : colors.ink} />
         </View>
       ) : null}
       <Text className={`text-[16px] font-semibold tracking-tight ${LABEL[variant]}`}>

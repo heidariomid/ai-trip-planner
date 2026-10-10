@@ -73,3 +73,5 @@
   a daily keep-alive, and release notes (spec 17)
 - feat: add a landing page, a desktop layout with a sidebar, and a teal
   accent with a recoloured icon
+- fix: centre the landing buttons on a phone and put the plan's two
+  buttons side by side with an AI icon

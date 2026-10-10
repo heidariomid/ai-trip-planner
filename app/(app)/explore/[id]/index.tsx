@@ -1,4 +1,5 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
+import { Sparkles } from "lucide-react-native";
 import { useState } from "react";
 import { ActivityIndicator, FlatList, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -72,32 +73,39 @@ export default function ExplorePlanScreen() {
             <View className="pb-5">
               <PlanBanner plan={plan} onBack={goBack} />
 
-              <View className="mt-5">
-                <Button
-                  label="Copy to my trips"
-                  onPress={() =>
-                    router.push({ pathname: "/explore/[id]/copy", params: { id: plan.id } })
-                  }
-                />
-              </View>
-              {/* Opens an empty chat with this typed and not sent. */}
-              <View className="mt-3">
-                <Button
-                  label="Plan with AI"
-                  variant="secondary"
-                  onPress={() =>
-                    router.push({
-                      pathname: "/chat",
-                      params: {
-                        fresh: "1",
-                        draft: `Plan a trip like "${plan.title}" for ${pluralize(
-                          plan.days.length,
-                          "day",
-                        )}.`,
-                      },
-                    })
-                  }
-                />
+              <View className="mt-5 max-w-[420px] flex-row gap-3">
+                <View className="flex-1">
+                  <Button
+                    label="Copy to my trips"
+                    fullWidth
+                    compact
+                    onPress={() =>
+                      router.push({ pathname: "/explore/[id]/copy", params: { id: plan.id } })
+                    }
+                  />
+                </View>
+                {/* Opens an empty chat with this typed and not sent. */}
+                <View className="flex-1">
+                  <Button
+                    label="Plan with AI"
+                    variant="secondary"
+                    icon={Sparkles}
+                    fullWidth
+                    compact
+                    onPress={() =>
+                      router.push({
+                        pathname: "/chat",
+                        params: {
+                          fresh: "1",
+                          draft: `Plan a trip like "${plan.title}" for ${pluralize(
+                            plan.days.length,
+                            "day",
+                          )}.`,
+                        },
+                      })
+                    }
+                  />
+                </View>
               </View>
 
               {day ? (

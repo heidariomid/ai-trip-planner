@@ -67,7 +67,7 @@ export function LandingHero() {
           </Reveal>
 
           <Reveal delay={3}>
-            <View className="mt-9 max-w-[340px] gap-3 lg:max-w-none lg:flex-row lg:items-center">
+            <View className="mt-9 gap-3 md:max-w-[340px] lg:max-w-none lg:flex-row lg:items-center">
               <LandingButton
                 label="Start planning free"
                 href="/sign-up"
