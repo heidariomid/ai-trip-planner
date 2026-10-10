@@ -1,10 +1,11 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { ArrowLeft, History, SquarePen } from "lucide-react-native";
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
   KeyboardAvoidingView,
+  type LayoutChangeEvent,
   Platform,
   Pressable,
   View,
@@ -41,6 +42,7 @@ const STARTERS_WITHOUT_TRIP = [
 ] as const;
 
 const LIST_CONTENT = { paddingTop: 12, paddingBottom: 8, flexGrow: 1 } as const;
+const FOOTER = "footer";
 
 export default function ChatScreen() {
   const maxWidth = useContentWidth("reading");
@@ -115,10 +117,78 @@ export default function ChatScreen() {
     else router.replace("/");
   }
 
-  // A saved conversation opens on its newest message at once; only a reply
-  // being written glides down.
-  function scrollToEnd() {
-    list.current?.scrollToEnd({ animated: chat.isSending });
+  // Once the traveller asks something, their question goes to the top of the
+  // screen and stays there while the reply is written under it. The list never
+  // follows the reply down, so it can be read from its first line.
+  const [isPinned, setIsPinned] = useState(false);
+  const [listHeight, setListHeight] = useState(0);
+  const heights = useRef(new Map<string, number>());
+  const [, redraw] = useState(0);
+  const isJumpPending = useRef(false);
+
+  useEffect(() => {
+    if (chat.isLoading) setIsPinned(false);
+  }, [chat.isLoading]);
+
+  const pinnedIndex = isPinned ? chat.messages.map((item) => item.role).lastIndexOf("user") : -1;
+  const pinnedId = chat.messages[pinnedIndex]?.id;
+
+  // Empty space under a short reply, sized so that the end of the list is
+  // exactly the question at the top of the screen.
+  let spacer = 0;
+  if (pinnedIndex >= 0 && listHeight > 0) {
+    let tail = heights.current.get(FOOTER) ?? 0;
+    for (const message of chat.messages.slice(pinnedIndex)) {
+      tail += heights.current.get(message.id) ?? 0;
+    }
+    spacer = Math.max(0, listHeight - LIST_CONTENT.paddingTop - LIST_CONTENT.paddingBottom - tail);
+  }
+  const isSpacerSettled = useRef(false);
+  isSpacerSettled.current =
+    pinnedId !== undefined && heights.current.has(pinnedId) && heights.current.has(FOOTER);
+
+  function measure(key: string, isBelowQuestion: boolean) {
+    return (event: LayoutChangeEvent) => {
+      const { height } = event.nativeEvent.layout;
+      if (heights.current.get(key) === height) return;
+      heights.current.set(key, height);
+      if (isBelowQuestion) redraw((count) => count + 1);
+    };
+  }
+
+  function pinNextQuestion() {
+    heights.current.delete(FOOTER);
+    isJumpPending.current = true;
+    setIsPinned(true);
+  }
+
+  function ask(text: string) {
+    if (chat.isSending || !text.trim()) return;
+    pinNextQuestion();
+    chat.send(text);
+  }
+
+  function regenerate() {
+    if (chat.isSending) return;
+    pinNextQuestion();
+    chat.regenerate();
+  }
+
+  // A saved conversation opens on its newest message at once. After a
+  // question the list moves once, to put that question at the top.
+  function handleContentSizeChange() {
+    if (!isPinned) {
+      list.current?.scrollToEnd({ animated: false });
+      return;
+    }
+    if (!isJumpPending.current) return;
+    list.current?.scrollToEnd({ animated: true });
+    if (isSpacerSettled.current || !chat.isSending) isJumpPending.current = false;
+  }
+
+  function handleListLayout(event: LayoutChangeEvent) {
+    setListHeight(event.nativeEvent.layout.height);
+    if (!isPinned) list.current?.scrollToEnd({ animated: false });
   }
 
   return (
@@ -168,19 +238,21 @@ export default function ChatScreen() {
                 // time, the list does not know its full height yet, and the
                 // jump to the end lands partway up a long conversation.
                 initialNumToRender={Math.max(10, chat.messages.length)}
-                onContentSizeChange={scrollToEnd}
-                onLayout={scrollToEnd}
-                renderItem={({ item }) => (
-                  <ChatBubble
-                    message={item}
-                    isLatestReply={
-                      item === lastMessage && item.role === "assistant" && !chat.isSending
-                    }
-                    actions={actions}
-                    near={trip?.destination ?? ""}
-                    onPickChip={chat.send}
-                    onRegenerate={chat.regenerate}
-                  />
+                onContentSizeChange={handleContentSizeChange}
+                onLayout={handleListLayout}
+                renderItem={({ item, index }) => (
+                  <View onLayout={measure(item.id, isPinned && index >= pinnedIndex)}>
+                    <ChatBubble
+                      message={item}
+                      isLatestReply={
+                        item === lastMessage && item.role === "assistant" && !chat.isSending
+                      }
+                      actions={actions}
+                      near={trip?.destination ?? ""}
+                      onPickChip={ask}
+                      onRegenerate={regenerate}
+                    />
+                  </View>
                 )}
                 ListEmptyComponent={
                   chat.isLoading ? (
@@ -201,7 +273,7 @@ export default function ChatScreen() {
                           <Pressable
                             key={starter}
                             accessibilityRole="button"
-                            onPress={() => chat.send(starter)}
+                            onPress={() => ask(starter)}
                             style={shadows.soft}
                             className="h-11 justify-center rounded-full bg-surface px-4 active:bg-canvas"
                           >
@@ -214,10 +286,13 @@ export default function ChatScreen() {
                 }
                 ListFooterComponent={
                   <View>
-                    {chat.streamingText !== null ? (
-                      <StreamingBubble text={chat.streamingText} />
-                    ) : null}
-                    <FormMessage message={chat.error} />
+                    <View onLayout={measure(FOOTER, true)}>
+                      {chat.streamingText !== null ? (
+                        <StreamingBubble text={chat.streamingText} />
+                      ) : null}
+                      <FormMessage message={chat.error} />
+                    </View>
+                    {spacer > 0 ? <View style={{ height: spacer }} /> : null}
                   </View>
                 }
               />
@@ -226,7 +301,7 @@ export default function ChatScreen() {
                 <ChatComposer
                   initialText={params.draft}
                   isSending={chat.isSending}
-                  onSend={chat.send}
+                  onSend={ask}
                   onStop={chat.stop}
                 />
                 <Text className="mt-2 text-center text-[12px] leading-4 text-muted">

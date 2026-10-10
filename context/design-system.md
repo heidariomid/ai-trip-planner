@@ -314,8 +314,12 @@ Use these. Do not restyle them per screen.
   value), a booking card (a Lucide icon in a `canvas` circle, the kind
   as a label, the name in bold), and suggestion chips as white 44pt
   capsules with `ink` text. A card's button is a `CardAction`: a 44pt
-  capsule, outlined with `ink` text, and filled `accent` only for
-  Create Trip. Once a card is saved its button reads "Added" at 45%
+  capsule. The one that saves the card is filled `accent` with white
+  text (Create Trip, Add to Trip, Add to Bookings, Add to Packing; user
+  request, 2026-10-10, because outlined save buttons went unnoticed);
+  every other one (Save Draft, Edit, Regenerate) is outlined with `ink`
+  text. A hotel card also has a "View on Google Maps" link under its
+  line, in the same style as the place on a day's stop. Once a card is saved its button reads "Added" at 45%
   opacity. A day card also has Edit, which turns each stop into an
   outlined `line` block with a remove cross and a `TimeField`, and Done
   to leave it. The place on a stop is a link: a pin, the name in medium
@@ -326,12 +330,18 @@ Use these. Do not restyle them per screen.
   like `TripMenu`. While a reply has no text yet the bubble holds a
   small `subtle` spinner. A `muted` 12px line under the composer says
   the assistant can be wrong. Accent here is the traveller's bubbles
-  and the send button, nothing else
+  and the send button, nothing else. After a question the list moves
+  once, to put that question at the top of the screen, and then stays
+  still while the reply is written under it; it never follows the
+  reply down
 
-- `components/AssistantButton.tsx` — a white 48pt capsule with a Lucide
-  sparkles icon and "Assistant" in semibold `ink`, floating at the bottom
-  right of a trip with `shadows.card`. It opens that trip's conversation.
-  White, not `accent`: the trip screen already carries enough of it
+- `components/AssistantButton.tsx` — a 56pt `accent` capsule with a white
+  Lucide sparkles icon and "Ask AI" in semibold white, floating at the
+  bottom right of a trip with `shadows.accent`. It opens that trip's
+  conversation. It was a white 48pt capsule reading "Assistant"; the
+  user said on 2026-10-10 that travellers do not notice it, so it is
+  filled, and it is the one place the trip screen goes past the
+  two-accent rule on purpose
 - `components/DayPickerSheet.tsx` — a sheet at the bottom, like
   `TripMenu`, that asks which existing day of a trip a day card goes
   onto. A day is a 48pt row; the chosen one is `accent-soft` with

@@ -33,7 +33,8 @@ from Home and from a trip.
 ## Current state
 
 Specs 1 through 17 are done, and the site is live at
-`https://plan-trip-ai.vercel.app`. Spec 18 is written and not built.
+`https://plan-trip-ai.vercel.app`. Spec 18 and spec 19 are written and
+not built.
 
 - Expo Router, email and Google sign-in, and a `profiles` row on first
   sign-up. Verified on Expo Go and web
@@ -124,7 +125,7 @@ the Supabase project.
 ## Approach — one spec at a time
 
 The build order is @context/features/spec1-auth.md through
-@context/features/spec18-password-reset-and-email.md. A step does not start before the
+@context/features/spec19-launch-and-traffic.md. A step does not start before the
 one it depends on.
 
 Auth and the data model come before AI, because changing where a trip is
@@ -238,6 +239,7 @@ Full columns live in the spec that creates the table.
 | members, join code | spec 15 | owner stays on `trips`. Other people are members. Join is a function |
 | account | spec 16 | deletion through an Edge Function, privacy policy. No new table |
 | email | spec 18 | password reset by code, custom SMTP through Resend, email confirmation |
+| `traffic_daily` | spec 19 | visits and sign-ups per shared link per day, as totals. Nothing about a person |
 
 `auth.users` is owned by Supabase and must not be written to directly.
 
@@ -279,6 +281,7 @@ and inside the chat.
 | Family share | 15, done |
 | Web app shell, install hint, delete account, privacy policy | 16, done |
 | Password reset | 18 |
+| Launch posts and traffic counters (no new screen) | 19 |
 
 ---
 
@@ -371,3 +374,6 @@ and when it is done.
     Done
 18. @context/features/spec18-password-reset-and-email.md — password reset
     by code, Resend, email confirmation on. Not scheduled
+19. @context/features/spec19-launch-and-traffic.md — share the site on
+    every channel, Product Hunt last, and count visits and sign-ups per
+    channel. Not started

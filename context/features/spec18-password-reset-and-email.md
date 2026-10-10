@@ -2,7 +2,7 @@
 
 ## Overview
 
-Spec 18 of 18. Depends on spec 1 and spec 16. Not scheduled: the user
+Spec 18 of 19. Depends on spec 1 and spec 16. Not scheduled: the user
 left email out of the first release on 2026-10-09. Build it when
 travellers outside the team need to recover an account.
 

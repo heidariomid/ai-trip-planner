@@ -220,7 +220,7 @@ function PlaceCardView({ place, near: fallbackCity }: PlaceCardProps) {
 }
 
 /** The place on a day's stop, as the one link on the row: it opens Google Maps. */
-function PlaceLink({ place, near }: { place: string; near: string }) {
+function PlaceLink({ place, near, label }: { place: string; near: string; label?: string }) {
   return (
     <Pressable
       accessibilityRole="link"
@@ -230,7 +230,9 @@ function PlaceLink({ place, near }: { place: string; near: string }) {
       className="mt-0.5 flex-row items-center self-start active:opacity-60"
     >
       <MapPin size={12} color={colors.subtle} />
-      <Text className="ml-1 text-[13px] font-medium leading-[18px] text-ink">{place}</Text>
+      <Text className="ml-1 text-[13px] font-medium leading-[18px] text-ink">
+        {label ?? place}
+      </Text>
       <View className="ml-0.5">
         <ArrowUpRight size={12} color={colors.subtle} />
       </View>
@@ -331,6 +333,7 @@ function DayCardView({ day, cardKey, actions, near, isPartOfNewTrip }: DayCardPr
         {actions.canEditTrip && !isEditing ? (
           <CardAction
             label={isAdded ? "Added" : "Add to Trip"}
+            primary
             disabled={isAdded || isEmpty}
             onPress={() => actions.onAddDay(cardKey, current)}
           />
@@ -373,9 +376,10 @@ interface BookingCardProps {
   booking: BookingCard;
   cardKey: string;
   actions: ChatCardActions;
+  near: string;
 }
 
-function BookingCardView({ booking, cardKey, actions }: BookingCardProps) {
+function BookingCardView({ booking, cardKey, actions, near }: BookingCardProps) {
   const Icon = BOOKING_ICONS[booking.kind];
   const detail = getBookingDetail(booking);
   const isAdded = actions.isAdded(cardKey);
@@ -392,12 +396,18 @@ function BookingCardView({ booking, cardKey, actions }: BookingCardProps) {
           {detail ? (
             <Text className="mt-0.5 text-[13px] leading-[18px] text-subtle">{detail}</Text>
           ) : null}
+          {booking.kind === "hotel" ? (
+            <View className="mt-1">
+              <PlaceLink place={getBookingTitle(booking)} near={near} label="View on Google Maps" />
+            </View>
+          ) : null}
         </View>
       </View>
       {actions.canEditTrip ? (
         <View className="mt-3 flex-row">
           <CardAction
             label={isAdded ? "Added" : "Add to Bookings"}
+            primary
             disabled={isAdded}
             onPress={() => actions.onAddBooking(cardKey, booking)}
           />
@@ -436,6 +446,7 @@ function PackingCardView({ groups, cardKey, actions }: PackingCardProps) {
         <View className="mt-3 flex-row">
           <CardAction
             label={isAdded ? "Added" : "Add to Packing"}
+            primary
             disabled={isAdded}
             onPress={() => actions.onAddPacking(cardKey, groups)}
           />
@@ -516,6 +527,7 @@ export function ChatCards({ messageId, cards, actions, near, onPickChip }: ChatC
           booking={booking}
           cardKey={`${messageId}:booking:${index}`}
           actions={actions}
+          near={city}
         />
       ))}
 

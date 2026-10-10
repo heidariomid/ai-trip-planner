@@ -77,3 +77,6 @@
   buttons side by side with an AI icon
 - feat: add an account menu on Home's avatar, plan photos on Explore
   cards, Enter to send in the chat, and equal landing cards
+- feat: pin the question in the chat instead of following the reply,
+  fill the trip's Ask AI button and the chat's save buttons, and link
+  a hotel card to Google Maps

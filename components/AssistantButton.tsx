@@ -15,11 +15,11 @@ export function AssistantButton({ onPress }: AssistantButtonProps) {
       accessibilityRole="button"
       accessibilityLabel="Open this trip's chat with the assistant"
       onPress={onPress}
-      style={shadows.card}
-      className="h-12 flex-row items-center rounded-full bg-surface px-4 active:opacity-80"
+      style={shadows.accent}
+      className="h-14 flex-row items-center rounded-full bg-accent px-5 active:bg-accent-deep"
     >
-      <Sparkles size={18} color={colors.ink} />
-      <Text className="ml-2 text-[15px] font-semibold text-ink">Assistant</Text>
+      <Sparkles size={20} color={colors.surface} />
+      <Text className="ml-2 text-[16px] font-semibold text-white">Ask AI</Text>
     </Pressable>
   );
 }
