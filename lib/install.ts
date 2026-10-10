@@ -65,7 +65,9 @@ export async function promptInstall(): Promise<boolean> {
   }
 }
 
-function isStandalone(): boolean {
+/** The web app opened from its home screen icon, not in a browser tab. */
+export function isStandaloneWebApp(): boolean {
+  if (Platform.OS !== "web" || typeof window === "undefined") return false;
   const iosStandalone = (navigator as Navigator & { standalone?: boolean }).standalone === true;
   return iosStandalone || window.matchMedia("(display-mode: standalone)").matches;
 }
@@ -77,7 +79,7 @@ function isStandalone(): boolean {
  */
 export function getInstallDevice(): InstallDevice | null {
   if (Platform.OS !== "web" || typeof window === "undefined") return null;
-  if (isStandalone()) return null;
+  if (isStandaloneWebApp()) return null;
 
   const agent = navigator.userAgent;
   // An iPad asks for the desktop site and calls itself a Mac; the touch

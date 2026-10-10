@@ -11,7 +11,7 @@ card style that disagrees with this file, this file wins.
 
 ## The look
 
-Minimal and airy. A pale canvas, white cards, navy text, and one indigo
+Minimal and airy. A pale canvas, white cards, navy text, and one teal
 accent. Photos and destination art supply the colour; the interface
 stays quiet around them.
 
@@ -43,9 +43,9 @@ missing, add a token to `lib/theme.js` and list it here.
 | `subtle` | `#74778F` | Labels, captions, secondary text |
 | `muted` | `#B7B9C9` | Placeholders, inactive icons, disabled text |
 | `line` | `#E8E8F0` | Hairline borders and dividers |
-| `accent` | `#5038E0` | Primary button, active tab, links, the add button |
-| `accent-deep` | `#3E28C4` | Pressed state of an accent element |
-| `accent-soft` | `#EEEBFD` | Tinted background for a selected chip or an info message |
+| `accent` | `#0F766E` | Primary button, active tab, links, the add button |
+| `accent-deep` | `#0B5A53` | Pressed state of an accent element |
+| `accent-soft` | `#D9EFEB` | Tinted background for a selected chip or an info message |
 | `sky-soft` | `#E3F0FE` | One end of the wash on the AI planning card. Nowhere else |
 | `peach-soft` | `#FFEBDD` | The other end of that wash. Nowhere else |
 | `heart` | `#E5484D` | The filled heart of a saved place. Nowhere else |
@@ -405,6 +405,31 @@ Use these. Do not restyle them per screen.
 - The "Saved places" row on the Profile tab — a 56pt `surface` row with
   `rounded-2xl` and `shadows.soft`: an `ink` heart, the label in medium
   `ink`, the count in `subtle`, and a `muted` chevron
+
+- **Desktop layout** — from 1024px wide a browser is "wide"
+  (`useIsWide` in `hooks/useLayout.ts`; never the native app). The
+  floating tab bar is replaced by `components/Sidebar.tsx`: a 248pt
+  `surface` column with a `line` edge, the app icon and name, then
+  Home, My Trips, Explore, Assistant, and Profile as 48pt capsules. The
+  active one is `accent-soft` with `accent` text, like the active tab.
+  Content is capped by `useContentWidth`: 1040 for a list of cards
+  (Home, My Trips, Explore), which then shows two to a row; 720 for a
+  screen that is read (a trip, a plan, the chat, the lists); 520 for a
+  form and Profile. A cover is 320pt tall. Sheets and dialogs keep 380
+- **The landing page** — `components/landing/`, shown at `/` to a
+  signed-out visitor in a browser. It is marketing, drawn outside the
+  app's rules like `og-image.png`: a mesh of `sky-soft`, `peach-soft`,
+  and `accent-soft` on `canvas`, a glass nav, large type, and motion (fade-up on scroll, floating cards, a
+  ticker, and a phone that plays a conversation). Its CSS is built from
+  the tokens in `lib/landing-styles.ts` and added to the page at
+  runtime; those `lp-` classes are used nowhere in the app. It still
+  uses only the theme's colours. Its closing block is light, like the
+  mockup: a white-to-`canvas` card with a soft grey shadow, a white
+  seal holding an `ink` plane, an `ink` headline with a `muted` full
+  stop, and the `accent` button. No red and no dark block: the user
+  rejected both on 2026-10-10. Every section's eyebrow, headline, and
+  lead are centred through `SectionHeader`; the user does not want
+  section text pushed to one side
 
 A plan's picture is bundled, not private: `getExploreImage(key)` from
 `lib/explore-images.ts` returns it, or the placeholder for an unknown

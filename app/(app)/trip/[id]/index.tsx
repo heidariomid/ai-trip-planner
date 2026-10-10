@@ -48,6 +48,7 @@ import {
 } from "../../../../components/Photos";
 import { TripBanner } from "../../../../components/TripBanner";
 import { TripMenu } from "../../../../components/TripMenu";
+import { useContentWidth } from "../../../../hooks/useLayout";
 import { useBookings } from "../../../../hooks/useBookings";
 import { useNotes } from "../../../../hooks/useNotes";
 import { usePacking } from "../../../../hooks/usePacking";
@@ -87,6 +88,7 @@ function defaultDay(days: ItineraryDay[]): ItineraryDay | null {
 }
 
 export default function TripScreen() {
+  const maxWidth = useContentWidth("reading");
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
   const {
@@ -243,7 +245,7 @@ export default function TripScreen() {
             keyExtractor={(row) => row.key}
             showsVerticalScrollIndicator={false}
             keyboardShouldPersistTaps="handled"
-            contentContainerStyle={CONTENT_STYLE}
+            contentContainerStyle={{ ...CONTENT_STYLE, maxWidth }}
             ListHeaderComponent={
               <View className="pb-5">
                 <TripBanner

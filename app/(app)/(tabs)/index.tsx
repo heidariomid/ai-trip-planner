@@ -11,6 +11,12 @@ import { SectionHeader } from "../../../components/SectionHeader";
 import { TripCard } from "../../../components/TripCard";
 import { useAuth } from "../../../hooks/useAuth";
 import { useExplorePlans } from "../../../hooks/useExplorePlans";
+import {
+  GRID_ITEM_STYLE,
+  GRID_ROW_STYLE,
+  useContentWidth,
+  useGridColumns,
+} from "../../../hooks/useLayout";
 import { useProfile } from "../../../hooks/useProfile";
 import { useTabBarClearance } from "../../../hooks/useTabBar";
 import { useTrips } from "../../../hooks/useTrips";
@@ -25,6 +31,8 @@ export default function HomeScreen() {
   const { user } = useAuth();
   const { profile } = useProfile();
   const paddingBottom = useTabBarClearance();
+  const maxWidth = useContentWidth("grid");
+  const columns = useGridColumns();
   const trips = useTrips();
   const explore = useExplorePlans();
 
@@ -48,12 +56,15 @@ export default function HomeScreen() {
         <FlatList
           data={tripsToContinue}
           keyExtractor={(trip) => trip.id}
+          key={columns}
+          numColumns={columns}
+          columnWrapperStyle={columns > 1 ? GRID_ROW_STYLE : undefined}
           showsVerticalScrollIndicator={false}
           refreshing={trips.isRefreshing || explore.isRefreshing}
           onRefresh={refresh}
           contentContainerStyle={{
             width: "100%",
-            maxWidth: 420,
+            maxWidth,
             alignSelf: "center",
             paddingHorizontal: 20,
             paddingTop: 16,
@@ -95,7 +106,7 @@ export default function HomeScreen() {
             </View>
           }
           renderItem={({ item }) => (
-            <View className="mb-4">
+            <View className="mb-4" style={columns > 1 ? GRID_ITEM_STYLE : undefined}>
               <TripCard
                 trip={item}
                 onPress={() => router.push({ pathname: "/trip/[id]", params: { id: item.id } })}

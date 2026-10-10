@@ -13,6 +13,7 @@ import { FormMessage } from "../../../../components/FormMessage";
 import { PersonRow } from "../../../../components/PersonRow";
 import { RoundButton } from "../../../../components/RoundButton";
 import { Text } from "../../../../components/Text";
+import { useContentWidth } from "../../../../hooks/useLayout";
 import { useTripSharing } from "../../../../hooks/useTripSharing";
 import { formatJoinCode, type MemberRole, type TripPerson } from "../../../../lib/members";
 import { colors } from "../../../../lib/theme";
@@ -34,6 +35,7 @@ type Question = { kind: "remove"; person: TripPerson } | { kind: "regenerate" } 
 
 /** Who a trip is shared with, and for its owner the code that lets someone join. */
 export default function ShareTripScreen() {
+  const maxWidth = useContentWidth("reading");
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
   const sharing = useTripSharing(id);
@@ -102,7 +104,7 @@ export default function ShareTripScreen() {
           data={sharing.people}
           keyExtractor={(person) => person.id}
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={CONTENT_STYLE}
+          contentContainerStyle={{ ...CONTENT_STYLE, maxWidth }}
           ListHeaderComponent={
             <View>
               <RoundButton icon={ArrowLeft} accessibilityLabel="Go back" onPress={close} />

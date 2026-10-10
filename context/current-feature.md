@@ -71,3 +71,5 @@
 - chore: add the Vercel config so the web export is built and served
 - feat: release the web app with a first-screen line, a link preview,
   a daily keep-alive, and release notes (spec 17)
+- feat: add a landing page, a desktop layout with a sidebar, and a teal
+  accent with a recoloured icon

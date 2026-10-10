@@ -10,6 +10,7 @@ import { EmptyState } from "../../components/EmptyState";
 import { FormMessage } from "../../components/FormMessage";
 import { RoundButton } from "../../components/RoundButton";
 import { Text } from "../../components/Text";
+import { useContentWidth } from "../../hooks/useLayout";
 import { useChatThreads } from "../../hooks/useChatThreads";
 import type { ChatThreadSummary } from "../../lib/chat";
 import { formatDate, toISODate } from "../../lib/dates";
@@ -32,6 +33,7 @@ function describe(thread: ChatThreadSummary): string {
 
 /** Every conversation the traveller has had with the assistant, newest first. */
 export default function ChatHistoryScreen() {
+  const maxWidth = useContentWidth("reading");
   const router = useRouter();
   const { threads, isLoading, error, removeThread } = useChatThreads();
   const [deleting, setDeleting] = useState<ChatThreadSummary | null>(null);
@@ -69,7 +71,7 @@ export default function ChatHistoryScreen() {
           data={threads}
           keyExtractor={(thread) => thread.id}
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={CONTENT_STYLE}
+          contentContainerStyle={{ ...CONTENT_STYLE, maxWidth }}
           ListHeaderComponent={
             <View>
               <RoundButton icon={ArrowLeft} accessibilityLabel="Go back" onPress={close} />

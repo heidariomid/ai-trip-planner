@@ -2,6 +2,7 @@ import { ArrowLeft } from "lucide-react-native";
 import { Image, View } from "react-native";
 
 import type { ExplorePlanDetail } from "../lib/explore";
+import { useIsWide } from "../hooks/useLayout";
 import { getExploreImage } from "../lib/explore-images";
 import { Fact } from "./Fact";
 import { RoundButton } from "./RoundButton";
@@ -15,9 +16,11 @@ export interface PlanBannerProps {
 // A style object, not classes: on web a class does not override the intrinsic
 // size of a bundled image.
 const COVER_SIZE = { width: "100%", height: 200 } as const;
+const WIDE_COVER_SIZE = { width: "100%", height: 320 } as const;
 
 /** The top of a curated plan. No dates and no status: a plan has neither. */
 export function PlanBanner({ plan, onBack }: PlanBannerProps) {
+  const isWide = useIsWide();
   const placeCount = plan.days.reduce((total, day) => total + day.activities.length, 0);
 
   return (
@@ -26,7 +29,7 @@ export function PlanBanner({ plan, onBack }: PlanBannerProps) {
         <Image
           source={getExploreImage(plan.image_key)}
           resizeMode="cover"
-          style={COVER_SIZE}
+          style={isWide ? WIDE_COVER_SIZE : COVER_SIZE}
           className="rounded-card bg-canvas"
           accessible={false}
         />

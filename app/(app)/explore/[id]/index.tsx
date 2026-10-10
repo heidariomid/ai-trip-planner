@@ -9,6 +9,7 @@ import { DayChips } from "../../../../components/DayChips";
 import { EmptyState } from "../../../../components/EmptyState";
 import { PlanBanner } from "../../../../components/PlanBanner";
 import { Text } from "../../../../components/Text";
+import { useContentWidth } from "../../../../hooks/useLayout";
 import { useExplorePlan } from "../../../../hooks/useExplorePlan";
 import { pluralize } from "../../../../lib/dates";
 import { colors } from "../../../../lib/theme";
@@ -23,6 +24,7 @@ const CONTENT_STYLE = {
 } as const;
 
 export default function ExplorePlanScreen() {
+  const maxWidth = useContentWidth("reading");
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
   const { plan, isLoading, isMissing, error } = useExplorePlan(id);
@@ -65,7 +67,7 @@ export default function ExplorePlanScreen() {
           data={activities}
           keyExtractor={(activity) => activity.id}
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={CONTENT_STYLE}
+          contentContainerStyle={{ ...CONTENT_STYLE, maxWidth }}
           ListHeaderComponent={
             <View className="pb-5">
               <PlanBanner plan={plan} onBack={goBack} />

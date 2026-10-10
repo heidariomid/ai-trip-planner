@@ -9,6 +9,7 @@ import { EmptyState } from "../../components/EmptyState";
 import { FormMessage } from "../../components/FormMessage";
 import { RoundButton } from "../../components/RoundButton";
 import { Text } from "../../components/Text";
+import { useContentWidth } from "../../hooks/useLayout";
 import { useSavedPlaces } from "../../hooks/useSavedPlaces";
 import { openInMaps } from "../../lib/maps";
 import type { SavedPlace } from "../../lib/saved-places";
@@ -30,6 +31,7 @@ function describe(place: SavedPlace): string {
 
 /** The places the traveller put a heart on in the chat, newest first. */
 export default function SavedPlacesScreen() {
+  const maxWidth = useContentWidth("reading");
   const router = useRouter();
   const { places, isLoading, error, refresh, toggle } = useSavedPlaces();
   const [removeError, setRemoveError] = useState<string | null>(null);
@@ -57,7 +59,7 @@ export default function SavedPlacesScreen() {
           data={places}
           keyExtractor={(place) => place.id}
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={CONTENT_STYLE}
+          contentContainerStyle={{ ...CONTENT_STYLE, maxWidth }}
           ListHeaderComponent={
             <View>
               <RoundButton icon={ArrowLeft} accessibilityLabel="Go back" onPress={close} />

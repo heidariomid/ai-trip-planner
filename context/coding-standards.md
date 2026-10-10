@@ -52,7 +52,7 @@
   missing, add a token to `lib/theme.js`
 - **The look is minimal and airy, and that is a product decision, not a
   preference.** A pale `canvas`, white `surface` cards with a soft
-  shadow, navy `ink` text, grey `subtle` labels, and one indigo `accent`.
+  shadow, navy `ink` text, grey `subtle` labels, and one teal `accent`.
   The accent is rare on purpose: primary action, active state, links. A
   screen with three accent elements has two too many. **No gradients
   (except the pale wash on the AI planning card on Home), no blur, no

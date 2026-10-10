@@ -2,6 +2,7 @@ import type { BottomTabBarProps } from "expo-router/js-tabs";
 import { Briefcase, House, User, type LucideIcon } from "lucide-react-native";
 import { Pressable, View } from "react-native";
 
+import { useIsWide } from "../hooks/useLayout";
 import { useTabBarOffset } from "../hooks/useTabBar";
 import { colors, shadows } from "../lib/theme";
 import { Text } from "./Text";
@@ -15,6 +16,10 @@ const ICONS: Record<string, LucideIcon> = {
 /** The floating capsule. It sits over the content, so each tab pads its own list. */
 export function TabBar({ state, descriptors, navigation }: BottomTabBarProps) {
   const bottom = useTabBarOffset();
+  const isWide = useIsWide();
+
+  // A desktop has the sidebar.
+  if (isWide) return null;
 
   return (
     <View

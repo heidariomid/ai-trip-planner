@@ -22,6 +22,7 @@ import { Text } from "../../components/Text";
 import { TripPicker } from "../../components/TripPicker";
 import { useChat } from "../../hooks/useChat";
 import { useChatActions } from "../../hooks/useChatActions";
+import { useContentWidth } from "../../hooks/useLayout";
 import { useTrips } from "../../hooks/useTrips";
 import type { ChatMessage } from "../../lib/chat";
 import { describeBooking, describePacking, setPendingPlan } from "../../lib/chat-actions";
@@ -42,6 +43,7 @@ const STARTERS_WITHOUT_TRIP = [
 const LIST_CONTENT = { paddingTop: 12, paddingBottom: 8, flexGrow: 1 } as const;
 
 export default function ChatScreen() {
+  const maxWidth = useContentWidth("reading");
   const router = useRouter();
   // `draft` is a message to open with, typed and not sent. `fresh` opens an
   // empty conversation instead of the newest one, and `threadId` a saved one.
@@ -127,7 +129,7 @@ export default function ChatScreen() {
           behavior={Platform.OS === "ios" ? "padding" : "height"}
         >
           <View className="flex-1 items-center px-5 pt-4">
-            <View className="w-full max-w-[420px] flex-1">
+            <View style={{ maxWidth }} className="w-full flex-1">
               <View className="flex-row items-center justify-between">
                 {/* As wide as the two buttons on the right, so the title stays centred. */}
                 <View className="w-24">

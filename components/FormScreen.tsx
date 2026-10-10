@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { KeyboardAvoidingView, Platform, Pressable, ScrollView, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { useContentWidth } from "../hooks/useLayout";
 import { colors, shadows } from "../lib/theme";
 import { Card } from "./Card";
 import { Text } from "./Text";
@@ -15,6 +16,8 @@ export interface FormScreenProps {
 
 /** A pushed screen holding one form: back button, title, card, keyboard handling. */
 export function FormScreen({ title, onBack, children }: FormScreenProps) {
+  const maxWidth = useContentWidth("form");
+
   return (
     <View className="flex-1 bg-canvas">
       <SafeAreaView className="flex-1" edges={["top", "bottom"]}>
@@ -28,7 +31,7 @@ export function FormScreen({ title, onBack, children }: FormScreenProps) {
             showsVerticalScrollIndicator={false}
           >
             <View className="items-center px-5 pb-10 pt-4">
-              <View className="w-full max-w-[380px]">
+              <View style={{ maxWidth }} className="w-full">
                 <Pressable
                   accessibilityRole="button"
                   accessibilityLabel="Go back"

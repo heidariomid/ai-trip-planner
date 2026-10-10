@@ -8,6 +8,12 @@ import { EmptyState } from "../../../components/EmptyState";
 import { FormMessage } from "../../../components/FormMessage";
 import { Text } from "../../../components/Text";
 import { TripCard } from "../../../components/TripCard";
+import {
+  GRID_ITEM_STYLE,
+  GRID_ROW_STYLE,
+  useContentWidth,
+  useGridColumns,
+} from "../../../hooks/useLayout";
 import { useTabBarClearance } from "../../../hooks/useTabBar";
 import { useTrips } from "../../../hooks/useTrips";
 import { colors } from "../../../lib/theme";
@@ -18,6 +24,8 @@ export default function TripsScreen() {
   const router = useRouter();
   const { trips, isLoading, isRefreshing, error, refresh } = useTrips();
   const tabBarClearance = useTabBarClearance();
+  const maxWidth = useContentWidth("grid");
+  const columns = useGridColumns();
   const hasTrips = trips.length > 0;
 
   function openForm() {
@@ -30,12 +38,15 @@ export default function TripsScreen() {
         <FlatList
           data={trips}
           keyExtractor={(trip) => trip.id}
+          key={columns}
+          numColumns={columns}
+          columnWrapperStyle={columns > 1 ? GRID_ROW_STYLE : undefined}
           showsVerticalScrollIndicator={false}
           refreshing={isRefreshing}
           onRefresh={refresh}
           contentContainerStyle={{
             width: "100%",
-            maxWidth: 420,
+            maxWidth,
             alignSelf: "center",
             paddingHorizontal: 20,
             paddingTop: 16,
@@ -51,7 +62,7 @@ export default function TripsScreen() {
             </View>
           }
           renderItem={({ item }) => (
-            <View className="mb-4">
+            <View className="mb-4" style={columns > 1 ? GRID_ITEM_STYLE : undefined}>
               <TripCard
                 trip={item}
                 onPress={() =>
@@ -81,7 +92,7 @@ export default function TripsScreen() {
             style={{ bottom: tabBarClearance, pointerEvents: "box-none" }}
             className="absolute left-0 right-0 items-center px-5"
           >
-            <View className="w-full max-w-[380px] items-end">
+            <View style={{ maxWidth: maxWidth - 40 }} className="w-full items-end">
               <AddButton
                 accessibilityLabel="Create a trip"
                 onPress={openForm}

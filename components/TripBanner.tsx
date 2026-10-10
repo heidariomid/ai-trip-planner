@@ -2,6 +2,7 @@ import { ArrowLeft, CalendarDays, Ellipsis, Users } from "lucide-react-native";
 import { Image, Pressable, View } from "react-native";
 
 import { useImageSource } from "../hooks/useImageSource";
+import { useIsWide } from "../hooks/useLayout";
 import { countDays, formatDateRange, getTripStatus, pluralize } from "../lib/dates";
 import { colors, shadows } from "../lib/theme";
 import type { TripDetail } from "../lib/trip-detail";
@@ -20,9 +21,12 @@ export interface TripBannerProps {
 // A style object, not classes: the placeholder is a bundled image, and on web
 // a class does not override its intrinsic size.
 const COVER_SIZE = { width: "100%", height: 200 } as const;
+// A wider screen gives the cover more room, so it keeps its shape.
+const WIDE_COVER_SIZE = { width: "100%", height: 320 } as const;
 
 export function TripBanner({ trip, onBack, onShare, onOpenMenu }: TripBannerProps) {
   const cover = useImageSource(trip.image_path);
+  const isWide = useIsWide();
   const status = getTripStatus(trip.start_date, trip.end_date);
 
   return (
@@ -31,7 +35,7 @@ export function TripBanner({ trip, onBack, onShare, onOpenMenu }: TripBannerProp
         <Image
           source={cover}
           resizeMode="cover"
-          style={COVER_SIZE}
+          style={isWide ? WIDE_COVER_SIZE : COVER_SIZE}
           className="rounded-card bg-canvas"
           accessible={false}
         />

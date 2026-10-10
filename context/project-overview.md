@@ -108,6 +108,13 @@ Specs 1 through 17 are done, and the site is live at
   title, description, and picture, and Vercel calls `/api/keep-alive`
   once a day so the free Supabase project does not pause
 
+- A signed-out visitor in a browser sees a landing page at `/` instead
+  of Sign In, and a browser at least 1024px wide gets a desktop layout
+  with a sidebar, wider content, and two cards to a row. The accent is
+  teal and the icon is recoloured to match. The landing page was checked
+  on web at phone, tablet, and desktop widths; the signed-in desktop
+  screens were not
+
 No app build has been deployed: no EAS build, no store listing. The
 `chat`, `place-photo`, and `trip-cover` Edge Functions are deployed on
 the Supabase project.

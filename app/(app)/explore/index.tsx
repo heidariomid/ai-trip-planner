@@ -11,6 +11,12 @@ import { FormMessage } from "../../../components/FormMessage";
 import { RoundButton } from "../../../components/RoundButton";
 import { Text } from "../../../components/Text";
 import { useExplorePlans } from "../../../hooks/useExplorePlans";
+import {
+  GRID_ITEM_STYLE,
+  GRID_ROW_STYLE,
+  useContentWidth,
+  useGridColumns,
+} from "../../../hooks/useLayout";
 import { colors } from "../../../lib/theme";
 
 const CONTENT_STYLE = {
@@ -26,6 +32,8 @@ const CONTENT_STYLE = {
 export default function ExploreScreen() {
   const router = useRouter();
   const { plans, isLoading, isRefreshing, error, refresh } = useExplorePlans();
+  const maxWidth = useContentWidth("grid");
+  const columns = useGridColumns();
   const [category, setCategory] = useState<string | null>(null);
 
   // The chip filters the plans already loaded. It is not a new request.
@@ -43,10 +51,13 @@ export default function ExploreScreen() {
         <FlatList
           data={shown}
           keyExtractor={(plan) => plan.id}
+          key={columns}
+          numColumns={columns}
+          columnWrapperStyle={columns > 1 ? GRID_ROW_STYLE : undefined}
           showsVerticalScrollIndicator={false}
           refreshing={isRefreshing}
           onRefresh={refresh}
-          contentContainerStyle={CONTENT_STYLE}
+          contentContainerStyle={{ ...CONTENT_STYLE, maxWidth }}
           ListHeaderComponent={
             <View className="pb-5">
               <View className="mb-5 self-start">
@@ -64,7 +75,7 @@ export default function ExploreScreen() {
             </View>
           }
           renderItem={({ item }) => (
-            <View className="mb-4">
+            <View className="mb-4" style={columns > 1 ? GRID_ITEM_STYLE : undefined}>
               <ExploreCard
                 plan={item}
                 onPress={() =>
