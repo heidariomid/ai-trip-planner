@@ -162,13 +162,15 @@ export default function ProfileScreen() {
           disabled={isSigningOut}
           onPress={() => void handleSignOut()}
           style={shadows.soft}
-          className={`min-h-[56px] flex-row items-center rounded-2xl bg-surface px-4 active:bg-canvas ${
+          className={`min-h-[56px] flex-row items-center rounded-2xl bg-surface px-3 active:bg-danger-soft ${
             isSigningOut ? "opacity-45" : ""
           }`}
         >
-          <LogOut size={18} color={colors.ink} />
-          <Text className="ml-3 flex-1 text-[15px] font-medium text-ink">Sign out</Text>
-          {isSigningOut ? <ActivityIndicator size="small" color={colors.ink} /> : null}
+          <View className="h-8 w-8 items-center justify-center rounded-full bg-danger-soft">
+            <LogOut size={16} color={colors.danger} />
+          </View>
+          <Text className="ml-2.5 flex-1 text-[15px] font-medium text-danger">Sign out</Text>
+          {isSigningOut ? <ActivityIndicator size="small" color={colors.danger} /> : null}
         </Pressable>
       </View>
 

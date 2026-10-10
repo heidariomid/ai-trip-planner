@@ -27,22 +27,45 @@ interface MenuRowProps {
   onPress: () => void;
   disabled?: boolean;
   busy?: boolean;
+  /** Red, with the icon on a tinted circle. For Sign out. */
+  danger?: boolean;
 }
 
-function MenuRow({ icon: Icon, label, onPress, disabled = false, busy = false }: MenuRowProps) {
+function MenuRow({
+  icon: Icon,
+  label,
+  onPress,
+  disabled = false,
+  busy = false,
+  danger = false,
+}: MenuRowProps) {
+  const color = danger ? colors.danger : colors.ink;
+
   return (
     <Pressable
       accessibilityRole="button"
       accessibilityState={{ disabled, busy }}
       disabled={disabled}
       onPress={onPress}
-      className={`h-12 flex-row items-center rounded-2xl px-2 active:bg-canvas ${
-        disabled ? "opacity-45" : ""
-      }`}
+      className={`h-12 flex-row items-center rounded-2xl px-2 ${
+        danger ? "active:bg-danger-soft" : "active:bg-canvas"
+      } ${disabled ? "opacity-45" : ""}`}
     >
-      <Icon size={18} color={colors.ink} />
-      <Text className="ml-3 flex-1 text-[16px] font-medium text-ink">{label}</Text>
-      {busy ? <ActivityIndicator size="small" color={colors.ink} /> : null}
+      {danger ? (
+        <View className="-ml-1.5 h-8 w-8 items-center justify-center rounded-full bg-danger-soft">
+          <Icon size={16} color={color} />
+        </View>
+      ) : (
+        <Icon size={18} color={color} />
+      )}
+      <Text
+        className={`flex-1 text-[16px] font-medium ${
+          danger ? "ml-2 text-danger" : "ml-3 text-ink"
+        }`}
+      >
+        {label}
+      </Text>
+      {busy ? <ActivityIndicator size="small" color={color} /> : null}
     </Pressable>
   );
 }
@@ -95,6 +118,7 @@ export function ProfileMenu({
             <MenuRow
               icon={LogOut}
               label="Sign out"
+              danger
               onPress={onSignOut}
               disabled={isSigningOut}
               busy={isSigningOut}

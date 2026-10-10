@@ -97,7 +97,7 @@ export function LandingHero() {
           </Reveal>
         </View>
 
-        <Reveal delay={2} className="mt-16 items-center md:mt-0 md:w-[330px] lg:w-[460px]">
+        <Reveal eager delay={2} className="mt-12 items-center md:mt-0 md:w-[330px] lg:w-[460px]">
           <View>
             <PhoneDemo />
 

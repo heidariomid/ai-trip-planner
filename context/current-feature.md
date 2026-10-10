@@ -84,3 +84,5 @@
   say so in the privacy policy
 - feat: measure page speed on the website with Vercel Speed Insights and
   say so in the privacy policy
+- fix: show the landing phone on load so the first screen invites
+  scrolling, and draw Sign out in red in the account menu and on Profile

@@ -22,6 +22,7 @@ stays quiet around them.
   accent colour. The one exception is the AI planning card on Home,
   which carries a pale sky-to-peach wash. Do not spread it
 - Red is for errors only, apart from the `heart` token on a saved place
+  and `danger` on Sign out
 
 ---
 
@@ -49,6 +50,8 @@ missing, add a token to `lib/theme.js` and list it here.
 | `sky-soft` | `#E3F0FE` | One end of the wash on the AI planning card. Nowhere else |
 | `peach-soft` | `#FFEBDD` | The other end of that wash. Nowhere else |
 | `heart` | `#E5484D` | The filled heart of a saved place. Nowhere else |
+| `danger` | `#DC2626` | The icon and label of Sign out |
+| `danger-soft` | `#FEE2E2` | The circle behind the Sign out icon, and that row while pressed |
 
 | Shadow | Use |
 | --- | --- |
@@ -169,7 +172,8 @@ Use these. Do not restyle them per screen.
   button that opens `components/ProfileMenu.tsx`: a sheet at the bottom
   like `TripMenu`, with the name and email, then Profile, Edit profile,
   and Saved places, a `line` divider, and Sign out. Nothing in it is
-  `accent`. The ask bar is a card with a pale wash from `sky-soft`
+  `accent`. Sign out is red (user request, 2026-10-10): a 16pt icon in
+  `danger` on a 32pt `danger-soft` circle, and the label in `danger`. The ask bar is a card with a pale wash from `sky-soft`
   through `surface` to `peach-soft`, corner to corner (user decision,
   2026-10-08, picked over flat mint, sky, and sand after pure white
   felt too plain), with a `surface` edge and `shadows.card`, a small
@@ -398,7 +402,8 @@ Use these. Do not restyle them per screen.
   in medium `ink`, and a `muted` chevron. The profile card has a `muted`
   pencil with a 44pt target on its top right, which opens Edit profile.
   After a wider gap "Sign out" is a fourth row of the same shape with
-  no chevron, and under it sits "Delete account": 14px medium red text
+  no chevron, drawn in red like the one in the account menu (a `danger`
+  icon on a `danger-soft` circle and a `danger` label), and under it sits "Delete account": 14px medium red text
   with a 44pt target and no border or fill, which opens a
   `ConfirmDialog`. The tab has no capsule buttons (user request,
   2026-10-10: three stacked buttons looked messy). It is red because it destroys
