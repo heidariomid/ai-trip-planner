@@ -14,6 +14,7 @@ import { useEffect } from "react";
 import { ActivityIndicator, View } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
+import { WebAnalytics } from "../components/WebAnalytics";
 import { AuthProvider, useAuth } from "../hooks/useAuth";
 import { colors } from "../lib/theme";
 
@@ -44,6 +45,7 @@ export default function RootLayout() {
     <SafeAreaProvider>
       <AuthProvider>
         <RootNavigator />
+        <WebAnalytics />
         <StatusBar style="dark" />
       </AuthProvider>
     </SafeAreaProvider>

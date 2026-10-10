@@ -80,3 +80,5 @@
 - feat: pin the question in the chat instead of following the reply,
   fill the trip's Ask AI button and the chat's save buttons, and link
   a hotel card to Google Maps
+- feat: count page views on the website with Vercel Web Analytics and
+  say so in the privacy policy
