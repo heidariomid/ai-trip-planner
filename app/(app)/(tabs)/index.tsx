@@ -1,4 +1,5 @@
 import { useRouter } from "expo-router";
+import { useState } from "react";
 import { ActivityIndicator, FlatList, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -7,6 +8,7 @@ import { EmptyState } from "../../../components/EmptyState";
 import { FormMessage } from "../../../components/FormMessage";
 import { HomeHeader } from "../../../components/HomeHeader";
 import { PopularDestinations } from "../../../components/PopularDestinations";
+import { ProfileMenu } from "../../../components/ProfileMenu";
 import { SectionHeader } from "../../../components/SectionHeader";
 import { TripCard } from "../../../components/TripCard";
 import { useAuth } from "../../../hooks/useAuth";
@@ -20,6 +22,7 @@ import {
 import { useProfile } from "../../../hooks/useProfile";
 import { useTabBarClearance } from "../../../hooks/useTabBar";
 import { useTrips } from "../../../hooks/useTrips";
+import { signOut } from "../../../lib/auth";
 import { getTripStatus } from "../../../lib/dates";
 import { colors } from "../../../lib/theme";
 
@@ -36,6 +39,11 @@ export default function HomeScreen() {
   const trips = useTrips();
   const explore = useExplorePlans();
 
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isSigningOut, setIsSigningOut] = useState(false);
+  const [signOutError, setSignOutError] = useState<string | null>(null);
+
+  const email = profile?.email ?? user?.email ?? "";
   const name = profile?.full_name ?? user?.email ?? "Traveller";
   const tripsToContinue = trips.trips
     // A draft is not a trip yet. It waits on My Trips until it is moved there.
@@ -44,6 +52,28 @@ export default function HomeScreen() {
         trip.status !== "draft" && getTripStatus(trip.start_date, trip.end_date) !== "Past",
     )
     .slice(0, MAX_TRIPS_ON_HOME);
+
+  function closeMenu() {
+    setIsMenuOpen(false);
+    setSignOutError(null);
+  }
+
+  // The sheet closes first, so it is not left open over the screen it opened.
+  function openFromMenu(path: "/profile" | "/edit-profile" | "/saved-places") {
+    closeMenu();
+    router.push(path);
+  }
+
+  // A sign-out that works removes this screen: the route guard shows the
+  // signed-out side, so there is nothing to close.
+  async function handleSignOut() {
+    setSignOutError(null);
+    setIsSigningOut(true);
+    const result = await signOut();
+    if (result.success) return;
+    setIsSigningOut(false);
+    setSignOutError(result.error);
+  }
 
   function refresh() {
     trips.refresh();
@@ -77,6 +107,7 @@ export default function HomeScreen() {
                 avatarUrl={profile?.avatar_url}
                 avatarPath={profile?.avatar_path}
                 onAsk={() => router.push("/chat")}
+                onOpenMenu={() => setIsMenuOpen(true)}
               />
 
               <View className="mt-5">
@@ -126,6 +157,19 @@ export default function HomeScreen() {
           }
         />
       </SafeAreaView>
+
+      <ProfileMenu
+        visible={isMenuOpen}
+        name={name}
+        email={email}
+        onOpenProfile={() => openFromMenu("/profile")}
+        onEditProfile={() => openFromMenu("/edit-profile")}
+        onOpenSavedPlaces={() => openFromMenu("/saved-places")}
+        onSignOut={() => void handleSignOut()}
+        isSigningOut={isSigningOut}
+        error={signOutError}
+        onClose={closeMenu}
+      />
     </View>
   );
 }

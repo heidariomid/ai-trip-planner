@@ -1,6 +1,7 @@
 import { Image, Pressable, View } from "react-native";
 
 import type { ExplorePlan } from "../lib/explore";
+import { getExploreImage } from "../lib/explore-images";
 import { Card } from "./Card";
 import { Fact } from "./Fact";
 import { Text } from "./Text";
@@ -12,9 +13,9 @@ export interface ExploreCardProps {
 
 // A style object, not classes: on web a class does not override the intrinsic
 // size of a bundled image.
-const MAP_SIZE = { width: 92, height: "100%", minHeight: 132 } as const;
+const PICTURE_SIZE = { width: 92, height: "100%", minHeight: 132 } as const;
 
-/** A curated plan on Home. The map is art; the plan's own picture is on its screen. */
+/** A curated plan in the Explore list, with its own picture on the right. */
 export function ExploreCard({ plan, onPress }: ExploreCardProps) {
   return (
     <Pressable
@@ -46,10 +47,10 @@ export function ExploreCard({ plan, onPress }: ExploreCardProps) {
           </View>
 
           <Image
-            source={require("../assets/explore/map.png")}
+            source={getExploreImage(plan.image_key)}
             resizeMode="cover"
-            style={MAP_SIZE}
-            className="rounded-2xl"
+            style={PICTURE_SIZE}
+            className="rounded-2xl bg-canvas"
             accessible={false}
           />
         </View>

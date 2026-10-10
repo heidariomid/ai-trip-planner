@@ -10,8 +10,6 @@ interface Destination {
   place: string;
   country: string;
   picture: ImageSourcePropType;
-  /** Tailwind height for the desktop row, so the cards step up and down. */
-  height: string;
 }
 
 // The five curated plans the app ships with.
@@ -20,31 +18,26 @@ const DESTINATIONS: Destination[] = [
     place: "Swiss Alps",
     country: "Switzerland",
     picture: require("../../assets/explore/alps.jpg"),
-    height: "lg:h-[380px]",
   },
   {
     place: "Dubai",
     country: "United Arab Emirates",
     picture: require("../../assets/explore/dubai.jpg"),
-    height: "lg:h-[440px]",
   },
   {
     place: "Chicago",
     country: "United States",
     picture: require("../../assets/explore/chicago.jpg"),
-    height: "lg:h-[380px]",
   },
   {
     place: "Los Angeles",
     country: "United States",
     picture: require("../../assets/explore/los-angeles.jpg"),
-    height: "lg:h-[440px]",
   },
   {
     place: "Lake Tahoe",
     country: "United States",
     picture: require("../../assets/explore/tahoe.jpg"),
-    height: "lg:h-[380px]",
   },
 ];
 
@@ -62,12 +55,12 @@ export function LandingDestinations() {
         />
       </Reveal>
 
-      <View className="mt-12 flex-row flex-wrap justify-between lg:mt-16 lg:flex-nowrap lg:items-end lg:gap-4">
+      <View className="mt-12 flex-row flex-wrap justify-between lg:mt-16 lg:flex-nowrap lg:gap-4">
         {DESTINATIONS.map((destination, index) => (
           <Reveal
             key={destination.place}
             delay={Math.min(index, 4) as 0 | 1 | 2 | 3 | 4}
-            className={`mb-4 h-[220px] lg:mb-0 lg:w-auto lg:flex-1 ${destination.height} ${
+            className={`mb-4 h-[220px] lg:mb-0 lg:h-[420px] lg:w-auto lg:flex-1 ${
               index === 0 ? "w-full" : "w-[48.2%]"
             }`}
           >

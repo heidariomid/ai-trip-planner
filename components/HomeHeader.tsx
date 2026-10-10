@@ -1,4 +1,4 @@
-import { View } from "react-native";
+import { Pressable, View } from "react-native";
 
 import { useCurrentHour } from "../hooks/useCurrentHour";
 import { AskBar } from "./AskBar";
@@ -11,6 +11,8 @@ export interface HomeHeaderProps {
   /** An uploaded avatar. Shown instead of `avatarUrl` when set. */
   avatarPath?: string | null;
   onAsk: () => void;
+  /** The avatar is a button that opens the account menu. */
+  onOpenMenu: () => void;
 }
 
 const MORNING_STARTS = 5;
@@ -30,7 +32,13 @@ function getFirstName(name: string): string {
 }
 
 /** The top of Home: the greeting, the avatar, and the AI planning card. */
-export function HomeHeader({ name, avatarUrl, avatarPath, onAsk }: HomeHeaderProps) {
+export function HomeHeader({
+  name,
+  avatarUrl,
+  avatarPath,
+  onAsk,
+  onOpenMenu,
+}: HomeHeaderProps) {
   const hour = useCurrentHour();
 
   return (
@@ -40,7 +48,14 @@ export function HomeHeader({ name, avatarUrl, avatarPath, onAsk }: HomeHeaderPro
           {getGreeting(hour)}{" "}
           <Text className="font-bold text-ink">{getFirstName(name)}</Text>
         </Text>
-        <Avatar path={avatarPath} uri={avatarUrl} name={name} />
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="Open the account menu"
+          onPress={onOpenMenu}
+          className="rounded-full active:opacity-70"
+        >
+          <Avatar path={avatarPath} uri={avatarUrl} name={name} />
+        </Pressable>
       </View>
 
       <AskBar onPress={onAsk} />

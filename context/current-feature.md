@@ -75,3 +75,5 @@
   accent with a recoloured icon
 - fix: centre the landing buttons on a phone and put the plan's two
   buttons side by side with an AI icon
+- feat: add an account menu on Home's avatar, plan photos on Explore
+  cards, Enter to send in the chat, and equal landing cards

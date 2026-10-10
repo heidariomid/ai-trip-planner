@@ -1,10 +1,34 @@
 import { ArrowUp, Square } from "lucide-react-native";
 import { useState } from "react";
-import { Pressable, TextInput, View } from "react-native";
+import {
+  Platform,
+  Pressable,
+  TextInput,
+  View,
+  type NativeSyntheticEvent,
+  type TextInputKeyPressEventData,
+} from "react-native";
 
 import { MAX_CHAT_MESSAGE_LENGTH } from "../lib/chat";
 import { hasPersian, isRightToLeft, RIGHT_TO_LEFT } from "../lib/persian";
 import { colors, shadows } from "../lib/theme";
+
+/** What a browser adds to a key press. React Native's own event has only `key`. */
+interface WebKeyPress extends TextInputKeyPressEventData {
+  shiftKey?: boolean;
+  isComposing?: boolean;
+}
+
+// A real keyboard: Enter sends and Shift+Enter starts a new line. A phone's
+// on-screen keyboard keeps Enter for a new line, because it has no Shift to
+// hold and the send button is under the thumb.
+function hasHardwareKeyboard(): boolean {
+  return (
+    Platform.OS === "web" &&
+    typeof window !== "undefined" &&
+    !window.matchMedia("(pointer: coarse)").matches
+  );
+}
 
 export interface ChatComposerProps {
   /** A message already typed when the screen opens. It is not sent. */
@@ -30,6 +54,14 @@ export function ChatComposer({
     setText("");
   }
 
+  function handleKeyPress(event: NativeSyntheticEvent<WebKeyPress>) {
+    const { key, shiftKey, isComposing } = event.nativeEvent;
+    // Enter also confirms a word while typing Chinese, Japanese, or Korean.
+    if (key !== "Enter" || shiftKey || isComposing || !hasHardwareKeyboard()) return;
+    event.preventDefault();
+    submit();
+  }
+
   return (
     <View
       style={shadows.soft}
@@ -43,6 +75,7 @@ export function ChatComposer({
         selectionColor={colors.accent}
         cursorColor={colors.accent}
         multiline
+        onKeyPress={handleKeyPress}
         maxLength={MAX_CHAT_MESSAGE_LENGTH}
         accessibilityLabel="Message"
         style={isRightToLeft(text) ? RIGHT_TO_LEFT : undefined}

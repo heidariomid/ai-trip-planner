@@ -147,7 +147,9 @@ Use these. Do not restyle them per screen.
   and `uri` for a public or local one, and never shows the grey
   placeholder: no picture means the letter
 - `components/ExploreCard.tsx` — a `Card` with a title, facts as label
-  above value, tags as `canvas` capsules, and the static map picture.
+  above value, tags as `canvas` capsules, and the plan's own bundled
+  picture as a 92pt image on the right (user request, 2026-10-10; it
+  replaced a static map drawing that read as a placeholder).
   It opens the plan
 - `components/Fact.tsx` — one fact: a small `subtle` label above a bold
   `ink` value
@@ -163,7 +165,11 @@ Use these. Do not restyle them per screen.
   whole ask bar is one button that opens the assistant. The
   header is one 22px line, a `subtle` greeting then the first name in
   bold `ink`. Nothing after the name: no emoji and no icon (the user
-  found both ugly, 2026-10-08). The avatar is on the right. The ask bar is a card with a pale wash from `sky-soft`
+  found both ugly, 2026-10-08). The avatar is on the right, and it is a
+  button that opens `components/ProfileMenu.tsx`: a sheet at the bottom
+  like `TripMenu`, with the name and email, then Profile, Edit profile,
+  and Saved places, a `line` divider, and Sign out. Nothing in it is
+  `accent`. The ask bar is a card with a pale wash from `sky-soft`
   through `surface` to `peach-soft`, corner to corner (user decision,
   2026-10-08, picked over flat mint, sky, and sand after pure white
   felt too plain), with a `surface` edge and `shadows.card`, a small
