@@ -111,7 +111,8 @@ Use these. Do not restyle them per screen.
   it 96pt tall
 - `components/FormMessage.tsx` — `error` is red, `info` is `accent-soft`
 - `components/AuthScreenLayout.tsx` — canvas, safe area, keyboard
-  handling, and above the title a brand row and then the install hint.
+  handling, and above the title a brand row. It also mounts the install
+  hint sheet.
   The brand row says what the app is to someone who opens the link
   cold: the app icon at 40pt with 10pt corners, "AI Trip Planner" in
   15px semibold `ink`, and one 13px `subtle` line under it
@@ -119,13 +120,15 @@ Use these. Do not restyle them per screen.
   the sky-to-peach wash, the icon, and the headline in Outfit. It is
   drawn outside the app, so the wash is allowed there
 - `components/InstallHint.tsx` — how to put the web app on the home
-  screen, on Sign In and Sign Up only. A `surface` block with
-  `rounded-2xl` and `shadows.soft`: a semibold `ink` title, a `subtle`
-  line, a `muted` close cross with a 44pt target, then two numbered
-  steps, each a Lucide icon in a 36pt `canvas` circle beside a medium
-  `ink` label. On Android a `secondary` "Install app" button sits under
-  the steps when the browser offers its prompt. Nothing in it is
-  `accent`, so Sign in stays the one filled button
+  screen, on Sign In and Sign Up only. A sheet at the bottom over an
+  `ink` scrim (user request, 2026-10-10, replacing a static block above
+  the title): `surface` with `rounded-card` top corners, a `line` grab
+  handle, the app icon at 56pt, a centred card-title headline, a
+  `subtle` line, a divider, then three numbered steps, each a medium
+  `ink` label with a Lucide icon in a 36pt `canvas` circle on the
+  right. A full-width `primary` "Got it" closes it for good, and so
+  does a tap on the scrim. On Android a `secondary` "Install app"
+  button sits under it when the browser offers its prompt
 - `components/Text.tsx` — every string. Sets the Outfit family
 - `components/Screen.tsx` — a tab screen: canvas, top safe area, screen
   title, capped width, bottom padding for the tab bar. It does not

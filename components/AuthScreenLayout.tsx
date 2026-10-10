@@ -52,7 +52,6 @@ export function AuthScreenLayout({ title, subtitle, children }: AuthScreenLayout
                     </Text>
                   </View>
                 </View>
-                <InstallHint />
                 <Text className="ml-1 text-[32px] font-bold leading-tight tracking-tight text-ink">
                   {title}
                 </Text>
@@ -66,6 +65,7 @@ export function AuthScreenLayout({ title, subtitle, children }: AuthScreenLayout
           </ScrollView>
         </KeyboardAvoidingView>
       </SafeAreaView>
+      <InstallHint />
     </View>
   );
 }
