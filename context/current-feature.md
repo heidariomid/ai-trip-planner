@@ -82,3 +82,5 @@
   a hotel card to Google Maps
 - feat: count page views on the website with Vercel Web Analytics and
   say so in the privacy policy
+- feat: measure page speed on the website with Vercel Speed Insights and
+  say so in the privacy policy

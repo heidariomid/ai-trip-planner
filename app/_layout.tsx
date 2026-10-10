@@ -15,6 +15,7 @@ import { ActivityIndicator, View } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
 import { WebAnalytics } from "../components/WebAnalytics";
+import { WebSpeedInsights } from "../components/WebSpeedInsights";
 import { AuthProvider, useAuth } from "../hooks/useAuth";
 import { colors } from "../lib/theme";
 
@@ -46,6 +47,7 @@ export default function RootLayout() {
       <AuthProvider>
         <RootNavigator />
         <WebAnalytics />
+        <WebSpeedInsights />
         <StatusBar style="dark" />
       </AuthProvider>
     </SafeAreaProvider>
