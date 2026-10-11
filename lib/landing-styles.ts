@@ -13,6 +13,22 @@ const INK = "26, 28, 61";
 const EASE = "cubic-bezier(0.2, 0.7, 0.2, 1)";
 
 const CSS = `
+/* While the landing page is drawn the document scrolls, not a view inside a
+   fixed-height root, so a phone browser hides its bars and the page runs edge
+   to edge behind them. */
+html.lp-document { height: auto; overflow-x: hidden; }
+html.lp-document body { height: auto; overflow: visible; }
+html.lp-document #root { display: none; }
+.lp-backdrop {
+  position: fixed !important;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 100vh;
+  height: 100lvh;
+  pointer-events: none;
+}
+.lp-pinned { position: fixed !important; }
 .lp-mesh {
   background:
     radial-gradient(55% 45% at 8% 4%, ${colors["sky-soft"]} 0%, transparent 70%),

@@ -1,7 +1,9 @@
+import { useIsFocused } from "expo-router";
 import { useRef } from "react";
-import { ScrollView, View } from "react-native";
+import { View } from "react-native";
 
 import { ensureLandingStyles } from "../../lib/landing-styles";
+import { DocumentScroll } from "./DocumentScroll";
 import { LandingDestinations } from "./LandingDestinations";
 import { LandingFeatures } from "./LandingFeatures";
 import { LandingFooter } from "./LandingFooter";
@@ -18,6 +20,7 @@ ensureLandingStyles();
  * the way in. It only exists on the web.
  */
 export function LandingPage() {
+  const isFocused = useIsFocused();
   const sections = useRef<Partial<Record<LandingSection, View | null>>>({});
 
   function remember(section: LandingSection) {
@@ -32,9 +35,14 @@ export function LandingPage() {
     element?.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
+  // The stack keeps this screen mounted under Sign In, and the page owns the
+  // document's scrolling while it is drawn.
+  if (!isFocused) return null;
+
   return (
-    <View className="lp-mesh flex-1">
-      <ScrollView showsVerticalScrollIndicator={false}>
+    <DocumentScroll>
+      <View className="lp-backdrop lp-mesh" />
+      <View>
         <LandingHero />
         <View ref={remember("features")} className="lp-anchor">
           <LandingFeatures />
@@ -47,8 +55,8 @@ export function LandingPage() {
           <LandingStack />
         </View>
         <LandingFooter />
-      </ScrollView>
+      </View>
       <LandingNav onJump={jumpTo} />
-    </View>
+    </DocumentScroll>
   );
 }

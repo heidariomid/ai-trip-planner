@@ -21,7 +21,7 @@ export function LandingNav({ onJump }: LandingNavProps) {
   return (
     <View
       style={{ pointerEvents: "box-none" }}
-      className="absolute left-0 right-0 top-0 z-10 items-center px-3 pt-3 lg:px-8 lg:pt-5"
+      className="lp-pinned left-0 right-0 top-0 z-10 items-center px-3 pt-3 lg:px-8 lg:pt-5"
     >
       <View className="lp-glass h-[60px] w-full max-w-[1116px] flex-row items-center rounded-full pl-3 pr-2">
         <Image

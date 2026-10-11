@@ -26,7 +26,7 @@ costs money.
   migration: `producthunt`, `hackernews`, `reddit-reactnative`,
   `reddit-expo`, `reddit-supabase`, `reddit-sideproject`,
   `discord-expo`, `discord-supabase`, `linkedin`, `devto`, `x`,
-  `peerlist`, `indiehackers`, `github`, and `resume`. Anything else,
+  `peerlist`, `indiehackers`, `startupmap`, `github`, and `resume`. Anything else,
   and a visit with no `ref`, counts as `direct`
 - A tag is used and not the browser's referrer, because apps such as
   LinkedIn, Reddit, and Discord open links in a way that often sends no
@@ -97,6 +97,11 @@ costs money.
   sign-in from a home screen icon, the model that leaves junk after its
   JSON, and row-level security checked as three users. The user picks
   one
+- **StartupMap** (`startupmap.lol`, recommended by the user's teacher,
+  2026-10-11) is a free listing that signs in with X and needs a city
+  for its pin. The pin is "Tehran, Iran" (user's
+  choice, 2026-10-11): a city, never a home address. Its paid points, its
+  badge for the landing page, and its link for the X bio are not used
 - Each community's own rules on self-promotion are read before its post
   is written, and a channel that forbids it is dropped from the list
   with a line saying so
@@ -104,7 +109,8 @@ costs money.
 ### Before the public channels
 
 - Channels go out in order, smallest first, so a problem is found by
-  ten people and not by a thousand: the user's own circle and LinkedIn,
+  ten people and not by a thousand: the user's own circle, LinkedIn, and
+  the small directories (Peerlist, Indie Hackers, StartupMap),
   then the Discord showcases and Reddit, then the article, then Show HN,
   and **Product Hunt last**
 - Before Reddit and after: the user has opened every screen on a phone
