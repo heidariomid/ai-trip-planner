@@ -1,8 +1,9 @@
 import { useIsFocused } from "expo-router";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { View } from "react-native";
 
 import { ensureLandingStyles } from "../../lib/landing-styles";
+import { captureTrafficVisit } from "../../lib/traffic";
 import { DocumentScroll } from "./DocumentScroll";
 import { LandingDestinations } from "./LandingDestinations";
 import { LandingFeatures } from "./LandingFeatures";
@@ -23,6 +24,11 @@ export function LandingPage() {
   const isFocused = useIsFocused();
   const sections = useRef<Partial<Record<LandingSection, View | null>>>({});
 
+  useEffect(() => {
+    if (!isFocused) return;
+    captureTrafficVisit();
+  }, [isFocused]);
+
   function remember(section: LandingSection) {
     return (view: View | null) => {
       sections.current[section] = view;
@@ -41,8 +47,7 @@ export function LandingPage() {
 
   return (
     <DocumentScroll>
-      <View className="lp-backdrop lp-mesh" />
-      <View>
+      <View className="lp-mesh">
         <LandingHero />
         <View ref={remember("features")} className="lp-anchor">
           <LandingFeatures />

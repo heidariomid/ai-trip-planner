@@ -88,3 +88,4 @@
   scrolling, and draw Sign out in red in the account menu and on Profile
 - fix: scroll the document on the landing page so a phone browser hides
   its bars and the page runs edge to edge
+- feat: count visits and sign-ups from each shared link and draft the launch posts

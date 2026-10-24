@@ -6,8 +6,9 @@
 
 **Tell it where you're going. Get a day-by-day trip you can edit, share, and take with you.**
 
-One Expo codebase that runs as an installable web app and in Expo Go,
-backed by Supabase, with an AI assistant that proposes and a traveller who decides.
+[Live app](https://plan-trip-ai.vercel.app/?ref=github) · [Source](https://github.com/heidariomid/ai-trip-planner)
+
+<img src="docs/launch/images/hero.png" width="960" alt="The AI Trip Planner landing page, with a phone showing a generated trip" />
 
 ![Expo SDK 57](https://img.shields.io/badge/Expo-SDK%2057-000020?logo=expo&logoColor=white)
 ![React Native 0.86](https://img.shields.io/badge/React%20Native-0.86-61DAFB?logo=react&logoColor=black)
@@ -17,12 +18,21 @@ backed by Supabase, with an AI assistant that proposes and a traveller who decid
 
 </div>
 
+One Expo codebase, deployed as a website you can add to a phone's home screen.
+Supabase holds the trips. An assistant proposes a plan, and a tap is what saves it.
+
+| Layer | Choice |
+| --- | --- |
+| App | Expo SDK 57, React Native 0.86, Expo Router, TypeScript strict |
+| UI | Tailwind through NativeWind, Outfit, one theme file |
+| Data | Supabase Postgres, Auth, Storage, and Row Level Security |
+| AI | Google Gemini for the chat, FLUX on Cloudflare Workers AI for covers |
+
 ---
 
 ## Contents
 
 - [What it does](#what-it-does)
-- [Tech stack](#tech-stack)
 - [Getting started](#getting-started)
 - [Project structure](#project-structure)
 - [Status and limits](#status-and-limits)
@@ -46,20 +56,7 @@ backed by Supabase, with an AI assistant that proposes and a traveller who decid
 
 Persian text is supported throughout: it is drawn in its own font and reads right to left, inside an otherwise left-to-right interface.
 
-## Tech stack
-
-| Layer | Choice |
-| --- | --- |
-| Framework | Expo SDK 57, React Native 0.86, React 19 |
-| Language | TypeScript, strict mode |
-| Navigation | Expo Router (file-based, typed routes) |
-| Styling | Tailwind through NativeWind 4, with one theme file as the source for every colour |
-| Backend | Supabase: Postgres, Auth, Storage, Edge Functions (Deno) |
-| Auth | Email and password, and Google through the browser flow so it runs in Expo Go |
-| Icons and type | Lucide icons, Outfit for Latin text |
-| AI | Google Gemini for the chat, FLUX.2 klein on Cloudflare Workers AI for covers, Wikipedia for place photos |
-
-Every model call goes through a Supabase Edge Function, so model keys never reach the app. The model only proposes; the app saves after a tap.
+Every model call goes through a Supabase Edge Function, so model keys never reach the app. The model only proposes; the app saves after a tap. Place photos come from Wikipedia. Auth is email and password, plus Google through the browser so it runs in Expo Go.
 
 ## Getting started
 
@@ -93,7 +90,7 @@ Only `EXPO_PUBLIC_*` values reach the bundle. Never put a secret key in this fil
 
 ### 3. Set up the database
 
-Run the files in [`supabase/migrations/`](supabase/migrations/) in order, from `0001` to `0020`, in the Supabase SQL editor or with the Supabase CLI. They create every table, policy, function, and Storage bucket.
+Run the files in [`supabase/migrations/`](supabase/migrations/) in order, from `0001` to `0022`, in the Supabase SQL editor or with the Supabase CLI. They create every table, policy, function, and Storage bucket.
 
 ### 4. Deploy the Edge Functions
 
@@ -142,7 +139,7 @@ docs/              Design reviews written before and after each feature
 
 ## Status and limits
 
-- Specs 1 to 16 are built. The public web release is in progress, and password reset by email comes after it.
+- Specs 1 to 17 are built. The site is live at [plan-trip-ai.vercel.app](https://plan-trip-ai.vercel.app/?ref=github). Password reset by email is not built yet.
 - Email confirmation is off, so an account can be made with an unverified address and a forgotten password cannot be recovered yet.
 - The AI runs on free tiers. The allowance is shared by everyone, and on the free Gemini tier Google may use prompts to improve its products.
 - There is no offline mode, no push notifications, and no App Store or Google Play build.

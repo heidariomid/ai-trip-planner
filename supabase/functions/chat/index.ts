@@ -24,7 +24,7 @@ const MAX_OUTPUT_TOKENS = 4096;
 
 const OVER_LIMIT = `You have reached today's limit of ${DAILY_LIMIT} messages. Try again tomorrow.`;
 const NOT_SET_UP = "The assistant is not set up yet.";
-const BUSY = "The assistant is busy right now. Try again in a minute.";
+const SHARED_LIMIT = "The free daily limit for everyone was reached. Back tomorrow.";
 const NOTHING_TO_REDO = "There is no reply to regenerate.";
 const NO_ANSWER = "The assistant could not answer that. Try asking another way.";
 const FAILED = "The assistant could not answer. Please try again.";
@@ -623,7 +623,7 @@ Deno.serve(async (request: Request) => {
   if (!modelResponse.ok || !modelResponse.body) {
     // The provider's own words are logged for us and never shown.
     console.error("[chat] model answered", modelResponse.status, await modelResponse.text());
-    const error = modelResponse.status === 429 ? BUSY : FAILED;
+    const error = modelResponse.status === 429 ? SHARED_LIMIT : FAILED;
     return json(502, { error, thread_id: thread.id });
   }
 

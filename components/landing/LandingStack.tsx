@@ -35,7 +35,7 @@ const STACK = [
 
 const NUMBERS = [
   { value: "17", label: "features shipped, spec by spec" },
-  { value: "21", label: "database migrations" },
+  { value: "22", label: "database migrations" },
   { value: "4", label: "Edge Functions" },
   { value: "0", label: "secrets in the bundle" },
 ] as const;

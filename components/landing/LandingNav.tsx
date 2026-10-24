@@ -46,6 +46,12 @@ export function LandingNav({ onJump }: LandingNavProps) {
 
         <View className="flex-1" />
 
+        <View className="mr-3 lg:hidden">
+          <Link href={GITHUB_URL} target="_blank" accessibilityLabel="GitHub">
+            <Text className="text-[14px] font-medium text-subtle">GitHub</Text>
+          </Link>
+        </View>
+
         <View className="mr-4 hidden sm:flex">
           <Link href="/sign-in">
             <Text className="lp-link text-[15px] font-medium text-subtle">Sign in</Text>

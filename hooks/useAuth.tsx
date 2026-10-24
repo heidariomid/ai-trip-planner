@@ -12,6 +12,7 @@ import { Platform } from "react-native";
 
 import { createSessionFromUrl } from "../lib/auth";
 import { supabase } from "../lib/supabase";
+import { noteFirstGoogleSignIn } from "../lib/traffic";
 
 interface AuthContextValue {
   session: Session | null;
@@ -48,9 +49,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, nextSession) => {
+    } = supabase.auth.onAuthStateChange((event, nextSession) => {
       setSession(nextSession);
       setIsRestoring(false);
+      // Deferred so this does not call the API while the auth lock is held.
+      if (event === "SIGNED_IN") {
+        const user = nextSession?.user ?? null;
+        setTimeout(() => noteFirstGoogleSignIn(user), 0);
+      }
     });
 
     return () => {

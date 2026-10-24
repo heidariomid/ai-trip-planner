@@ -585,6 +585,27 @@ export type Database = {
         }
         Relationships: []
       }
+      traffic_daily: {
+        Row: {
+          day: string
+          sign_ups: number
+          source: string
+          visits: number
+        }
+        Insert: {
+          day: string
+          sign_ups?: number
+          source: string
+          visits?: number
+        }
+        Update: {
+          day?: string
+          sign_ups?: number
+          source?: string
+          visits?: number
+        }
+        Relationships: []
+      }
       trip_join_codes: {
         Row: {
           code: string
@@ -818,6 +839,18 @@ export type Database = {
       ping: {
         Args: never
         Returns: string
+      }
+      record_sign_up: {
+        Args: {
+          p_source: string
+        }
+        Returns: undefined
+      }
+      record_visit: {
+        Args: {
+          p_source: string
+        }
+        Returns: undefined
       }
       replace_day_activities: {
         Args: {

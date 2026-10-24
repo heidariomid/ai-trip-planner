@@ -33,8 +33,9 @@ from Home and from a trip.
 ## Current state
 
 Specs 1 through 17 are done, and the site is live at
-`https://plan-trip-ai.vercel.app`. Spec 18 and spec 19 are written and
-not built.
+`https://plan-trip-ai.vercel.app`. Spec 18 is written and not built.
+Spec 19's counting and draft posts are on `main`. Migration `0022` was
+applied by the user on 2026-10-24. No channel has been published.
 
 - Expo Router, email and Google sign-in, and a `profiles` row on first
   sign-up. Verified on Expo Go and web

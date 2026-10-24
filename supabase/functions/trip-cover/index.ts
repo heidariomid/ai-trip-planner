@@ -24,6 +24,8 @@ const MAX_DESCRIPTION_LENGTH = 200;
 
 const NOT_SET_UP = "Cover generation is not set up yet.";
 const OVER_LIMIT = "You've used today's covers. Try again tomorrow, or choose a photo.";
+const SHARED_LIMIT =
+  "The free daily limit for everyone was reached. Back tomorrow, or choose a photo.";
 const FAILED = "We couldn't create a cover this time. Try again, or choose a photo.";
 
 const CORS = {
@@ -136,8 +138,11 @@ Deno.serve(async (request: Request) => {
 
     if (!answer.ok) {
       // A blocked prompt and a spent daily allowance both land here.
-      console.error("[trip-cover] model answered", answer.status, (await answer.text()).slice(0, 500));
-      return json(502, { error: FAILED, remaining });
+      const detail = (await answer.text()).slice(0, 500);
+      console.error("[trip-cover] model answered", answer.status, detail);
+      const sharedLimit =
+        answer.status === 429 || /quota|neuron|allowance|billing/i.test(detail);
+      return json(502, { error: sharedLimit ? SHARED_LIMIT : FAILED, remaining });
     }
 
     const image: unknown = (await answer.json())?.result?.image;

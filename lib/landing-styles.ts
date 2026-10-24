@@ -19,22 +19,20 @@ const CSS = `
 html.lp-document { height: auto; overflow-x: hidden; }
 html.lp-document body { height: auto; overflow: visible; }
 html.lp-document #root { display: none; }
-.lp-backdrop {
-  position: fixed !important;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 100vh;
-  height: 100lvh;
-  pointer-events: none;
-}
 .lp-pinned { position: fixed !important; }
+/* The mesh scrolls with the page as a repeating tile. A fixed layer with a
+   colour makes iOS Safari paint its status bar and toolbar strips solid, and
+   the page then stops short of the screen's edges. Every glow fades out inside
+   its tile, so the repeat has no seam. */
 .lp-mesh {
-  background:
-    radial-gradient(55% 45% at 8% 4%, ${colors["sky-soft"]} 0%, transparent 70%),
-    radial-gradient(50% 42% at 96% 10%, ${colors["peach-soft"]} 0%, transparent 70%),
-    radial-gradient(40% 36% at 55% 70%, ${colors["accent-soft"]} 0%, transparent 72%),
-    ${colors.canvas};
+  background-color: ${colors.canvas};
+  background-image:
+    radial-gradient(55% 30% at 8% 22%, ${colors["sky-soft"]} 0%, transparent 70%),
+    radial-gradient(50% 28% at 96% 26%, ${colors["peach-soft"]} 0%, transparent 70%),
+    radial-gradient(40% 36% at 55% 72%, ${colors["accent-soft"]} 0%, transparent 72%);
+  background-size: 100% 1500px;
+  background-position: 0 -300px;
+  background-repeat: repeat-y;
 }
 .lp-wash {
   background: linear-gradient(135deg, ${colors["sky-soft"]} 0%, ${colors.surface} 48%, ${colors["peach-soft"]} 100%);

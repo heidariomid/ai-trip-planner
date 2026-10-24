@@ -5,6 +5,7 @@ import { Platform } from "react-native";
 
 import { toReadableAuthError } from "./auth-errors";
 import { supabase } from "./supabase";
+import { recordSignUp } from "./traffic";
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -49,6 +50,9 @@ export async function signUpWithEmail(
       };
     }
 
+    // The session is already on the client, so this call is signed in.
+    // It does not run for an address that already has an account.
+    void recordSignUp();
     return ok;
   } catch (error) {
     return failed(error);
