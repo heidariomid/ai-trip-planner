@@ -55,7 +55,8 @@ export default function RootLayout() {
 }
 
 function RootNavigator() {
-  const { session, isRestoring } = useAuth();
+  const { session, isRestoring, isRecovering } = useAuth();
+  const signedIn = session !== null && !isRecovering;
 
   // Nothing routable renders until the stored session has been read back.
   // Mounting the navigator first is what produces a flash of the sign-in
@@ -72,10 +73,10 @@ function RootNavigator() {
 
   return (
     <Stack screenOptions={{ headerShown: false }}>
-      <Stack.Protected guard={session !== null}>
+      <Stack.Protected guard={signedIn}>
         <Stack.Screen name="(app)" />
       </Stack.Protected>
-      <Stack.Protected guard={session === null}>
+      <Stack.Protected guard={!signedIn}>
         <Stack.Screen name="(auth)" />
       </Stack.Protected>
     </Stack>

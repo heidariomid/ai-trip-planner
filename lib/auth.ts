@@ -1,3 +1,4 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { makeRedirectUri } from "expo-auth-session";
 import * as QueryParams from "expo-auth-session/build/QueryParams";
 import * as WebBrowser from "expo-web-browser";
@@ -15,9 +16,51 @@ export interface AuthResult {
   error: string | null;
   /** Set when the call worked but the traveller still has something to do. */
   notice?: string;
+  /**
+   * The reset code was accepted, so a session exists, but the new password
+   * was not saved. Home stays closed until a later save succeeds.
+   */
+  recoveryPending?: boolean;
 }
 
 const ok: AuthResult = { success: true, error: null };
+
+const RESET_NOTICE = "If an account exists for that email, we sent a 6-digit code.";
+
+// Set before verifyOtp returns. verifyOtp creates a session at once, and the
+// route guard has to stay on the reset screen until the new password is saved.
+const RECOVERY_HOLD_KEY = "password-recovery-hold";
+let passwordRecoveryOpen = false;
+
+export function isPasswordRecoveryOpen(): boolean {
+  return passwordRecoveryOpen;
+}
+
+export async function readPasswordRecoveryHold(): Promise<boolean> {
+  try {
+    return (await AsyncStorage.getItem(RECOVERY_HOLD_KEY)) === "1";
+  } catch {
+    return passwordRecoveryOpen;
+  }
+}
+
+export async function openPasswordRecovery(): Promise<void> {
+  passwordRecoveryOpen = true;
+  try {
+    await AsyncStorage.setItem(RECOVERY_HOLD_KEY, "1");
+  } catch {
+    // The in-memory flag still covers this visit.
+  }
+}
+
+export async function closePasswordRecovery(): Promise<void> {
+  passwordRecoveryOpen = false;
+  try {
+    await AsyncStorage.removeItem(RECOVERY_HOLD_KEY);
+  } catch {
+    // The in-memory flag is already clear.
+  }
+}
 
 function failed(error: unknown): AuthResult {
   return { success: false, error: toReadableAuthError(error) };
@@ -38,15 +81,13 @@ export async function signUpWithEmail(
     });
     if (error) return failed(error);
 
-    // This phase expects "Confirm email" to be off, so sign-up hands back a
-    // session and the route guard moves on. If the setting is on, there is no
-    // session and nothing would appear to happen — say so instead.
+    // With confirmation on there is no session yet, so Home must not open.
+    // The route guard only moves on when a session exists.
     if (!data.session) {
       return {
         success: true,
         error: null,
-        notice:
-          "Account created. Check your email for a confirmation link, then sign in.",
+        notice: "Account created. Check your email, then sign in.",
       };
     }
 
@@ -56,6 +97,60 @@ export async function signUpWithEmail(
     return ok;
   } catch (error) {
     return failed(error);
+  }
+}
+
+export async function requestPasswordReset(email: string): Promise<AuthResult> {
+  try {
+    const { error } = await supabase.auth.resetPasswordForEmail(email);
+    // The same sentence either way, so the screen does not reveal whether
+    // the address has an account.
+    if (error && error.code !== "user_not_found") return failed(error);
+    return { success: true, error: null, notice: RESET_NOTICE };
+  } catch (error) {
+    return failed(error);
+  }
+}
+
+/**
+ * Accepts the reset code, then saves the new password. The code check creates
+ * a session immediately. On a password failure the hold stays open so Home
+ * does not show, and the caller can save again without a new code.
+ */
+export async function resetPassword(
+  email: string,
+  code: string,
+  password: string,
+): Promise<AuthResult> {
+  try {
+    await openPasswordRecovery();
+    const { error } = await supabase.auth.verifyOtp({
+      email,
+      token: code.trim(),
+      type: "recovery",
+    });
+    if (error) {
+      await closePasswordRecovery();
+      return failed(error);
+    }
+
+    const { error: updateError } = await supabase.auth.updateUser({ password });
+    if (updateError) return { ...failed(updateError), recoveryPending: true };
+    return ok;
+  } catch (error) {
+    await closePasswordRecovery();
+    return failed(error);
+  }
+}
+
+/** Saves a new password after the reset code was already accepted. */
+export async function updatePassword(password: string): Promise<AuthResult> {
+  try {
+    const { error } = await supabase.auth.updateUser({ password });
+    if (error) return { ...failed(error), recoveryPending: true };
+    return ok;
+  } catch (error) {
+    return { ...failed(error), recoveryPending: true };
   }
 }
 

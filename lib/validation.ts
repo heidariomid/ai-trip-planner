@@ -14,6 +14,13 @@ export interface SignInFields {
   password: string;
 }
 
+export interface ResetPasswordFields {
+  email: string;
+  code: string;
+  password: string;
+  confirmPassword: string;
+}
+
 /**
  * Client validation is UX only — it keeps obvious mistakes off the network.
  * The database and Supabase Auth remain the real boundary.
@@ -25,6 +32,34 @@ export function validateSignIn(fields: SignInFields): Partial<Record<keyof SignI
   else if (!EMAIL_PATTERN.test(fields.email.trim())) errors.email = "That doesn't look like an email address.";
 
   if (!fields.password) errors.password = "Enter your password.";
+
+  return errors;
+}
+
+export function validateEmail(email: string): string | null {
+  if (!email.trim()) return "Enter your email address.";
+  if (!EMAIL_PATTERN.test(email.trim())) return "That doesn't look like an email address.";
+  return null;
+}
+
+export function validateResetPassword(
+  fields: ResetPasswordFields,
+): Partial<Record<keyof ResetPasswordFields, string>> {
+  const errors: Partial<Record<keyof ResetPasswordFields, string>> = {};
+
+  const emailError = validateEmail(fields.email);
+  if (emailError) errors.email = emailError;
+
+  if (!/^\d{6}$/.test(fields.code.trim())) errors.code = "Enter the 6-digit code.";
+
+  if (!fields.password) errors.password = "Choose a password.";
+  else if (fields.password.length < MIN_PASSWORD_LENGTH) {
+    errors.password = `Use at least ${MIN_PASSWORD_LENGTH} characters.`;
+  }
+
+  if (fields.password !== fields.confirmPassword) {
+    errors.confirmPassword = "Both passwords need to match.";
+  }
 
   return errors;
 }

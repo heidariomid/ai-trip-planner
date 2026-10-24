@@ -33,7 +33,7 @@ from Home and from a trip.
 ## Current state
 
 Specs 1 through 17 are done, and the site is live at
-`https://plan-trip-ai.vercel.app`. Spec 18 is written and not built.
+`https://plan-trip-ai.vercel.app`. Spec 18 is on `main`. SMTP, the reset template, and Confirm email were set by the user on 2026-10-24. A real reset code has not been tried.
 Spec 19's counting and draft posts are on `main`. Migration `0022` was
 applied by the user on 2026-10-24. No channel has been published.
 
@@ -374,7 +374,7 @@ and when it is done.
 17. @context/features/spec17-release.md — the web app on a public address.
     Done
 18. @context/features/spec18-password-reset-and-email.md — password reset
-    by code, Resend, email confirmation on. Not scheduled
+    by code, Resend, email confirmation on. Done. A real code has not been tried
 19. @context/features/spec19-launch-and-traffic.md — share the site on
     every channel, Product Hunt last, and count visits and sign-ups per
     channel. Not started

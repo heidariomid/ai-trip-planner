@@ -89,3 +89,4 @@
 - fix: scroll the document on the landing page so a phone browser hides
   its bars and the page runs edge to edge
 - feat: count visits and sign-ups from each shared link and draft the launch posts
+- feat: let a traveller reset a password with a 6-digit code

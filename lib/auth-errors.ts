@@ -6,6 +6,8 @@ const MESSAGES: Record<string, string> = {
   user_already_exists: "An account with that email already exists. Sign in instead.",
   email_exists: "An account with that email already exists. Sign in instead.",
   weak_password: "That password is too weak. Use at least 6 characters.",
+  same_password: "That is already your password. Choose a different one.",
+  otp_expired: "That code is wrong or expired. Request a new one.",
   over_request_rate_limit: "Too many attempts. Wait a minute and try again.",
   over_email_send_rate_limit: "Too many attempts. Wait a minute and try again.",
   validation_failed: "Check the details you entered and try again.",

@@ -78,6 +78,12 @@ export default function SignInScreen() {
         returnKeyType="go"
       />
 
+      <View className="mb-2 items-center">
+        <Link href="/reset-password">
+          <Text className="py-2 text-[14px] font-semibold text-accent">Forgot password?</Text>
+        </Link>
+      </View>
+
       <View className="mt-1.5">
         <Button
           label="Sign in"

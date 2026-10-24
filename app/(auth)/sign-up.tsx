@@ -23,8 +23,8 @@ export default function SignUpScreen() {
   const [notice, setNotice] = useState<string | null>(null);
   const [pending, setPending] = useState<"email" | "google" | null>(null);
 
-  // Email confirmation is off for this phase, so a successful sign-up returns a
-  // session straight away and the route guard moves us to home.
+  // With confirmation on, sign-up has no session and this screen stays here
+  // with the notice. With it off, the session opens Home.
   async function handleEmailSignUp() {
     const errors = validateSignUp({ fullName, email, password, confirmPassword });
     setFieldErrors(errors);

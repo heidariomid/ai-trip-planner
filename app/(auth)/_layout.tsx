@@ -1,13 +1,23 @@
-import { Stack } from "expo-router";
+import { Redirect, Stack, usePathname } from "expo-router";
 
-// The root layout removes this whole group once there is a session, so these
-// screens cannot be reached while signed in.
+import { useAuth } from "../../hooks/useAuth";
+
+// The root layout keeps this group up while signed out, and also while a
+// reset code has been accepted but the new password is not saved yet.
 export default function AuthLayout() {
+  const { isRecovering } = useAuth();
+  const pathname = usePathname();
+  const finishingReset = isRecovering && pathname !== "/reset-password";
+
   return (
-    <Stack screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="index" />
-      <Stack.Screen name="sign-in" />
-      <Stack.Screen name="sign-up" />
-    </Stack>
+    <>
+      {finishingReset ? <Redirect href="/reset-password" /> : null}
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="index" />
+        <Stack.Screen name="sign-in" />
+        <Stack.Screen name="sign-up" />
+        <Stack.Screen name="reset-password" />
+      </Stack>
+    </>
   );
 }
